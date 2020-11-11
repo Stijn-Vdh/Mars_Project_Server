@@ -47,3 +47,38 @@ paths:
           description: Authorization information is missing or invalid.
         '5XX':
           description: Unexpected error.
+  /api/endpoints/{id}:
+    summary: get endpoint information
+    description: get endpoint information from ID
+    get:
+      tags:
+        - endpoint
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: give the id of the endpoint
+      responses:
+        '200':
+          description: list of an endpoint given their id
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
+                  available:
+                    type: boolean
+                  location:
+                    type: string
+                  privateEndpoint:
+                    type: boolean
+        '401':
+          description: Authorization information is missing or invalid.
+        '5XX':
+          description: Unexpected error.
