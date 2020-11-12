@@ -311,6 +311,39 @@ paths:
 
       security:
         - bearerAuth: [ ]
+  /api/subscriptionInfo/{id}:
+    description: collect statistics about your business
+    get:
+      summary: Collect statistics about your business.
+      tags:
+        - business
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: give the id of your business
+      responses:
+        '200':
+          description: Succesfully collect all the data.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  businessID:
+                    type: integer
+                  name:
+                    type: string
+                  subscription:
+                    type: string
+                  remainingSmallPods:
+                    type: integer
+                  remainingLargePods:
+                    type: integer
+      security:
+        - bearerAuth: [ ]
 
   /api/endpoints: #View all endpoints
     summary: get all endpoints
