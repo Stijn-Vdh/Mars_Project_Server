@@ -3,6 +3,8 @@ package be.howest.ti.mars.logic.controller;
 import be.howest.ti.mars.logic.controller.exceptions.AuthenticationException;
 import be.howest.ti.mars.logic.controller.exceptions.UsernameException;
 import be.howest.ti.mars.logic.controller.security.UserToken;
+import io.vertx.core.json.Json;
+import io.vertx.core.json.JsonObject;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -33,5 +35,10 @@ public class MarsController {
             account.setUserToken(new UserToken()); // sets a new token, invalidates previous set token
             return account.getUserToken().getToken();
         }
+    }
+
+    public boolean verifyAccountToken(String token) {
+        UserToken userToken = Json.decodeValue(new JsonObject().put("token", token).toString(), UserToken.class);
+        return accounts.stream().anyMatch(acc -> userToken.equals(acc.getUserToken()));
     }
 }

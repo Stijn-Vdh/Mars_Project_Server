@@ -35,4 +35,8 @@ class MarsOpenApiBridge {
         JsonObject json = ctx.getBodyAsJson();
         return  controller.login(json.getString("name"), json.getString("password"));
     }
+
+    public boolean verifyAccountToken(String token){
+        return controller.verifyAccountToken(token);
+    }
 }
