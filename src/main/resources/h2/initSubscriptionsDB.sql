@@ -1,4 +1,4 @@
-INSERT INTO subscriptions (subscriptionID, name) VALUES (1, 'Martian Transport');
+INSERT INTO subscriptions (name) VALUES ('Martian Transport');
 INSERT INTO subscriptions (name) VALUES ('Package Transport');
 INSERT INTO subscriptions (name) VALUES ('Combined Transport');
 INSERT INTO subscriptions (name) VALUES ('Start-up Business');
