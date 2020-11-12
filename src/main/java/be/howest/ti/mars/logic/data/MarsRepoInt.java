@@ -1,5 +1,6 @@
 package be.howest.ti.mars.logic.data;
 
+import be.howest.ti.mars.logic.controller.Subscription;
 import be.howest.ti.mars.logic.controller.UserAccount;
 
 import java.util.Set;
@@ -36,7 +37,7 @@ public interface MarsRepoInt {
     void addDelivery(String delivery);
 
     // Subscriptions
-    Set<String> getSubscriptions();
+    Set<Subscription> getSubscriptions();
     void getSubscriptionInfo(int businessID);
     void buySubscription (UserAccount user, String subscription);
     void buySubscription (String business, String subscription);

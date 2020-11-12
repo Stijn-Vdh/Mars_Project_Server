@@ -1,10 +1,19 @@
 package be.howest.ti.mars.logic.data;
 
+import be.howest.ti.mars.logic.controller.Subscription;
 import be.howest.ti.mars.logic.controller.UserAccount;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class MarsRepository implements MarsRepoInt {
+    private static final Logger logger = Logger.getLogger(MarsRepository.class.getName());
     @Override
     public Set<String> getEndpoints() {
         return null;
@@ -101,8 +110,25 @@ public class MarsRepository implements MarsRepoInt {
     }
 
     @Override
-    public Set<String> getSubscriptions() {
-        return null;
+    public Set<Subscription> getSubscriptions() {
+        Set<Subscription> subscriptions = new HashSet<>();
+        String SQL_SELECT_ALL_SUBSCRIPTIONS = "select * from subscriptions";
+
+        try(Connection con = MarsConnection.getConnection();
+            PreparedStatement stmt = con.prepareStatement(SQL_SELECT_ALL_SUBSCRIPTIONS);
+            ResultSet rs = stmt.executeQuery()){
+
+            while(rs.next()){
+                int id = rs.getInt("subscriptionID");
+                String name = rs.getString("name");
+
+                Subscription sub = new Subscription(id, name);
+                subscriptions.add(sub);
+            }
+        }catch (SQLException ex){
+               logger.log(Level.WARNING, ex.getMessage(), ex);
+        }
+        return subscriptions;
     }
 
     @Override
