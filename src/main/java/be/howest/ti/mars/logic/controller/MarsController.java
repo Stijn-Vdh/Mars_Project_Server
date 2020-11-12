@@ -7,10 +7,7 @@ import be.howest.ti.mars.logic.data.MarsRepository;
 import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
 
-
-import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 public class MarsController {
@@ -19,6 +16,9 @@ public class MarsController {
 
     public String getMessage() {
         return "Hello, Mars!";
+    }
+    public Set<BaseAccount> getAccounts() {
+        return accounts;
     }
 
     public void createUser(String name, String password, String endpoint, String address) {
@@ -42,6 +42,9 @@ public class MarsController {
         }
     }
 
+    public void logout(BaseAccount account) {
+        account.setUserToken(null);
+    }
 
     public Set<Subscription> getSubscriptions() {
         return repo.getSubscriptions();
@@ -51,4 +54,6 @@ public class MarsController {
         UserToken userToken = Json.decodeValue(new JsonObject().put("token", token).toString(), UserToken.class);
         return accounts.stream().anyMatch(acc -> userToken.equals(acc.getUserToken()));
     }
+
+
 }

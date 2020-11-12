@@ -1,6 +1,10 @@
 package be.howest.ti.mars.webserver;
 
+import be.howest.ti.mars.logic.controller.BaseAccount;
 import be.howest.ti.mars.logic.controller.MarsController;
+import be.howest.ti.mars.logic.controller.security.UserToken;
+import io.vertx.core.http.HttpHeaders;
+import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 
@@ -9,6 +13,7 @@ import java.util.logging.Logger;
 class MarsOpenApiBridge {
     private final MarsController controller;
     private static final Logger logger = Logger.getLogger(MarsOpenApiBridge.class.getName());
+    public static final String AUTHORIZATION_TOKEN_PREFIX = "Bearer ";
 
     MarsOpenApiBridge() {
         this.controller = new MarsController();
@@ -36,6 +41,10 @@ class MarsOpenApiBridge {
         return  controller.login(json.getString("name"), json.getString("password"));
     }
 
+    public  Object logout(RoutingContext ctx){
+        controller.logout(getAccount(ctx));
+        return null;
+    }
 
     public Object viewSubscriptions(RoutingContext ctx){
         return controller.getSubscriptions();
@@ -43,5 +52,22 @@ class MarsOpenApiBridge {
     public boolean verifyAccountToken(String token){
         return controller.verifyAccountToken(token);
 
+    }
+
+    private BaseAccount getAccount(RoutingContext ctx) {
+        UserToken userToken = Json.decodeValue(new JsonObject().put("token", getBearerToken(ctx)).toString(), UserToken.class);
+        return controller.getAccounts().stream()
+                .filter(acc -> userToken.equals(acc.getUserToken()))
+                .findAny()
+                .orElse(null);
+    }
+
+    private String getBearerToken(RoutingContext ctx) {
+        String header = ctx.request().getHeader(HttpHeaders.AUTHORIZATION);
+        if (header == null || !header.startsWith(AUTHORIZATION_TOKEN_PREFIX)) {
+            return null;
+        } else {
+            return header.substring(AUTHORIZATION_TOKEN_PREFIX.length());
+        }
     }
 }
