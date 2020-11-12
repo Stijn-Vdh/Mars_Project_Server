@@ -1,6 +1,7 @@
 package be.howest.ti.mars.webserver;
 
-import be.howest.ti.mars.logic.controller.exceptions.UsernameIsTakenException;
+import be.howest.ti.mars.logic.controller.exceptions.AuthenticationException;
+import be.howest.ti.mars.logic.controller.exceptions.UsernameException;
 import be.howest.ti.mars.logic.data.MarsConnection;
 import io.vertx.config.ConfigRetriever;
 import io.vertx.core.AbstractVerticle;
