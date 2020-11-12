@@ -12,7 +12,7 @@ public class BaseAccount {
     private final String address; // just random info
 
     public BaseAccount(String homeAddressEndpoint, String password, String username, String address) {
-        this(new UserToken(), homeAddressEndpoint, password, username, address);
+        this(new UserToken(username), homeAddressEndpoint, password, username, address);
     }
 
     public BaseAccount(UserToken userToken, String homeAddressEndpoint, String password, String username, String address) {

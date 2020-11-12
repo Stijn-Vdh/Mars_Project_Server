@@ -37,7 +37,7 @@ public class MarsController {
         if (account == null) {   // pw and name doesnt match
             throw new AuthenticationException("Credentials does not match!");
         } else {
-            account.setUserToken(new UserToken()); // sets a new token, invalidates previous set token
+            account.setUserToken(new UserToken(name)); // sets a new token, invalidates previous set token
             return account.getUserToken().getToken();
         }
     }
