@@ -64,6 +64,7 @@ paths:
           description: Internal error.
     delete:
       summary: logout
+      operationId: logout
       tags:
         - authentication
       responses:
@@ -71,6 +72,8 @@ paths:
           description: succesfully logged out of the system
         '401':
           description: Authorization information is missing or invalid.
+        '403':
+          description: Forbidden.
         '5XX':
           description: Unexpected error.
       security:
@@ -154,6 +157,10 @@ paths:
                   subscription: "Unlimited",
                   subscriptionID: "5"
                 }
+        '401':
+          description: Authorization information is missing or invalid.
+        '403':
+          description: Forbidden!
       security:
         - bearerAuth: [ ]
   /api/user/{id}/shareLocation:
@@ -173,6 +180,8 @@ paths:
           description: Succesfuly shared your location with your friends.
         '401':
           description: Authorization information is missing or invalid.
+        '403':
+            description: Forbidden!
         '5XX':
           description: Unexpected error.
       security:
@@ -202,6 +211,10 @@ paths:
                   userID: 5,
                   name: 'Frank'
                 } ]
+        '401':
+          description: Authorization information is missing or invalid.
+        '403':
+          description: Forbidden!
       security:
         - bearerAuth: [ ]
   /api/friend/{id}: #Add a friend or delete one
@@ -239,6 +252,8 @@ paths:
             description: Succesfuly deleted a friend.
           '401':
             description: Authorization information is missing or invalid.
+          '403':
+            description: Forbidden!
           '5XX':
             description: Unexpected error.
         security:
@@ -260,6 +275,8 @@ paths:
             description: Succesfuly retrieved the location of your friend.
           '401':
             description: Authorization information is missing or invalid.
+          '403':
+            description: Forbidden!
           '5XX':
             description: Unexpected error.
           default:
@@ -268,7 +285,7 @@ paths:
           - bearerAuth: [ ]
 
   /api/subscription:
-    description: Buy a new subscription.
+    description: subscription.
     get:
       operationId: viewSubscriptions
       tags:
@@ -311,6 +328,12 @@ paths:
       responses:
         '200':
           description: Succesfuly bought a subscription
+        '401':
+          description: Authorization information is missing or invalid.
+        '403':
+          description: Forbidden!
+        '500':
+          description: Internal error.
       security:
         - bearerAuth: [ ]
     delete:
@@ -322,7 +345,9 @@ paths:
           description: Succesfully removed your current subscription.
         '401':
           description: Authorization information is missing or invalid.
-        '5XX':
+        '403':
+            description: Forbidden!
+        '500':
           description: Unexpected error.
 
       security:
@@ -358,6 +383,12 @@ paths:
                     type: integer
                   remainingLargePods:
                     type: integer
+        '401':
+          description: Authorization information is missing or invalid.
+        '403':
+          description: Forbidden!
+        '500':
+          description: Unexpected error.
       security:
         - bearerAuth: [ ]
 
@@ -396,7 +427,9 @@ paths:
           description: Succesfuly bought a ticket.
         '401':
           description: Authorization information is missing or invalid.
-        '5XX':
+        '403':
+          description: Forbidden!
+        '500':
           description: Unexpected error.
       security:
         - bearerAuth: [ ]
@@ -426,7 +459,9 @@ paths:
                 }]
         '401':
           description: Authorization information is missing or invalid.
-        '5XX':
+        '403':
+          description: Forbidden!
+        '500':
           description: Unexpected error.
   /api/endpoints/{id}: #view endpoint information
     summary: get endpoint information
@@ -461,7 +496,9 @@ paths:
                     type: boolean
         '401':
           description: Authorization information is missing or invalid.
-        '5XX':
+        '403':
+          description: Forbidden!
+        '500':
           description: Unexpected error.
 
   /api/delivery/{id}: #Get delivery information
@@ -493,7 +530,9 @@ paths:
                     type: boolean
         '401':
           description: Authorization information is missing or invalid.
-        '5XX':
+        '403':
+          description: Forbidden!
+        '500':
           description: Unexpected error.
       security:
         - bearerAuth: [ ]
@@ -528,7 +567,9 @@ paths:
                     type: integer
         '401':
           description: Authorization information is missing or invalid.
-        '5XX':
+        '403':
+          description: Forbidden!
+        '500':
           description: Unexpected error.
       security:
         - bearerAuth: [ ]
@@ -563,7 +604,9 @@ paths:
                     type: integer
         '401':
           description: Authorization information is missing or invalid.
-        '5XX':
+        '403':
+          description: Forbidden!
+        '500':
           description: Unexpected error.
       security:
         - bearerAuth: [ ]
@@ -600,7 +643,9 @@ paths:
                     type: string
         '401':
           description: Authorization information is missing or invalid.
-        '5XX':
+        '403':
+          description: Forbidden!
+        '500':
           description: Unexpected error.
 
       security:
@@ -638,8 +683,10 @@ paths:
                     type: integer
         '401':
           description: Authorization information is missing or invalid.
-        '5XX':
-          description: Unexpected error.
+        '403':
+            description: Forbidden!
+        '500':
+            description: Unexpected error.
       security:
         - bearerAuth: [ ]
 
