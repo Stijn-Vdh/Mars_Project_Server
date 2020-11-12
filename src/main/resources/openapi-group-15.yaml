@@ -20,7 +20,130 @@ paths:
             application/json:
               schema:
                 type: string
-  /api/endpoints:
+
+  /api/login: #login or logout
+    summary: login/logout
+    description: login/logout
+    post:
+      summary: login
+      tags:
+        - authentication
+      requestBody:
+        description: provide login information.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Succesfuly logged in.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  loginToken:
+                    type: string
+    delete:
+      summary: logout
+      tags:
+        - authentication
+      responses:
+        '200':
+          description: succesfully logged out of the system
+        '401':
+          description: Authorization information is missing or invalid.
+        '5XX':
+          description: Unexpected error.
+      security:
+        - bearerAuth: [ ]
+
+  /api/createUser: #create account
+    summary: create a user.
+    description: creat a new user.
+    post:
+      summary: create a user.
+      tags:
+        - user
+      requestBody:
+        description: provide correct information to create a user.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                homeAdress:
+                  type: string
+                homeEndpointID:
+                  type: integer
+                businessAcount:
+                  type: boolean
+                password:
+                  type: string
+      responses:
+        '200':
+          description: user created
+        '5XX':
+          description: Unexpected error.
+  /api/user/{id}: #get account information
+    summary: get user information
+    description: get user information
+    get:
+      summary: get user information.
+      tags:
+        - user
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: give the id of the user
+      responses:
+        '200':
+          description: list of an endpoint given their id
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  userID:
+                    type: integer
+                  name:
+                    type: string
+                  homeAdress:
+                    type: string
+                  homeEndpointID:
+                    type: integer
+                  password:
+                    type: string
+                  subscription:
+                    type: string
+                  subscriptionID:
+                    type: integer
+                example: {
+                  userID: 1,
+                  name: "Debby",
+                  homeAdress: "Colony 1, residence 15",
+                  homeEndpoint: 5,
+                  password: "DFdes6'(Dfeiqdsfv64501d*",
+                  subscription: "Unlimited",
+                  subscriptionID: "5"
+                }
+      security:
+        - bearerAuth: [ ]
+
+
+  /api/endpoints: #View all endpoints
     summary: get all endpoints
     description: Get all enpoints
     get:
@@ -47,7 +170,7 @@ paths:
           description: Authorization information is missing or invalid.
         '5XX':
           description: Unexpected error.
-  /api/endpoints/{id}:
+  /api/endpoints/{id}: #view endpoint information
     summary: get endpoint information
     description: get endpoint information from ID
     get:
