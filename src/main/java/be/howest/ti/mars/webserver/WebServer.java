@@ -1,5 +1,6 @@
 package be.howest.ti.mars.webserver;
 
+import be.howest.ti.mars.logic.controller.exceptions.UsernameIsTakenException;
 import be.howest.ti.mars.logic.data.MarsRepository;
 import io.vertx.config.ConfigRetriever;
 import io.vertx.core.AbstractVerticle;
@@ -130,12 +131,11 @@ public class WebServer extends AbstractVerticle {
 
     private void addRoutes(OpenAPI3RouterFactory factory) {
         addRouteWithCtxFunction(factory, "getMessage", bridge::getMessage);
+        addRouteWithCtxFunction(factory,"createUser", bridge::createUser);
     }
 
-    private void addRouteWithCtxFunction(OpenAPI3RouterFactory factory, String operationId,
-                                            Function<RoutingContext, Object> bridgeFunction) {
-        factory.addHandlerByOperationId(operationId,
-                ctx -> handleResult(bridgeFunction.apply(ctx), ctx));
+    private void addRouteWithCtxFunction(OpenAPI3RouterFactory factory, String operationId, Function<RoutingContext, Object> bridgeFunction) {
+        factory.addHandlerByOperationId(operationId, ctx -> handleResult(bridgeFunction.apply(ctx), ctx));
     }
 
     private void handleResult(Object result, RoutingContext ctx) {
@@ -189,8 +189,14 @@ public class WebServer extends AbstractVerticle {
     }
 
     private void onInternalServerError(RoutingContext ctx) {
-        LOGGER.log(Level.SEVERE, () -> String.format("onInternalServerError at %s", ctx.request().absoluteURI()));
-        replyWithFailure(ctx, 500, "Internal Server Error", null);
+        try {
+            throw ctx.failure();
+        }catch (UsernameIsTakenException ex){
+            replyWithFailure(ctx, 402, ex.getMessage(), ex.getMessage());
+        }catch (Throwable throwable){
+            LOGGER.log(Level.SEVERE, () -> String.format("onInternalServerError at %s", ctx.request().absoluteURI()));
+            replyWithFailure(ctx, 500, "Internal Server Error", null);
+        }
     }
 
     private void replyWithFailure(RoutingContext ctx, int statusCode, String message, String cause) {
