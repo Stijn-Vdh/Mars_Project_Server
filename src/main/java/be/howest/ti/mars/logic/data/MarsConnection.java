@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.*;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /*
@@ -46,13 +47,19 @@ public class MarsConnection {
                 "-webPort", String.valueOf(console)).start();
         try{
             initDatabase();
-            addSubscriptionsToDb();
-        }catch (IOException ex){
-            logger.warning(ex.getMessage());
+
+        }catch (SQLException | IOException ex){
+            logger.log(Level.WARNING,ex.getMessage(), ex);
         }
+
+        try{
+            addSubscriptionsToDb();
+        }catch (SQLException | IOException ex){
+            logger.log(Level.WARNING,ex.getMessage(), ex);
+
+        }
+
     }
-
-
 
     public static Connection getConnection() throws SQLException{
         return DriverManager.getConnection(INSTANCE.url,INSTANCE.username, INSTANCE.password);
@@ -77,6 +84,6 @@ public class MarsConnection {
         executeScript("src/main/resources/h2/setupDB.sql");
     }
     private static void addSubscriptionsToDb() throws SQLException, IOException{
-        executeScript("src/main/resources/h2/initSubscriptionDB.sql");
+        executeScript("src/main/resources/h2/initSubscriptionsDB.sql");
     }
 }
