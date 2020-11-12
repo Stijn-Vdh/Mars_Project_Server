@@ -252,6 +252,66 @@ paths:
         security:
           - bearerAuth: [ ]
 
+  /api/subscription:
+    description: Buy a new subscription.
+    get:
+      tags:
+        - store
+      summary: View all available subscriptions.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  subscriptionID:
+                    type: integer
+                  subscriptionName:
+                    type: string
+                  subscriptionPrice:
+                    type: integer
+                example: [ {
+                  subscriptionID: 1,
+                  subscriptionName: 'Start-up'
+                },{
+                  subscriptionID: 2,
+                  subscriptionName: 'Professional'
+                } ]
+    post:
+      summary: Buy subscription
+      tags:
+        - store
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                subscriptionName:
+                  type: string
+      responses:
+        '200':
+          description: Succesfuly bought a subscription
+      security:
+        - bearerAuth: [ ]
+    delete:
+      tags:
+        - store
+      summary: Stop your currently active subscription
+      responses:
+        '200':
+          description: Succesfully removed your current subscription.
+        '401':
+          description: Authorization information is missing or invalid.
+        '5XX':
+          description: Unexpected error.
+
+      security:
+        - bearerAuth: [ ]
+
   /api/endpoints: #View all endpoints
     summary: get all endpoints
     description: Get all enpoints
