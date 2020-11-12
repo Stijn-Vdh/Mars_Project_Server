@@ -2,7 +2,11 @@ package be.howest.ti.mars.logic.data;
 
 import org.h2.tools.Server;
 
-import java.sql.SQLException;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.sql.*;
+import java.util.logging.Logger;
 
 /*
 MBL: this is only a starter class to use a H2 database.
@@ -16,6 +20,7 @@ To make this class useful, please complete it with the topics seen in the module
  */
 public class MarsRepository {
     private static final MarsRepository INSTANCE = new MarsRepository();
+    private static final Logger logger = Logger.getLogger(MarsRepository.class.getName());
     private Server dbWebConsole;
     private String username;
     private String password;
@@ -39,5 +44,33 @@ public class MarsRepository {
         INSTANCE.dbWebConsole = Server.createWebServer(
                 "-ifNotExists",
                 "-webPort", String.valueOf(console)).start();
+        try{
+            initDatabase();
+        }catch (IOException ex){
+            logger.warning(ex.getMessage());
+        }
+    }
+
+    public static Connection getConnection() throws SQLException{
+        return DriverManager.getConnection(INSTANCE.url,INSTANCE.username, INSTANCE.password);
+    }
+
+    private static void executeScript(String filename) throws IOException, SQLException{
+        String createDbSql = readFile(filename);
+        try(
+            Connection connection = getConnection();
+            PreparedStatement stmt = connection.prepareStatement(createDbSql)
+        ){
+            stmt.executeUpdate();
+        }
+    }
+
+    private static String readFile(String filename) throws IOException {
+        Path file = Path.of(filename);
+        return Files.readString(file);
+    }
+
+    public static void initDatabase() throws SQLException, IOException {
+        executeScript("src/main/resources/h2/setupDB.sql");
     }
 }
