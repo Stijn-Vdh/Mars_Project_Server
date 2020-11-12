@@ -1,13 +1,20 @@
 openapi: 3.0.0
 info:
-  title: 'Mars Concept Title'
-  description: 'Please complete this spec as seen in the module Information Module'
+  title: 'MTTS'
+  description: 'Through an easily accessible network of travel tubes we want to  allow goods
+                    and people to travel more efficiently than ever.'
   version: 0.0.1
 servers:
   - url: http://localhost:8080/
     description: 'Local development implementation'
   - url: https://project-ii.ti.howest.be/mars-15
     description: 'Public web api'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+
 paths:
   /api/message:
     get:
@@ -511,3 +518,89 @@ paths:
           description: Unexpected error.
       security:
         - bearerAuth: [ ]
+
+  /api/routeInfo/{id}:
+    description: Get route information.
+    get:
+      summary: Get your current route information.
+      tags:
+        - travel
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Succesfuly bought a ticket.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  routID:
+                    type: integer
+                  from:
+                    type: string
+                  destination:
+                    type: string
+                  estmTime:
+                    type: integer
+                  currentLocation:
+                    type: string
+        '401':
+          description: Authorization information is missing or invalid.
+        '5XX':
+          description: Unexpected error.
+
+      security:
+        - bearerAuth: [ ]
+  /api/travel:
+    description: travel from one point to another.
+    post:
+      summary: Travel from one point to another.
+      tags:
+        - travel
+      requestBody:
+        description: provide required information in order to use this system.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                from:
+                  type: integer
+                destination:
+                  type: integer
+                podType:
+                  type: string
+                  enum: [ standard, luxury ]
+      responses:
+        '200':
+          description: Succesfuly requested a travel pod
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  travelID:
+                    type: integer
+        '401':
+          description: Authorization information is missing or invalid.
+        '5XX':
+          description: Unexpected error.
+      security:
+        - bearerAuth: [ ]
+
+  /api/ping:
+    get:
+      tags:
+        - server
+      summary: Checks if the server is running
+      responses:
+        '200':
+          description: Server is up and running
+        default:
+          description: Something is wrong
