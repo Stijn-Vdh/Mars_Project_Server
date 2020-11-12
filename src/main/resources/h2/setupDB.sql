@@ -3,7 +3,7 @@ DROP ALL OBJECTS;
 create table users
 (
 	userID int auto_increment,
-	homeEndpointID int not null,
+	homeEndpointID int,
 	name varchar(50),
 	password varchar(30),
 	homeAddress varchar(125),

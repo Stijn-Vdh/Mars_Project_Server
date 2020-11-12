@@ -270,6 +270,7 @@ paths:
   /api/subscription:
     description: Buy a new subscription.
     get:
+      operationId: viewSubscriptions
       tags:
         - store
       summary: View all available subscriptions.
