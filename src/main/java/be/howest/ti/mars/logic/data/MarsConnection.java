@@ -46,10 +46,13 @@ public class MarsConnection {
                 "-webPort", String.valueOf(console)).start();
         try{
             initDatabase();
+            addSubscriptionsToDb();
         }catch (IOException ex){
             logger.warning(ex.getMessage());
         }
     }
+
+
 
     public static Connection getConnection() throws SQLException{
         return DriverManager.getConnection(INSTANCE.url,INSTANCE.username, INSTANCE.password);
@@ -70,7 +73,10 @@ public class MarsConnection {
         return Files.readString(file);
     }
 
-    public static void initDatabase() throws SQLException, IOException {
+    private static void initDatabase() throws SQLException, IOException {
         executeScript("src/main/resources/h2/setupDB.sql");
+    }
+    private static void addSubscriptionsToDb() throws SQLException, IOException{
+        executeScript("src/main/resources/h2/initSubscriptionDB.sql");
     }
 }
