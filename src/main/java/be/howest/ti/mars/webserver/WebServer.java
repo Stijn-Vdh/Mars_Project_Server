@@ -1,6 +1,7 @@
 package be.howest.ti.mars.webserver;
 
-import be.howest.ti.mars.logic.controller.exceptions.UsernameIsTakenException;
+import be.howest.ti.mars.logic.controller.exceptions.AuthenticationException;
+import be.howest.ti.mars.logic.controller.exceptions.UsernameException;
 import be.howest.ti.mars.logic.data.MarsRepository;
 import io.vertx.config.ConfigRetriever;
 import io.vertx.core.AbstractVerticle;
@@ -70,7 +71,7 @@ public class WebServer extends AbstractVerticle {
                     dbProps.getInteger("webconsole.port", DB_WEB_CONSOLE_FALLBACK));
             LOGGER.info("Database webconsole started on port: " + dbProps.getInteger("webconsole.port"));
         } catch (SQLException ex) {
-            LOGGER.log(Level.SEVERE,"DB web console is unavailable", ex);
+            LOGGER.log(Level.SEVERE, "DB web console is unavailable", ex);
         }
     }
 
@@ -85,7 +86,7 @@ public class WebServer extends AbstractVerticle {
                                 .requestHandler(createRequestHandler(ar.result()))
                                 .listen(port, x -> listen(promise, x));
                     } else {
-                        LOGGER.log(Level.SEVERE," Failed to load API specification", ar.cause());
+                        LOGGER.log(Level.SEVERE, " Failed to load API specification", ar.cause());
                         LOGGER.info("Shutting down");
                         vertx.close();
                     }
@@ -131,7 +132,8 @@ public class WebServer extends AbstractVerticle {
 
     private void addRoutes(OpenAPI3RouterFactory factory) {
         addRouteWithCtxFunction(factory, "getMessage", bridge::getMessage);
-        addRouteWithCtxFunction(factory,"createUser", bridge::createUser);
+        addRouteWithCtxFunction(factory, "createUser", bridge::createUser);
+        addRouteWithCtxFunction(factory, "login", bridge::login);
     }
 
     private void addRouteWithCtxFunction(OpenAPI3RouterFactory factory, String operationId, Function<RoutingContext, Object> bridgeFunction) {
@@ -144,10 +146,10 @@ public class WebServer extends AbstractVerticle {
 
     private void installGeneralErrorHandlers(Router router) {
         router.errorHandler(400, this::onBadRequest)
-            .errorHandler(401, this::onUnAuthorised)
-            .errorHandler(403, this::onForbidden)
-            .errorHandler(404, this::onNotFound)
-            .errorHandler(500, this::onInternalServerError);
+                .errorHandler(401, this::onUnAuthorised)
+                .errorHandler(403, this::onForbidden)
+                .errorHandler(404, this::onNotFound)
+                .errorHandler(500, this::onInternalServerError);
 
         router.route().handler(ctx -> ctx.fail(404, new RuntimeException()));
     }
@@ -191,9 +193,10 @@ public class WebServer extends AbstractVerticle {
     private void onInternalServerError(RoutingContext ctx) {
         try {
             throw ctx.failure();
-        }catch (UsernameIsTakenException ex){
+        } catch (UsernameException | AuthenticationException ex) {
             replyWithFailure(ctx, 402, ex.getMessage(), ex.getMessage());
-        }catch (Throwable throwable){
+
+        } catch (Throwable throwable) {
             LOGGER.log(Level.SEVERE, () -> String.format("onInternalServerError at %s", ctx.request().absoluteURI()));
             replyWithFailure(ctx, 500, "Internal Server Error", null);
         }
