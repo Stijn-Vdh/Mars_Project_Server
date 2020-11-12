@@ -37,6 +37,7 @@ paths:
       summary: login, returns the authentication token
       tags:
         - authentication
+      operationId: login
       requestBody:
         description: provide login information.
         required: true
