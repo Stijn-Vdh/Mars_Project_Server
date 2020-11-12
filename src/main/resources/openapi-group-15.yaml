@@ -101,6 +101,8 @@ paths:
       responses:
         '200':
           description: user created
+        '402':
+          description: username already is taken
         '5XX':
           description: Unexpected error.
   /api/user/{id}: #get account information
