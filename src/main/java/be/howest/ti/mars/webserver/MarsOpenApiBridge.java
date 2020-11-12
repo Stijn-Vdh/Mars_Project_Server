@@ -38,20 +38,20 @@ class MarsOpenApiBridge {
         logger.info("login");
 
         JsonObject json = ctx.getBodyAsJson();
-        return  controller.login(json.getString("name"), json.getString("password"));
+        return controller.login(json.getString("name"), json.getString("password"));
     }
 
-    public  Object logout(RoutingContext ctx){
+    public Object logout(RoutingContext ctx) {
         controller.logout(getAccount(ctx));
         return null;
     }
 
-    public Object viewSubscriptions(RoutingContext ctx){
+    public Object viewSubscriptions(RoutingContext ctx) {
         return controller.getSubscriptions();
     }
-    public boolean verifyAccountToken(String token){
-        return controller.verifyAccountToken(token);
 
+    public boolean verifyAccountToken(RoutingContext ctx) {
+        return getAccount(ctx) != null;
     }
 
     private BaseAccount getAccount(RoutingContext ctx) {
@@ -62,7 +62,7 @@ class MarsOpenApiBridge {
                 .orElse(null);
     }
 
-    private String getBearerToken(RoutingContext ctx) {
+    public String getBearerToken(RoutingContext ctx) {
         String header = ctx.request().getHeader(HttpHeaders.AUTHORIZATION);
         if (header == null || !header.startsWith(AUTHORIZATION_TOKEN_PREFIX)) {
             return null;
