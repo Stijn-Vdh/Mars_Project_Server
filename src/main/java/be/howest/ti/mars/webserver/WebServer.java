@@ -1,7 +1,7 @@
 package be.howest.ti.mars.webserver;
 
 import be.howest.ti.mars.logic.controller.exceptions.UsernameIsTakenException;
-import be.howest.ti.mars.logic.data.MarsRepository;
+import be.howest.ti.mars.logic.data.MarsConnection;
 import io.vertx.config.ConfigRetriever;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.AsyncResult;
@@ -59,12 +59,12 @@ public class WebServer extends AbstractVerticle {
 
     @Override
     public void stop() {
-        MarsRepository.getInstance().cleanUp();
+        MarsConnection.getInstance().cleanUp();
     }
 
     private void configureDatabase(JsonObject dbProps) {
         try {
-            MarsRepository.configure(dbProps.getString("url"),
+            MarsConnection.configure(dbProps.getString("url"),
                     dbProps.getString("username"),
                     dbProps.getString("password"),
                     dbProps.getInteger("webconsole.port", DB_WEB_CONSOLE_FALLBACK));
