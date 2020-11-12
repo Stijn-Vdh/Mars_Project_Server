@@ -141,6 +141,27 @@ paths:
                 }
       security:
         - bearerAuth: [ ]
+  /api/user/{id}/shareLocation:
+    description: Share your location with your friends.
+    post:
+      summary: Share your location with your friends.
+      tags:
+        - user
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Succesfuly shared your location with your friends.
+        '401':
+          description: Authorization information is missing or invalid.
+        '5XX':
+          description: Unexpected error.
+      security:
+        - bearerAuth: [ ]
 
   /api/friend: #Get all our friends
     get:
