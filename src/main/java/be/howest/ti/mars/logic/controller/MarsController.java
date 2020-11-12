@@ -14,13 +14,12 @@ public class MarsController {
         return "Hello, Mars!";
     }
 
-    public byte[] createUser(String name, String password, String endpoint, String address) {
-        BaseAccount account = new UserAccount(name, password, endpoint, address);
+    public void createUser(String name, String password, String endpoint, String address) {
+        BaseAccount account = new UserAccount(name, password, endpoint, address, null);
 
         if (!accounts.add(account)) { // username exists already
             throw new UsernameException("Username (" + name + ") is already taken");
         }
-        return account.getUserToken().getToken();
     }
 
     public byte[] login(String name, String password) {
@@ -31,7 +30,7 @@ public class MarsController {
         if (account == null) {   // pw and name doesnt match
             throw new AuthenticationException("Credentials does not match!");
         } else {
-            account.setUserToken(new UserToken()); // sets a new token, invalidates previous set tokens
+            account.setUserToken(new UserToken()); // sets a new token, invalidates previous set token
             return account.getUserToken().getToken();
         }
     }

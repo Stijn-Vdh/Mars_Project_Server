@@ -21,9 +21,10 @@ class MarsOpenApiBridge {
         logger.info("createUser");
 
         JsonObject json = ctx.getBodyAsJson();
-        return controller.createUser(json.getString("name"),
+       controller.createUser(json.getString("name"),
                 json.getString("password"),
                 json.getString("homeAddress"),
                 String.valueOf(json.getInteger("homeEndpointID")));
+       return null; // doesnt allow void
     }
 }
