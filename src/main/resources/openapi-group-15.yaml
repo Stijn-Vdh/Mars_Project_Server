@@ -27,6 +27,8 @@ paths:
             application/json:
               schema:
                 type: string
+      tags:
+        - test
 
   /api/login: #login or logout
     summary: login/logout
@@ -349,6 +351,46 @@ paths:
                     type: integer
                   remainingLargePods:
                     type: integer
+      security:
+        - bearerAuth: [ ]
+
+  /api/ticket:
+    get:
+      summary: Get all ticket prices.
+      tags:
+        - store
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ticketID:
+                    type: integer
+                  name:
+                    type: string
+                  price:
+                    type: integer
+  /api/ticket/{id}:
+    post:
+      summary: Buy a new ticket
+      tags:
+        - store
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Succesfuly bought a ticket.
+        '401':
+          description: Authorization information is missing or invalid.
+        '5XX':
+          description: Unexpected error.
       security:
         - bearerAuth: [ ]
 
