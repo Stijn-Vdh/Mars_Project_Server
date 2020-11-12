@@ -4,6 +4,9 @@ import be.howest.ti.mars.logic.controller.exceptions.AuthenticationException;
 import be.howest.ti.mars.logic.controller.exceptions.UsernameException;
 import be.howest.ti.mars.logic.controller.security.UserToken;
 import be.howest.ti.mars.logic.data.MarsRepository;
+import io.vertx.core.json.Json;
+import io.vertx.core.json.JsonObject;
+
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -39,7 +42,12 @@ public class MarsController {
         }
     }
 
+
     public Set<Subscription> getSubscriptions(){
         return repo.getSubscriptions();
     }
-}
+
+    public boolean verifyAccountToken(String token) {
+        UserToken userToken = Json.decodeValue(new JsonObject().put("token", token).toString(), UserToken.class);
+        return accounts.stream().anyMatch(acc -> userToken.equals(acc.getUserToken()));
+    }

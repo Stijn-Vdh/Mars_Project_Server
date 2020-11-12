@@ -7,6 +7,7 @@ import io.vertx.config.ConfigRetriever;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Promise;
+import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.json.Json;
@@ -23,6 +24,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.sql.SQLException;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -30,6 +32,7 @@ import java.util.logging.Logger;
 public class WebServer extends AbstractVerticle {
     private static final Logger LOGGER = Logger.getLogger(WebServer.class.getName());
     private static final Integer DB_WEB_CONSOLE_FALLBACK = 9000;
+    public static final String AUTHORIZATION_TOKEN_PREFIX = "Bearer ";
     private static final String OPEN_API_SPEC = "openapi-group-15.yaml";
     private MarsOpenApiBridge bridge;
 
@@ -116,6 +119,9 @@ public class WebServer extends AbstractVerticle {
 
         // Allow Cross-Origin Resource Sharing (CORS) from all clients
         factory.addGlobalHandler(createCorsHandler());
+
+        // Verify the accounts token for all secured operations
+        factory.addSecurityHandler("bearerAuth", this::verifyAccountToken);
 
         // Add all route handlers
         addRoutes(factory);
@@ -222,5 +228,30 @@ public class WebServer extends AbstractVerticle {
             result.put("body", ctx.getBodyAsString());
 
         return result;
+    }
+
+    private void verifyAccountToken(RoutingContext ctx) {
+        verifyToken(ctx, token -> bridge.verifyAccountToken(token));
+    }
+
+    private void verifyToken(RoutingContext ctx, Predicate<String> check) {
+        String token = getBearerToken(ctx);
+
+        if (token == null) {
+            ctx.fail(401); // Unauthorized  due to wrong or absent header format
+        } else if (check.test(token)) {
+            ctx.next();
+        } else {
+            ctx.fail(403); // forbidden
+        }
+    }
+
+    private String getBearerToken(RoutingContext ctx) {
+        String header = ctx.request().getHeader(HttpHeaders.AUTHORIZATION);
+        if (header == null || !header.startsWith(AUTHORIZATION_TOKEN_PREFIX)) {
+            return null;
+        } else {
+            return header.substring(AUTHORIZATION_TOKEN_PREFIX.length());
+        }
     }
 }
