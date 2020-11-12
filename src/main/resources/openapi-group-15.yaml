@@ -142,7 +142,6 @@ paths:
       security:
         - bearerAuth: [ ]
 
-
   /api/endpoints: #View all endpoints
     summary: get all endpoints
     description: Get all enpoints
@@ -205,3 +204,107 @@ paths:
           description: Authorization information is missing or invalid.
         '5XX':
           description: Unexpected error.
+
+  /api/delivery/{id}: #Get delivery information
+    description: get delivery information
+    get:
+      summary: Get deliver information.
+      tags:
+        - delivery
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  deliveryID:
+                    type: integer
+                  deliveryType:
+                    type: string
+                    enum: [ small, large ]
+                  business:
+                    type: boolean
+        '401':
+          description: Authorization information is missing or invalid.
+        '5XX':
+          description: Unexpected error.
+      security:
+        - bearerAuth: [ ]
+  /api/sendSmallPackage: #Send small package
+    post:
+      summary: request and send a small package pod
+      tags:
+        - delivery
+      requestBody:
+        description: provide correct information for a small package pod.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                business:
+                  type: boolean
+                from:
+                  type: integer
+                destination:
+                  type: integer
+      responses:
+        '200':
+          description: package sent
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  deliveryID:
+                    type: integer
+        '401':
+          description: Authorization information is missing or invalid.
+        '5XX':
+          description: Unexpected error.
+      security:
+        - bearerAuth: [ ]
+  /api/sendLargePackage: #Send large package
+    post:
+      summary: request and send a large package pod (businesses only)
+      tags:
+        - delivery
+      requestBody:
+        description: provide correct information for a large package pod.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                businessID:
+                  type: integer
+                from:
+                  type: integer
+                destination:
+                  type: integer
+      responses:
+        '200':
+          description: package sent
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  deliveryID:
+                    type: integer
+        '401':
+          description: Authorization information is missing or invalid.
+        '5XX':
+          description: Unexpected error.
+      security:
+        - bearerAuth: [ ]
