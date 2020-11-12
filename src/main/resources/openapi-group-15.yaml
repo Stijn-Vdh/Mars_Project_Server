@@ -142,6 +142,95 @@ paths:
       security:
         - bearerAuth: [ ]
 
+  /api/friend: #Get all our friends
+    get:
+      summary: Get all your friends.
+      tags:
+        - friend
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  userID:
+                    type: integer
+                  name:
+                    type: string
+                example: [ {
+                  userID: 1,
+                  name: 'Debby'
+                },{
+                  userID: 5,
+                  name: 'Frank'
+                } ]
+      security:
+        - bearerAuth: [ ]
+  /api/friend/{id}: #Add a friend or delete one
+      post:
+        summary: Add a new friend.
+        tags:
+          - friend
+        parameters:
+          - in: path
+            name: id
+            schema:
+              type: integer
+            required: true
+        responses:
+          '200':
+            description: Succesfuly added a friend.
+          '401':
+            description: Authorization information is missing or invalid.
+          '5XX':
+            description: Unexpected error.
+        security:
+          - bearerAuth: [ ]
+      delete:
+        summary: Delete a friend.
+        tags:
+          - friend
+        parameters:
+          - in: path
+            name: id
+            schema:
+              type: integer
+            required: true
+        responses:
+          '200':
+            description: Succesfuly deleted a friend.
+          '401':
+            description: Authorization information is missing or invalid.
+          '5XX':
+            description: Unexpected error.
+        security:
+          - bearerAuth: [ ]
+  /api/friend/{id}/location: # Get the location of a current friend
+      description: Get the current location of one of your friends.
+      get:
+        summary: Get the current location of one of your friends.
+        tags:
+          - friend
+        parameters:
+          - in: path
+            name: id
+            required: true
+            schema:
+              type: integer
+        responses:
+          '200':
+            description: Succesfuly retrieved the location of your friend.
+          '401':
+            description: Authorization information is missing or invalid.
+          '5XX':
+            description: Unexpected error.
+          default:
+            description: This friend does not share his location with others.
+        security:
+          - bearerAuth: [ ]
+
   /api/endpoints: #View all endpoints
     summary: get all endpoints
     description: Get all enpoints
