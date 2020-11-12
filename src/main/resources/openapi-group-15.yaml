@@ -34,7 +34,7 @@ paths:
     summary: login/logout
     description: login/logout
     post:
-      summary: login
+      summary: login, returns the authentication token
       tags:
         - authentication
       requestBody:
@@ -51,14 +51,14 @@ paths:
                   type: string
       responses:
         '200':
-          description: Succesfuly logged in.
+          description: Succesfully logged in.
           content:
-            application/json:
+            text/plain:
               schema:
-                type: object
-                properties:
-                  loginToken:
-                    type: string
+                type: string
+                example: "sdjfsldffjfsdfkjsdfgdfksfdfjslfkdf"
+        '500':
+          description: Internal error.
     delete:
       summary: logout
       tags:
@@ -104,8 +104,8 @@ paths:
           description: user created
         '402':
           description: username already is taken
-        '5XX':
-          description: Unexpected error.
+        '500':
+          description: Internal error.
   /api/user/{id}: #get account information
     summary: get user information
     description: get user information
