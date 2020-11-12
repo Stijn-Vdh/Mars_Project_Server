@@ -1,6 +1,8 @@
 package be.howest.ti.mars.webserver;
 
-import be.howest.ti.mars.logic.data.MarsRepository;
+import be.howest.ti.mars.logic.controller.exceptions.AuthenticationException;
+import be.howest.ti.mars.logic.controller.exceptions.UsernameException;
+import be.howest.ti.mars.logic.data.MarsConnection;
 import io.vertx.config.ConfigRetriever;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.AsyncResult;
@@ -58,18 +60,18 @@ public class WebServer extends AbstractVerticle {
 
     @Override
     public void stop() {
-        MarsRepository.getInstance().cleanUp();
+        MarsConnection.getInstance().cleanUp();
     }
 
     private void configureDatabase(JsonObject dbProps) {
         try {
-            MarsRepository.configure(dbProps.getString("url"),
+            MarsConnection.configure(dbProps.getString("url"),
                     dbProps.getString("username"),
                     dbProps.getString("password"),
                     dbProps.getInteger("webconsole.port", DB_WEB_CONSOLE_FALLBACK));
             LOGGER.info("Database webconsole started on port: " + dbProps.getInteger("webconsole.port"));
         } catch (SQLException ex) {
-            LOGGER.log(Level.SEVERE,"DB web console is unavailable", ex);
+            LOGGER.log(Level.SEVERE, "DB web console is unavailable", ex);
         }
     }
 
@@ -84,7 +86,7 @@ public class WebServer extends AbstractVerticle {
                                 .requestHandler(createRequestHandler(ar.result()))
                                 .listen(port, x -> listen(promise, x));
                     } else {
-                        LOGGER.log(Level.SEVERE," Failed to load API specification", ar.cause());
+                        LOGGER.log(Level.SEVERE, " Failed to load API specification", ar.cause());
                         LOGGER.info("Shutting down");
                         vertx.close();
                     }
@@ -130,12 +132,12 @@ public class WebServer extends AbstractVerticle {
 
     private void addRoutes(OpenAPI3RouterFactory factory) {
         addRouteWithCtxFunction(factory, "getMessage", bridge::getMessage);
+        addRouteWithCtxFunction(factory, "createUser", bridge::createUser);
+        addRouteWithCtxFunction(factory, "login", bridge::login);
     }
 
-    private void addRouteWithCtxFunction(OpenAPI3RouterFactory factory, String operationId,
-                                            Function<RoutingContext, Object> bridgeFunction) {
-        factory.addHandlerByOperationId(operationId,
-                ctx -> handleResult(bridgeFunction.apply(ctx), ctx));
+    private void addRouteWithCtxFunction(OpenAPI3RouterFactory factory, String operationId, Function<RoutingContext, Object> bridgeFunction) {
+        factory.addHandlerByOperationId(operationId, ctx -> handleResult(bridgeFunction.apply(ctx), ctx));
     }
 
     private void handleResult(Object result, RoutingContext ctx) {
@@ -144,10 +146,10 @@ public class WebServer extends AbstractVerticle {
 
     private void installGeneralErrorHandlers(Router router) {
         router.errorHandler(400, this::onBadRequest)
-            .errorHandler(401, this::onUnAuthorised)
-            .errorHandler(403, this::onForbidden)
-            .errorHandler(404, this::onNotFound)
-            .errorHandler(500, this::onInternalServerError);
+                .errorHandler(401, this::onUnAuthorised)
+                .errorHandler(403, this::onForbidden)
+                .errorHandler(404, this::onNotFound)
+                .errorHandler(500, this::onInternalServerError);
 
         router.route().handler(ctx -> ctx.fail(404, new RuntimeException()));
     }
@@ -189,8 +191,15 @@ public class WebServer extends AbstractVerticle {
     }
 
     private void onInternalServerError(RoutingContext ctx) {
-        LOGGER.log(Level.SEVERE, () -> String.format("onInternalServerError at %s", ctx.request().absoluteURI()));
-        replyWithFailure(ctx, 500, "Internal Server Error", null);
+        try {
+            throw ctx.failure();
+        } catch (UsernameException | AuthenticationException ex) {
+            replyWithFailure(ctx, 402, ex.getMessage(), ex.getMessage());
+
+        } catch (Throwable throwable) {
+            LOGGER.log(Level.SEVERE, () -> String.format("onInternalServerError at %s", ctx.request().absoluteURI()));
+            replyWithFailure(ctx, 500, "Internal Server Error", null);
+        }
     }
 
     private void replyWithFailure(RoutingContext ctx, int statusCode, String message, String cause) {
