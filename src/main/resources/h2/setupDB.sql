@@ -1,18 +1,8 @@
-DROP table if exists users;
-DROP table if exists businesses;
-DROP table if exists subscriptions;
-DROP table if exists users_subscriptions;
-DROP table if exists businesses_subscriptions;
-DROP table if exists trips;
-DROP table if exists trips_users;
-DROP table if exists deliveries;
-DROP table if exists deliveries_businesses;
-DROP table if exists endpoints;
-DROP table if exists friends;
+DROP ALL OBJECTS;
 
 create table users
 (
-	userID int not null,
+	userID int auto_increment,
 	homeEndpointID int not null,
 	name varchar(50),
 	password varchar(30),
@@ -25,7 +15,7 @@ create table users
 
 create table businesses
 (
-	businessID int not null,
+	businessID int auto_increment,
 	name varchar(50),
 	subscriptionID int,
 	CONSTRAINT businessID_pk Primary Key (businessID)
@@ -33,7 +23,7 @@ create table businesses
 
 create table subscriptions
 (
-	subscriptionID int not null,
+	subscriptionID int auto_increment,
 	name varchar(50),
 	CONSTRAINT subscriptionID_pk PRIMARY KEY (subscriptionID)
 );
@@ -56,7 +46,7 @@ create table businesses_subscriptions
 
 create table trips
 (
-	tripID int not null,
+	tripID int auto_increment,
 	`from` varchar(125),
 	destination varchar(125),
 	`when` date,
@@ -69,12 +59,12 @@ create table trips_users
 	tripID int not null,
 	userID int not null,
 	CONSTRAINT tripID_fk FOREIGN KEY (tripID) REFERENCES trips(tripID),
-	CONSTRAINT userID_fk FOREIGN KEY (userID) REFERENCES users(userID)
+	CONSTRAINT t_userID_fk FOREIGN KEY (userID) REFERENCES users(userID)
 );
 
 create table deliveries
 (
-	deliveryID int not null,
+	deliveryID int auto_increment,
 	deliveryType varchar(25),
 	`when` date
 );
@@ -89,7 +79,7 @@ create table deliveries_businesses
 
 create table endpoints
 (
-	endpointID int not null,
+	endpointID int auto_increment,
 	name varchar(50),
 	CONSTRAINT endpointID_pk PRIMARY KEY (endpointID)
 );
@@ -99,7 +89,7 @@ create table friends
 	friendID int not null,
 	userID int not null,
 	name varchar(50),
-	CONSTRAINT friendID_pk PRIMARY KEY (friendID),
-	CONSTRAINT userID_fk FOREIGN KEY (userID) REFERENCES users(userID)
+	CONSTRAINT f_userID_fk FOREIGN KEY (userID) REFERENCES users(userID),
+	CONSTRAINT friendID_fk FOREIGN KEY (friendID) REFERENCES users(userID)
 )
 
