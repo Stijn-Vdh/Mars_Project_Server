@@ -2,6 +2,8 @@ package be.howest.ti.mars.logic.controller;
 
 import be.howest.ti.mars.logic.controller.security.UserToken;
 
+import java.util.Objects;
+
 public class BaseAccount {
     private final UserToken userToken;
     private final String homeAddressEndpoint; //replace with endpoint class
@@ -39,5 +41,18 @@ public class BaseAccount {
 
     public String getAddress() {
         return address;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        BaseAccount that = (BaseAccount) o;
+        return username.equals(that.username);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(username);
     }
 }
