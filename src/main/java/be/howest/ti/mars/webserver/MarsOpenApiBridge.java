@@ -39,7 +39,7 @@ class MarsOpenApiBridge {
 
     public Object viewSubscriptions(RoutingContext ctx){
         return controller.getSubscriptions();
-
+    }
     public boolean verifyAccountToken(String token){
         return controller.verifyAccountToken(token);
 

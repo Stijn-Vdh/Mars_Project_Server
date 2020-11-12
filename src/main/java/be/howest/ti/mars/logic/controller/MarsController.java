@@ -43,7 +43,7 @@ public class MarsController {
     }
 
 
-    public Set<Subscription> getSubscriptions(){
+    public Set<Subscription> getSubscriptions() {
         return repo.getSubscriptions();
     }
 
@@ -51,3 +51,4 @@ public class MarsController {
         UserToken userToken = Json.decodeValue(new JsonObject().put("token", token).toString(), UserToken.class);
         return accounts.stream().anyMatch(acc -> userToken.equals(acc.getUserToken()));
     }
+}
