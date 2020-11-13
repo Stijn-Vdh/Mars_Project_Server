@@ -24,6 +24,8 @@ public class MarsController {
         BaseAccount account;
         if (isBusiness) {
             account = new BusinessAccount(name, password, endpoint, address, null);
+            BusinessAccount business = (BusinessAccount) account;
+            repo.addBusiness(business);
         } else {
             account = new UserAccount(name, password, endpoint, address, null);
             UserAccount user = (UserAccount) account;

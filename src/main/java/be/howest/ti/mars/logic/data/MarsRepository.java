@@ -1,5 +1,6 @@
 package be.howest.ti.mars.logic.data;
 
+import be.howest.ti.mars.logic.controller.BusinessAccount;
 import be.howest.ti.mars.logic.controller.Subscription;
 import be.howest.ti.mars.logic.controller.UserAccount;
 import be.howest.ti.mars.logic.controller.exceptions.DatabaseException;
@@ -29,7 +30,7 @@ public class MarsRepository implements MarsRepoInt {
     @Override
     public void addUser(UserAccount user) {
         String SQL_INSERT_USER =
-                "INSERT INTO USERS(homeEndpointID, name, password, homeAddress, sharesLocation, subscriptionID, businessAccount) VALUES(?,?,?,?,?,?,?)";
+                "INSERT INTO USERS(homeEndpointID, name, password, homeAddress, sharesLocation, subscriptionID) VALUES(?,?,?,?,?,?)";
         try (Connection con = MarsConnection.getConnection();
              PreparedStatement stmt = con.prepareStatement(SQL_INSERT_USER)) {
             stmt.setInt(1, user.getHomeAddressEndpoint());
@@ -38,11 +39,27 @@ public class MarsRepository implements MarsRepoInt {
             stmt.setString(4, user.getAddress());
             stmt.setBoolean(5, false);
             stmt.setInt(6, 0);
-            stmt.setBoolean(7, false);
             stmt.executeUpdate();
         } catch (SQLException ex) {
             throw new DatabaseException("Cannot add user!");
         }
+    }
+
+    @Override
+    public void addBusiness(BusinessAccount business) {
+        String SQL_INSERT_USER = "INSERT INTO BUSINESSES(homeEndpointID, name, password, homeAddress, subscriptionID) VALUES(?,?,?,?,?)";
+        try (Connection con = MarsConnection.getConnection();
+             PreparedStatement stmt = con.prepareStatement(SQL_INSERT_USER)){
+            stmt.setInt(1, business.getHomeAddressEndpoint());
+            stmt.setString(2, business.getUsername());
+            stmt.setString(3, business.getPassword());
+            stmt.setString(4, business.getAddress());
+            stmt.setInt(5, 0);
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            throw new DatabaseException("Cannot add business!");
+        }
+
     }
 
         @Override
@@ -120,10 +137,6 @@ public class MarsRepository implements MarsRepoInt {
         return null;
     }
 
-    @Override
-    public void addBusiness(String business) {
-
-    }
 
     @Override
     public Set<String> getTrips() {

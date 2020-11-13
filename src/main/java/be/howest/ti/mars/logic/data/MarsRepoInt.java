@@ -1,5 +1,6 @@
 package be.howest.ti.mars.logic.data;
 
+import be.howest.ti.mars.logic.controller.BusinessAccount;
 import be.howest.ti.mars.logic.controller.Subscription;
 import be.howest.ti.mars.logic.controller.UserAccount;
 
@@ -22,7 +23,7 @@ public interface MarsRepoInt {
 
     // Business
     Set<String> getBusinesses(); // todo:  String moet business class worden
-    void addBusiness(String business);
+    void addBusiness(BusinessAccount business);
 
     // Travel
     Set<String> getTrips(); // todo:  String moet trip class worden

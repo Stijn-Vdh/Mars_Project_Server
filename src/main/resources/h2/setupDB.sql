@@ -16,7 +16,10 @@ create table users
 create table businesses
 (
 	businessID int auto_increment,
+	homeEndpointID int,
 	name varchar(50),
+	password varchar(512),
+	homeAddress varchar(125),
 	subscriptionID int,
 	CONSTRAINT businessID_pk Primary Key (businessID)
 );
