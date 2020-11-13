@@ -16,11 +16,15 @@ public class UserToken {
     private final byte[] token;
 
     public UserToken() {
-        token = hashToken(new Random(System.currentTimeMillis()).nextInt(5000)+""); //makes PRNG "random"
+        this("");
     }
 
-    private byte[] hashToken(String token)  { //according to internet PBKDF2 is more secure than SHA-512 since its slower to crack
-        SecureRandom random = new SecureRandom();
+    public UserToken(String username) { // 100% prevent duplicates, UUIDs are not 100% unique
+        token = hashToken(new Random(System.currentTimeMillis()).nextInt(5000) + username);   //makes PRNG "random"
+    }
+
+    private byte[] hashToken(String token) { //according to internet PBKDF2 is more secure than SHA-512 since its slower to crack
+        SecureRandom random = new SecureRandom(); //reduces collisions
         byte[] salt = new byte[64];
         random.nextBytes(salt);
         KeySpec spec = new PBEKeySpec(token.toCharArray(), salt, 65536, 512);

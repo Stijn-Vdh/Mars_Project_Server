@@ -4,13 +4,8 @@ import be.howest.ti.mars.logic.controller.exceptions.AuthenticationException;
 import be.howest.ti.mars.logic.controller.exceptions.UsernameException;
 import be.howest.ti.mars.logic.controller.security.UserToken;
 import be.howest.ti.mars.logic.data.MarsRepository;
-import io.vertx.core.json.Json;
-import io.vertx.core.json.JsonObject;
 
-
-import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 public class MarsController {
@@ -19,6 +14,10 @@ public class MarsController {
 
     public String getMessage() {
         return "Hello, Mars!";
+    }
+
+    public Set<BaseAccount> getAccounts() {
+        return accounts;
     }
 
     public void createUser(String name, String password, String endpoint, String address) {
@@ -37,18 +36,17 @@ public class MarsController {
         if (account == null) {   // pw and name doesnt match
             throw new AuthenticationException("Credentials does not match!");
         } else {
-            account.setUserToken(new UserToken()); // sets a new token, invalidates previous set token
+            account.setUserToken(new UserToken(name)); // sets a new token, invalidates previous set token
             return account.getUserToken().getToken();
         }
     }
 
+    public void logout(BaseAccount account) {
+        account.setUserToken(null);
+    }
 
     public Set<Subscription> getSubscriptions() {
         return repo.getSubscriptions();
     }
 
-    public boolean verifyAccountToken(String token) {
-        UserToken userToken = Json.decodeValue(new JsonObject().put("token", token).toString(), UserToken.class);
-        return accounts.stream().anyMatch(acc -> userToken.equals(acc.getUserToken()));
-    }
 }

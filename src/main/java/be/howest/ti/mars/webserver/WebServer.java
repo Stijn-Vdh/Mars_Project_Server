@@ -32,9 +32,8 @@ import java.util.logging.Logger;
 public class WebServer extends AbstractVerticle {
     private static final Logger LOGGER = Logger.getLogger(WebServer.class.getName());
     private static final Integer DB_WEB_CONSOLE_FALLBACK = 9000;
-    public static final String AUTHORIZATION_TOKEN_PREFIX = "Bearer ";
     private static final String OPEN_API_SPEC = "openapi-group-15.yaml";
-    private MarsOpenApiBridge bridge;
+    private final MarsOpenApiBridge bridge;
 
     public WebServer(MarsOpenApiBridge bridge) {
         this.bridge = bridge;
@@ -141,6 +140,8 @@ public class WebServer extends AbstractVerticle {
         addRouteWithCtxFunction(factory, "createUser", bridge::createUser);
         addRouteWithCtxFunction(factory, "login", bridge::login);
         addRouteWithCtxFunction(factory, "viewSubscriptions", bridge::viewSubscriptions);
+        addRouteWithCtxFunction(factory, "logout", bridge::logout);
+
     }
 
     private void addRouteWithCtxFunction(OpenAPI3RouterFactory factory, String operationId, Function<RoutingContext, Object> bridgeFunction) {
@@ -231,27 +232,19 @@ public class WebServer extends AbstractVerticle {
     }
 
     private void verifyAccountToken(RoutingContext ctx) {
-        verifyToken(ctx, token -> bridge.verifyAccountToken(token));
+        verifyToken(ctx, bridge::verifyAccountToken);
     }
 
-    private void verifyToken(RoutingContext ctx, Predicate<String> check) {
-        String token = getBearerToken(ctx);
+    private void verifyToken(RoutingContext ctx, Predicate<RoutingContext> check) {
+        String token = bridge.getBearerToken(ctx);
 
         if (token == null) {
             ctx.fail(401); // Unauthorized  due to wrong or absent header format
-        } else if (check.test(token)) {
+        } else if (check.test(ctx)) {
             ctx.next();
         } else {
             ctx.fail(403); // forbidden
         }
     }
 
-    private String getBearerToken(RoutingContext ctx) {
-        String header = ctx.request().getHeader(HttpHeaders.AUTHORIZATION);
-        if (header == null || !header.startsWith(AUTHORIZATION_TOKEN_PREFIX)) {
-            return null;
-        } else {
-            return header.substring(AUTHORIZATION_TOKEN_PREFIX.length());
-        }
-    }
 }
