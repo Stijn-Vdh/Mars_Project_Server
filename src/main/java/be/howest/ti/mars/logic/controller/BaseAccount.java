@@ -6,16 +6,16 @@ import java.util.Objects;
 
 public class BaseAccount {
     private UserToken userToken;
-    private final String homeAddressEndpoint; //replace with endpoint class
+    private final int homeAddressEndpoint; //replace with endpoint class
     private final String password; // needs to be replaced with Password class which will contain hashed version
     private final String username; // needs to be unique
     private final String address; // just random info
 
-    public BaseAccount(String homeAddressEndpoint, String password, String username, String address) {
+    public BaseAccount(int homeAddressEndpoint, String password, String username, String address) {
         this(new UserToken(username), homeAddressEndpoint, password, username, address);
     }
 
-    public BaseAccount(UserToken userToken, String homeAddressEndpoint, String password, String username, String address) {
+    public BaseAccount(UserToken userToken, int homeAddressEndpoint, String password, String username, String address) {
         this.userToken = userToken;
         this.homeAddressEndpoint = homeAddressEndpoint;
         this.password = password;
@@ -27,7 +27,7 @@ public class BaseAccount {
         return userToken;
     }
 
-    public String getHomeAddressEndpoint() {
+    public int getHomeAddressEndpoint() {
         return homeAddressEndpoint;
     }
 

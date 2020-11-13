@@ -28,10 +28,10 @@ class MarsOpenApiBridge {
         logger.info("createAccount");
 
         JsonObject json = ctx.getBodyAsJson();
-        controller.createUser(json.getString("name"),
+        controller.createAccount(json.getString("name"),
                 SecureHash.getHashEncoded(json.getString("password")),
                 json.getString("homeAddress"),
-                String.valueOf(json.getInteger("homeEndpointID")),
+                json.getInteger("homeEndpointID"),
                 json.getBoolean("businessAccount")
         );
 
