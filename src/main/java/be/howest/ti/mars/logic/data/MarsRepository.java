@@ -63,13 +63,12 @@ public class MarsRepository implements MarsRepoInt {
             try(ResultSet rs = stmt.executeQuery()){
                 while(rs.next()){
 
-                    String name = rs.getString("name");
+                    String name = rs.getString("friendName");
                     String pwd = rs.getString("password");
                     int endpointID = rs.getInt("homeEndpointID");
                     String addr = rs.getString("homeAddress");
 
                     UserAccount friend = new UserAccount(name,pwd,endpointID,addr,null);
-
                     friends.add(friend);
                 }
             }
