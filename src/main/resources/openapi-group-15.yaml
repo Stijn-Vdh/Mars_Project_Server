@@ -218,28 +218,29 @@ paths:
           description: Forbidden!
       security:
         - bearerAuth: [ ]
-  /api/friend/{id}: #Add a friend or delete one
-      post:
-        operationId: addFriend
-        summary: Add a new friend.
-        tags:
-          - friend
-        parameters:
-          - in: path
-            name: id
-            schema:
-              type: integer
-            required: true
-        responses:
-          '200':
-            description: Succesfuly added a friend.
-          '401':
-            description: Authorization information is missing or invalid.
-          '5XX':
-            description: Unexpected error.
-        security:
-          - bearerAuth: [ ]
-      delete:
+  /api/friend/{fName}: #Add a friend or delete one
+    parameters:
+      - in: path
+        name: fName
+        schema:
+          type: string
+        required: true
+    post:
+      operationId: addFriend
+      summary: Add a new friend.
+      tags:
+        - friend
+
+      responses:
+        '200':
+          description: Succesfuly added a friend.
+        '401':
+          description: Authorization information is missing or invalid.
+        '5XX':
+          description: Unexpected error.
+      security:
+        - bearerAuth: [ ]
+    delete:
         summary: Delete a friend.
         tags:
           - friend

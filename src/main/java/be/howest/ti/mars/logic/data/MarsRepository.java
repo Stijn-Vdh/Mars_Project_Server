@@ -3,8 +3,6 @@ package be.howest.ti.mars.logic.data;
 import be.howest.ti.mars.logic.controller.Subscription;
 import be.howest.ti.mars.logic.controller.UserAccount;
 import be.howest.ti.mars.logic.controller.exceptions.DatabaseException;
-import org.h2.engine.Database;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -58,7 +56,7 @@ public class MarsRepository implements MarsRepoInt {
     @Override
     public Set<UserAccount> getFriends(UserAccount user) {
         Set<UserAccount> friends = new HashSet<>();
-        String SQL_SELECT_ALL_FRIENDS = "select f.friendid, u.* from friends f join users u on u.userid = f.userid where u.name like ?";
+        String SQL_SELECT_ALL_FRIENDS = "select f.friendName, u.* from friends f join users u on u.name = f.userName where u.name like ?";
 
         try(Connection con = MarsConnection.getConnection();
             PreparedStatement stmt = con.prepareStatement(SQL_SELECT_ALL_FRIENDS))
@@ -72,7 +70,7 @@ public class MarsRepository implements MarsRepoInt {
                     String pwd = rs.getString("password");
                     String homeAddress = rs.getString("homeAddress");
 
-                    UserAccount sub = new UserAccount(name,pwd,""+hID,homeAddress, null);
+                    UserAccount sub = new UserAccount(name,pwd,hID,homeAddress, null);
                     friends.add(sub);
                 }
             }

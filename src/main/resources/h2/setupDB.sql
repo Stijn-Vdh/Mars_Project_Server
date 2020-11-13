@@ -5,7 +5,7 @@ create table users
 	userID int auto_increment,
 	homeEndpointID int,
 	name varchar(50),
-	password varchar(30),
+	password varchar(512),
 	homeAddress varchar(125),
 	sharesLocation boolean,
 	subscriptionID int,
