@@ -1,5 +1,6 @@
 package be.howest.ti.mars.logic.data;
 
+import be.howest.ti.mars.logic.controller.BaseAccount;
 import be.howest.ti.mars.logic.controller.BusinessAccount;
 import be.howest.ti.mars.logic.controller.Subscription;
 import be.howest.ti.mars.logic.controller.UserAccount;
@@ -207,11 +208,34 @@ public class MarsRepository implements MarsRepoInt {
 
     @Override
     public void buySubscription(UserAccount user, String subscription) {
+        int id = getSubscriptions().stream()
+                                .filter(sub -> sub.getName().equals(subscription))
+                                .mapToInt(Subscription::getId).sum();
 
+        String SQL_UPDATE_USER = "UPDATE USERS SET subscriptionID=? where name=?";
+        String SQL_INSERT_USER_SUB = "INSERT INTO USERS_SUBSCRIPTIONS(userName,subscriptionID) values(?,?)";
+
+        try(Connection con = MarsConnection.getConnection();
+            PreparedStatement stmt = con.prepareStatement(SQL_UPDATE_USER)){
+            stmt.setInt(1, id);
+            stmt.setString(2, user.getUsername());
+            stmt.executeUpdate();
+        }catch (SQLException ex){
+            logger.log(Level.WARNING, ex.getMessage(), ex);
+        }
+
+        try(Connection con = MarsConnection.getConnection();
+            PreparedStatement stmt = con.prepareStatement(SQL_INSERT_USER_SUB)){
+            stmt.setString(1, user.getUsername());
+            stmt.setInt(2, id);
+            stmt.executeUpdate();
+        }catch (SQLException ex){
+            logger.log(Level.WARNING, ex.getMessage(), ex);
+        }
     }
 
     @Override
-    public void buySubscription(String business, String subscription) {
+    public void buySubscription(BusinessAccount business, String subscription) {
 
     }
 

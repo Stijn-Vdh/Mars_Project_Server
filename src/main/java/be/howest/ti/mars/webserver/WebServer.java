@@ -241,10 +241,10 @@ public class WebServer extends AbstractVerticle {
     }
 
     private void verifyUserAccountToken(RoutingContext ctx) {
-        verifyToken(ctx, bridge::verifyUserAccountToken);
+        verifyToken(ctx, bridge::isUserAccountToken);
     }
     private void verifyBusinessAccountToken(RoutingContext ctx) {
-        verifyToken(ctx, bridge::verifyBusinessAccountToken);
+        verifyToken(ctx, bridge::isBusinessAccountToken);
     }
 
     private void verifyToken(RoutingContext ctx, Predicate<RoutingContext> check) {

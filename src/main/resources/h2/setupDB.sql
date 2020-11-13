@@ -33,9 +33,9 @@ create table subscriptions
 
 create table users_subscriptions
 (
-	userID int not null,
+	userName varchar(50) not null,
 	subscriptionID int not null,
-	CONSTRAINT userID_fk FOREIGN KEY (userID) REFERENCES users(userID),
+	CONSTRAINT userID_fk FOREIGN KEY (userName) REFERENCES users(name),
 	CONSTRAINT u_subscriptionID_fk FOREIGN KEY (subscriptionID) REFERENCES subscriptions(subscriptionID)
 );
 

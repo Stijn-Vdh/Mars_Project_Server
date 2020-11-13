@@ -1,5 +1,6 @@
 package be.howest.ti.mars.logic.data;
 
+import be.howest.ti.mars.logic.controller.BaseAccount;
 import be.howest.ti.mars.logic.controller.BusinessAccount;
 import be.howest.ti.mars.logic.controller.Subscription;
 import be.howest.ti.mars.logic.controller.UserAccount;
@@ -41,7 +42,7 @@ public interface MarsRepoInt {
     List<Subscription> getSubscriptions();
     void getSubscriptionInfo(int businessID);
     void buySubscription (UserAccount user, String subscription);
-    void buySubscription (String business, String subscription);
+    void buySubscription (BusinessAccount business, String subscription);
     void removeSubscription (UserAccount user, String subscription);
     void removeSubscription (String business, String subscription);
 

@@ -2,9 +2,10 @@ package be.howest.ti.mars.logic.controller;
 
 import be.howest.ti.mars.logic.controller.exceptions.AuthenticationException;
 import be.howest.ti.mars.logic.controller.exceptions.UsernameException;
-import be.howest.ti.mars.logic.controller.security.UserToken;
+import be.howest.ti.mars.logic.controller.security.AccountToken;
 import be.howest.ti.mars.logic.data.MarsRepository;
 import java.util.*;
+import java.util.stream.Stream;
 
 public class MarsController {
     MarsRepository repo = new MarsRepository();
@@ -59,7 +60,7 @@ public class MarsController {
         account.setUserToken(null);
     }
 
-    public Set<Subscription> getSubscriptions() {
+    public List<Subscription> getSubscriptions() {
         return repo.getSubscriptions();
     }
 
@@ -77,5 +78,16 @@ public class MarsController {
                 .findAny().orElse(null);
         assert friendAccount != null;
         return user.removeFriend(friendAccount).getUsername();
+    }
+
+
+    public Object buyBusinessSubscription(BusinessAccount businessAccount, String subscriptionName) {
+        repo.buySubscription(businessAccount, subscriptionName);
+        return null;
+    }
+
+    public Object buyUserSubscription(UserAccount userAccount, String subscriptionName) {
+        repo.buySubscription(userAccount, subscriptionName);
+        return null;
     }
 }
