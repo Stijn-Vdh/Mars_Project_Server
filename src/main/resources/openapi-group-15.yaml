@@ -242,14 +242,9 @@ paths:
         - bearerAuth: [ ]
     delete:
         summary: Delete a friend.
+        operationId: removeFriend
         tags:
           - friend
-        parameters:
-          - in: path
-            name: id
-            schema:
-              type: integer
-            required: true
         responses:
           '200':
             description: Succesfuly deleted a friend.

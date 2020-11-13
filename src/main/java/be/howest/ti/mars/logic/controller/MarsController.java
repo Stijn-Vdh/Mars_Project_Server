@@ -58,10 +58,15 @@ public class MarsController {
 
     public Object addFriend(UserAccount user,String friendName) {
         UserAccount friendAccount = (UserAccount) accounts.stream()
-                                                        .filter(acc -> acc.getUsername().equals(friendName))
-                                                        .findAny().orElse(null);
-        System.out.println(friendAccount);
+                .filter(acc -> acc.getUsername().equals(friendName))
+                .findAny().orElse(null);
         return user.addFriend(friendAccount).getUsername();
     }
 
+    public Object removeFriend(UserAccount user, String friendName) {
+        UserAccount friendAccount = (UserAccount) accounts.stream()
+                .filter(acc -> acc.getUsername().equals(friendName))
+                .findAny().orElse(null);
+        return user.removeFriend(friendAccount).getUsername();
+    }
 }

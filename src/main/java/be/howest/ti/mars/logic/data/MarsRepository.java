@@ -95,6 +95,17 @@ public class MarsRepository implements MarsRepoInt {
 
     @Override
     public void removeFriend(String name, String friendName) {
+        String SQL_DELETE_FRIEND = "DELETE FROM friends WHERE friendName=? AND userName=?";
+        try(Connection con = MarsConnection.getConnection();
+            PreparedStatement stmt = con.prepareStatement(SQL_DELETE_FRIEND))
+        {
+            stmt.setString(1,friendName);
+            stmt.setString(2,name);
+
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            logger.log(Level.WARNING, ex.getMessage());
+        }
 
     }
 
