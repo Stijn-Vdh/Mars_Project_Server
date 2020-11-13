@@ -2,7 +2,7 @@ package be.howest.ti.mars.logic.controller;
 
 import be.howest.ti.mars.logic.controller.exceptions.AuthenticationException;
 import be.howest.ti.mars.logic.controller.exceptions.UsernameException;
-import be.howest.ti.mars.logic.controller.security.UserToken;
+import be.howest.ti.mars.logic.controller.security.AccountToken;
 import be.howest.ti.mars.logic.data.MarsRepository;
 
 import java.util.HashSet;
@@ -53,7 +53,7 @@ public class MarsController {
         if (account == null) {   // pw and name doesnt match
             throw new AuthenticationException("Credentials does not match!");
         } else {
-            account.setUserToken(new UserToken(name)); // sets a new token, invalidates previous set token
+            account.setUserToken(new AccountToken(name)); // sets a new token, invalidates previous set token
             return account.getUserToken().getToken();
         }
     }

@@ -1,22 +1,22 @@
 package be.howest.ti.mars.logic.controller;
 
-import be.howest.ti.mars.logic.controller.security.UserToken;
+import be.howest.ti.mars.logic.controller.security.AccountToken;
 
 import java.util.Objects;
 
 public class BaseAccount {
-    private UserToken userToken;
+    private AccountToken accountToken;
     private final int homeAddressEndpoint; //replace with endpoint class
     private final String password; // needs to be replaced with Password class which will contain hashed version
     private final String username; // needs to be unique
     private final String address; // just random info
 
     public BaseAccount(int homeAddressEndpoint, String password, String username, String address) {
-        this(new UserToken(username), homeAddressEndpoint, password, username, address);
+        this(new AccountToken(username), homeAddressEndpoint, password, username, address);
     }
 
-    public BaseAccount(UserToken userToken, int homeAddressEndpoint, String password, String username, String address) {
-        this.userToken = userToken;
+    public BaseAccount(AccountToken accountToken, int homeAddressEndpoint, String password, String username, String address) {
+        this.accountToken = accountToken;
         this.homeAddressEndpoint = homeAddressEndpoint;
         this.password = password;
         this.username = username;
@@ -27,8 +27,8 @@ public class BaseAccount {
         this(null,0,"",name,"");
     }
 
-    public UserToken getUserToken() {
-        return userToken;
+    public AccountToken getUserToken() {
+        return accountToken;
     }
 
     public int getHomeAddressEndpoint() {
@@ -47,8 +47,8 @@ public class BaseAccount {
         return address;
     }
 
-    public void setUserToken(UserToken userToken) {
-        this.userToken = userToken;
+    public void setUserToken(AccountToken accountToken) {
+        this.accountToken = accountToken;
     }
 
     @Override
