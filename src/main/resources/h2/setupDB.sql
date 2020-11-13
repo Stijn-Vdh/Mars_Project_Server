@@ -9,7 +9,8 @@ create table users
 	homeAddress varchar(125),
 	sharesLocation boolean,
 	subscriptionID int,
-	CONSTRAINT userID_pk Primary Key (userID)
+	businessAccount boolean,
+	CONSTRAINT userName_pk Primary Key (name)
 );
 
 create table businesses
@@ -88,10 +89,9 @@ create table endpoints
 
 create table friends
 (
-	friendID int not null,
-	userID int not null,
-	name varchar(50),
-	CONSTRAINT f_userID_fk FOREIGN KEY (userID) REFERENCES users(userID),
-	CONSTRAINT friendID_fk FOREIGN KEY (friendID) REFERENCES users(userID)
+	friendName varchar(50) not null,
+	userName varchar(50) not null,
+	CONSTRAINT f_userName_fk FOREIGN KEY (userName) REFERENCES users(name),
+	CONSTRAINT friendName_fk FOREIGN KEY (friendName) REFERENCES users(name)
 )
 

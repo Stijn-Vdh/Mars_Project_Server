@@ -9,11 +9,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class MarsController {
-    Set<BaseAccount> accounts = new HashSet<>();
     MarsRepository repo = new MarsRepository();
+    Set<BaseAccount> accounts = new HashSet<>();
 
     public String getMessage() {
-        return "Hello, Mars!";
+        return "SmellyEllie";
     }
 
     public Set<BaseAccount> getAccounts() {
@@ -58,4 +58,19 @@ public class MarsController {
         return repo.getSubscriptions();
     }
 
+    public Object addFriend(UserAccount user,String friendName) {
+        UserAccount friendAccount = (UserAccount) accounts.stream()
+                .filter(acc -> acc.getUsername().equals(friendName))
+                .findAny().orElse(null);
+        assert friendAccount != null;
+        return user.addFriend(friendAccount).getUsername();
+    }
+
+    public Object removeFriend(UserAccount user, String friendName) {
+        UserAccount friendAccount = (UserAccount) accounts.stream()
+                .filter(acc -> acc.getUsername().equals(friendName))
+                .findAny().orElse(null);
+        assert friendAccount != null;
+        return user.removeFriend(friendAccount).getUsername();
+    }
 }

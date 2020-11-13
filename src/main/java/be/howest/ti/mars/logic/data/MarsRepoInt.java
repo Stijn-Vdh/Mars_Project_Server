@@ -4,6 +4,7 @@ import be.howest.ti.mars.logic.controller.BusinessAccount;
 import be.howest.ti.mars.logic.controller.Subscription;
 import be.howest.ti.mars.logic.controller.UserAccount;
 
+import java.util.List;
 import java.util.Set;
 
 public interface MarsRepoInt {
@@ -11,14 +12,13 @@ public interface MarsRepoInt {
     void addEndpoint(String endpoint);
 
     // User
-    Set<UserAccount> getUsers();
     void addUser(UserAccount user);
     void ShareLocation(UserAccount user, Boolean shareLocation);
 
     // Friends
-    Set<UserAccount> getFriends(UserAccount user);
-    void addFriend(int userID, int friendID);
-    void removeFriend(int userID, int friendID);
+    List<UserAccount> getFriends(UserAccount user);
+    void beFriend(String name, String friendName);
+    void removeFriend(String name, String friendName);
     void getFriendLocation(int friendID);
 
     // Business

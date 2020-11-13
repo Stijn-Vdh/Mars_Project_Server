@@ -24,7 +24,6 @@ public class SecureHash {    //according to internet PBKDF2 is more secure than 
             SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
             return factory.generateSecret(spec).getEncoded();
         } catch (InvalidKeySpecException | NoSuchAlgorithmException ex) {
-            System.out.println(ex);
             throw new IllegalStateException("Shouldn't be happening");
         }
     }
@@ -35,7 +34,6 @@ public class SecureHash {    //according to internet PBKDF2 is more secure than 
 
             return factory.generateSecret(new PBEKeySpec(key.toCharArray(), new byte[64], 65536, 512)).getEncoded();
         } catch (InvalidKeySpecException | NoSuchAlgorithmException ex) {
-            System.out.println(ex);
             throw new IllegalStateException("Shouldn't be happening");
         }
     }

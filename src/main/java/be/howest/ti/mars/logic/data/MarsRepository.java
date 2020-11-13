@@ -4,13 +4,13 @@ import be.howest.ti.mars.logic.controller.BusinessAccount;
 import be.howest.ti.mars.logic.controller.Subscription;
 import be.howest.ti.mars.logic.controller.UserAccount;
 import be.howest.ti.mars.logic.controller.exceptions.DatabaseException;
-import org.h2.engine.Database;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -25,11 +25,6 @@ public class MarsRepository implements MarsRepoInt {
     @Override
     public void addEndpoint(String endpoint) {
 
-    }
-
-    @Override
-    public Set<UserAccount> getUsers() {
-        return null;
     }
 
     @Override
@@ -73,17 +68,62 @@ public class MarsRepository implements MarsRepoInt {
     }
 
     @Override
-    public Set<UserAccount> getFriends(UserAccount user) {
-        return null;
+    public List<UserAccount> getFriends(UserAccount user) {
+        List<UserAccount> friends = new LinkedList<>();
+        String SQL_SELECT_ALL_FRIENDS = "select f.friendName, u.* from friends f join users u on u.name = f.userName where u.name like ?";
+
+        try(Connection con = MarsConnection.getConnection();
+            PreparedStatement stmt = con.prepareStatement(SQL_SELECT_ALL_FRIENDS))
+        {
+            stmt.setString(1, '%'+user.getUsername()+'%');
+
+            try(ResultSet rs = stmt.executeQuery()){
+                while(rs.next()){
+
+                    String name = rs.getString("friendName");
+                    String pwd = rs.getString("password");
+                    int endpointID = rs.getInt("homeEndpointID");
+                    String addr = rs.getString("homeAddress");
+
+                    UserAccount friend = new UserAccount(name,pwd,endpointID,addr,null);
+                    friends.add(friend);
+                }
+            }
+
+        }catch (SQLException ex){
+            logger.log(Level.WARNING, ex.getMessage(), ex);
+        }
+        return friends;
     }
 
     @Override
-    public void addFriend(int userID, int friendID) {
+    public void beFriend(String name, String friendName) {
+        String SQL_INSERT_FRIEND = "Insert into friends(friendName, userName) values(?,?)";
+        try(Connection con = MarsConnection.getConnection();
+            PreparedStatement stmt = con.prepareStatement(SQL_INSERT_FRIEND))
+        {
+            stmt.setString(1,friendName);
+            stmt.setString(2,name);
 
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            logger.log(Level.WARNING, ex.getMessage());
+        }
     }
 
     @Override
-    public void removeFriend(int userID, int friendID) {
+    public void removeFriend(String name, String friendName) {
+        String SQL_DELETE_FRIEND = "DELETE FROM friends WHERE friendName=? AND userName=?";
+        try(Connection con = MarsConnection.getConnection();
+            PreparedStatement stmt = con.prepareStatement(SQL_DELETE_FRIEND))
+        {
+            stmt.setString(1,friendName);
+            stmt.setString(2,name);
+
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            logger.log(Level.WARNING, ex.getMessage());
+        }
 
     }
 
