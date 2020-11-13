@@ -163,25 +163,37 @@ paths:
           description: Forbidden!
       security:
         - bearerAuth: [ ]
-  /api/user/{id}/shareLocation:
+  /api/shareLocation:
     description: Share your location with your friends.
     post:
       summary: Share your location with your friends.
       tags:
         - user
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer
       responses:
         '200':
           description: Succesfuly shared your location with your friends.
         '401':
           description: Authorization information is missing or invalid.
+
         '403':
             description: Forbidden!
+        '5XX':
+          description: Unexpected error.
+      security:
+        - bearerAuth: [ ]
+    delete:
+      summary: Stop sharing your location with your friends.
+      tags:
+        - user
+      responses:
+        '200':
+          description: Succesfuly stopped sharing your location with your friends.
+        '401':
+          description: Authorization information is missing or invalid.
+        '402':
+          description: The location wasn't being shared already.
+        '403':
+          description: Forbidden!
         '5XX':
           description: Unexpected error.
       security:
@@ -381,48 +393,6 @@ paths:
                     type: integer
                   remainingLargePods:
                     type: integer
-        '401':
-          description: Authorization information is missing or invalid.
-        '403':
-          description: Forbidden!
-        '500':
-          description: Unexpected error.
-      security:
-        - bearerAuth: [ ]
-
-  /api/ticket:
-    get:
-      summary: Get all ticket prices.
-      tags:
-        - store
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  ticketID:
-                    type: integer
-                  name:
-                    type: string
-                  price:
-                    type: integer
-  /api/ticket/{id}:
-    post:
-      summary: Buy a new ticket
-      tags:
-        - store
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: Succesfuly bought a ticket.
         '401':
           description: Authorization information is missing or invalid.
         '403':
