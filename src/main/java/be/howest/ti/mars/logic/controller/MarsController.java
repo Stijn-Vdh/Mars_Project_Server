@@ -8,42 +8,49 @@ import java.util.*;
 
 public class MarsController {
     MarsRepository repo = new MarsRepository();
-    Set<BaseAccount> accounts = new HashSet<>();
+    Set<UserAccount> userAccounts = new HashSet<>();
+    Set<BusinessAccount> businessAccounts = new HashSet<>();
 
     public String getMessage() {
         return "SmellyEllie";
     }
 
-    public Set<BaseAccount> getAccounts() {
-        return accounts;
+    public Set<UserAccount> getUserAccounts() {
+        return userAccounts;
+    }
+    public Set<BusinessAccount> getBusinessAccounts() {
+        return businessAccounts;
     }
 
     public void createAccount(String name, String password, String address, int endpoint, boolean isBusiness) {
-        BaseAccount account;
         if (isBusiness) {
-            account = new BusinessAccount(name, password, endpoint, address, null);
-            BusinessAccount business = (BusinessAccount) account;
-            repo.addBusiness(business);
+            BusinessAccount account = new BusinessAccount(name, password, endpoint, address, null);
+            if ( userAccounts.contains(new UserAccount(name)) || !businessAccounts.add(account)) { // username exists already
+                throw new UsernameException("Username (" + name + ") is already taken");
+            }
+            repo.addBusiness(account);
         } else {
-            account = new UserAccount(name, password, endpoint, address, null);
-            UserAccount user = (UserAccount) account;
-            repo.addUser(user);
+            UserAccount account = new UserAccount(name, password, endpoint, address, null);
+            if ( businessAccounts.contains(new BusinessAccount(name)) || !userAccounts.add(account)) { // username exists already
+                throw new UsernameException("Username (" + name + ") is already taken");
+            }
+            repo.addUser(account);
         }
 
-        if (!accounts.add(account)) { // username exists already
-            throw new UsernameException("Username (" + name + ") is already taken");
-        }
+
     }
 
     public byte[] login(String name, String password) {
-        BaseAccount account = accounts.stream()
+        BaseAccount account = Stream.concat(
+                userAccounts.stream(),
+                businessAccounts.stream())
                 .filter(acc -> acc.getUsername().equals(name) && acc.getPassword().equals(password))
                 .findAny().orElse(null);
 
         if (account == null) {   // pw and name doesnt match
             throw new AuthenticationException("Credentials does not match!");
         } else {
-            account.setUserToken(new UserToken(name)); // sets a new token, invalidates previous set token
+            account.setUserToken(new AccountToken(name)); // sets a new token, invalidates previous set token
             return account.getUserToken().getToken();
         }
     }
@@ -52,12 +59,12 @@ public class MarsController {
         account.setUserToken(null);
     }
 
-    public List<Subscription> getSubscriptions() {
+    public Set<Subscription> getSubscriptions() {
         return repo.getSubscriptions();
     }
 
     public Object addFriend(UserAccount user,String friendName) {
-        UserAccount friendAccount = (UserAccount) accounts.stream()
+        UserAccount friendAccount = userAccounts.stream()
                 .filter(acc -> acc.getUsername().equals(friendName))
                 .findAny().orElse(null);
         assert friendAccount != null;
@@ -65,19 +72,10 @@ public class MarsController {
     }
 
     public Object removeFriend(UserAccount user, String friendName) {
-        UserAccount friendAccount = (UserAccount) accounts.stream()
+        UserAccount friendAccount = userAccounts.stream()
                 .filter(acc -> acc.getUsername().equals(friendName))
                 .findAny().orElse(null);
         assert friendAccount != null;
         return user.removeFriend(friendAccount).getUsername();
-    }
-
-    public Object buySubscription(BaseAccount acc, String subName){
-        List<Subscription> subscriptions = getSubscriptions();
-        int id = subscriptions.stream()
-                                .filter(sub -> sub.getName().equals(subName))
-                                .mapToInt(Subscription::getId).sum();
-        acc.setSubscriptionID(id);
-        return null;
     }
 }
