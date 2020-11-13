@@ -220,6 +220,7 @@ paths:
         - bearerAuth: [ ]
   /api/friend/{id}: #Add a friend or delete one
       post:
+        operationId: addFriend
         summary: Add a new friend.
         tags:
           - friend

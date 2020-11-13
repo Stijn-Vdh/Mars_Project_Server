@@ -26,7 +26,7 @@ public class UserAccount extends BaseAccount {
 
     public UserAccount addFriend(UserAccount friend){
         friends.add(friend);
-        repo.addFriend(getUsername(), friend.getUsername());
+        repo.beFriend(getUsername(), friend.getUsername());
         return friend;
     }
 

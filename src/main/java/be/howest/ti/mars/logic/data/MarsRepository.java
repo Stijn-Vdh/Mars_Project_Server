@@ -68,8 +68,18 @@ public class MarsRepository implements MarsRepoInt {
     }
 
     @Override
-    public void addFriend(String name, String friendName) {
+    public void beFriend(String name, String friendName) {
+        String SQL_INSERT_FRIEND = "Insert into friends(friendName, userName) values(?,?)";
+        try(Connection con = MarsConnection.getConnection();
+            PreparedStatement stmt = con.prepareStatement(SQL_INSERT_FRIEND))
+        {
+            stmt.setString(1,friendName);
+            stmt.setString(2,name);
 
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            logger.log(Level.WARNING, ex.getMessage());
+        }
     }
 
     @Override
