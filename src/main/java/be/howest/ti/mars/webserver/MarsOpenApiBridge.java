@@ -62,13 +62,11 @@ class MarsOpenApiBridge {
 
     public Object addFriend (RoutingContext ctx){
         UserAccount user = (UserAccount) getAccount(ctx);
-
         String friendName = ctx.request().getParam("fName");
         return controller.addFriend(user,friendName);
     }
     public Object removeFriend (RoutingContext ctx){
         UserAccount user = (UserAccount) getAccount(ctx);
-
         String friendName = ctx.request().getParam("fName");
         return controller.removeFriend(user,friendName);
     }

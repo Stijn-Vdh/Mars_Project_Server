@@ -2,9 +2,6 @@ package be.howest.ti.mars.logic.controller;
 
 import be.howest.ti.mars.logic.controller.security.UserToken;
 import be.howest.ti.mars.logic.data.MarsRepository;
-
-import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 
 public class UserAccount extends BaseAccount {

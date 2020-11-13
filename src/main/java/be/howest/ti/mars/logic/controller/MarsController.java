@@ -60,6 +60,7 @@ public class MarsController {
         UserAccount friendAccount = (UserAccount) accounts.stream()
                 .filter(acc -> acc.getUsername().equals(friendName))
                 .findAny().orElse(null);
+        assert friendAccount != null;
         return user.addFriend(friendAccount).getUsername();
     }
 
@@ -67,6 +68,7 @@ public class MarsController {
         UserAccount friendAccount = (UserAccount) accounts.stream()
                 .filter(acc -> acc.getUsername().equals(friendName))
                 .findAny().orElse(null);
+        assert friendAccount != null;
         return user.removeFriend(friendAccount).getUsername();
     }
 }
