@@ -74,6 +74,12 @@ class MarsOpenApiBridge {
     public Object viewSubscriptions(RoutingContext ctx) {
         return controller.getSubscriptions();
     }
+    public Object buySubscription(RoutingContext ctx) {
+        JsonObject json = ctx.getBodyAsJson();
+        String subscriptionName = json.getString("subscriptionName");
+
+        return controller.buySubscription(getAccount(ctx), subscriptionName);
+    }
 
     public boolean verifyAccountToken(RoutingContext ctx) {
         return getAccount(ctx) != null;
@@ -95,4 +101,6 @@ class MarsOpenApiBridge {
             return header.substring(AUTHORIZATION_TOKEN_PREFIX.length());
         }
     }
+
+
 }

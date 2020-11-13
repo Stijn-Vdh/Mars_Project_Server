@@ -10,6 +10,7 @@ public class BaseAccount {
     private final String password; // needs to be replaced with Password class which will contain hashed version
     private final String username; // needs to be unique
     private final String address; // just random info
+    private int subscriptionID;
 
     public BaseAccount(int homeAddressEndpoint, String password, String username, String address) {
         this(new UserToken(username), homeAddressEndpoint, password, username, address);
@@ -45,6 +46,10 @@ public class BaseAccount {
 
     public void setUserToken(UserToken userToken) {
         this.userToken = userToken;
+    }
+
+    public void setSubscriptionID(int id){
+        this.subscriptionID = id;
     }
 
     @Override

@@ -179,8 +179,8 @@ public class MarsRepository implements MarsRepoInt {
     }
 
     @Override
-    public Set<Subscription> getSubscriptions() {
-        Set<Subscription> subscriptions = new HashSet<>();
+    public List<Subscription> getSubscriptions() {
+        List<Subscription> subscriptions = new LinkedList<>();
         String SQL_SELECT_ALL_SUBSCRIPTIONS = "select * from subscriptions";
 
         try(Connection con = MarsConnection.getConnection();

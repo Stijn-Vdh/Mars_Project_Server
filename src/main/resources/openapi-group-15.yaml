@@ -312,6 +312,7 @@ paths:
                 } ]
     post:
       summary: Buy subscription
+      operationId: buySubscription
       tags:
         - store
       requestBody:
