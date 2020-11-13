@@ -11,7 +11,10 @@ servers:
     description: 'Public web api'
 components:
   securitySchemes:
-    bearerAuth:
+    UserToken:
+      type: http
+      scheme: bearer
+    BusinessToken:
       type: http
       scheme: bearer
 
@@ -77,7 +80,8 @@ paths:
         '5XX':
           description: Unexpected error.
       security:
-        - bearerAuth: [ ]
+        - UserToken: [ ]
+        - BusinessToken: []
 
   /api/createAccount:
     summary: create an account
@@ -112,20 +116,13 @@ paths:
           description: username already is taken
         '500':
           description: Internal error.
-  /api/user/{id}: #get account information
-    summary: get user information
-    description: get user information
+  /api/accountInformation: #get your account information
+    summary: get your account information
+    description: get your account information
     get:
       summary: get user information.
       tags:
         - user
-      parameters:
-        - in: path
-          name: id
-          schema:
-            type: integer
-          required: true
-          description: give the id of the user
       responses:
         '200':
           description: list of an endpoint given their id
@@ -142,8 +139,6 @@ paths:
                     type: string
                   homeEndpointID:
                     type: integer
-                  password:
-                    type: string
                   subscription:
                     type: string
                   subscriptionID:
@@ -153,7 +148,6 @@ paths:
                   name: "Debby",
                   homeAdress: "Colony 1, residence 15",
                   homeEndpoint: 5,
-                  password: "DFdes6'(Dfeiqdsfv64501d*",
                   subscription: "Unlimited",
                   subscriptionID: "5"
                 }
@@ -161,8 +155,11 @@ paths:
           description: Authorization information is missing or invalid.
         '403':
           description: Forbidden!
+        '500':
+          description: Internal error.
       security:
-        - bearerAuth: [ ]
+        - UserToken: [ ]
+        - BusinessToken: [ ]
   /api/user/{id}/shareLocation:
     description: Share your location with your friends.
     post:
@@ -185,7 +182,7 @@ paths:
         '5XX':
           description: Unexpected error.
       security:
-        - bearerAuth: [ ]
+        - UserToken: [ ]
 
   /api/friend: #Get all our friends
     get:
@@ -216,8 +213,10 @@ paths:
           description: Authorization information is missing or invalid.
         '403':
           description: Forbidden!
+        '500':
+          description: Internal error.
       security:
-        - bearerAuth: [ ]
+        - UserToken: [ ]
   /api/friend/{fName}: #Add a friend or delete one
     parameters:
       - in: path
@@ -236,10 +235,12 @@ paths:
           description: Succesfuly added a friend.
         '401':
           description: Authorization information is missing or invalid.
-        '5XX':
-          description: Unexpected error.
+        '403':
+          description: Forbidden!
+        '500':
+          description: Internal error.
       security:
-        - bearerAuth: [ ]
+        - UserToken: [ ]
     delete:
         summary: Delete a friend.
         operationId: removeFriend
@@ -252,10 +253,10 @@ paths:
             description: Authorization information is missing or invalid.
           '403':
             description: Forbidden!
-          '5XX':
-            description: Unexpected error.
+          '500':
+            description: Internal error.
         security:
-          - bearerAuth: [ ]
+          - UserToken: [ ]
   /api/friend/{id}/location: # Get the location of a current friend
       description: Get the current location of one of your friends.
       get:
@@ -275,12 +276,12 @@ paths:
             description: Authorization information is missing or invalid.
           '403':
             description: Forbidden!
-          '5XX':
+          '500':
             description: Unexpected error.
           default:
             description: This friend does not share his location with others.
         security:
-          - bearerAuth: [ ]
+          - UserToken: [ ]
 
   /api/subscription:
     description: subscription.
@@ -310,6 +311,8 @@ paths:
                   subscriptionID: 2,
                   subscriptionName: 'Professional'
                 } ]
+        '500':
+          description: Internal error.
     post:
       summary: Buy subscription
       tags:
@@ -333,7 +336,8 @@ paths:
         '500':
           description: Internal error.
       security:
-        - bearerAuth: [ ]
+        - UserToken: [ ]
+        - BusinessToken: [ ]
     delete:
       tags:
         - store
@@ -347,9 +351,9 @@ paths:
             description: Forbidden!
         '500':
           description: Unexpected error.
-
       security:
-        - bearerAuth: [ ]
+        - UserToken: [ ]
+        - BusinessToken: [ ]
   /api/subscriptionInfo/{id}:
     description: collect statistics about your business
     get:
@@ -388,49 +392,8 @@ paths:
         '500':
           description: Unexpected error.
       security:
-        - bearerAuth: [ ]
-
-  /api/ticket:
-    get:
-      summary: Get all ticket prices.
-      tags:
-        - store
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  ticketID:
-                    type: integer
-                  name:
-                    type: string
-                  price:
-                    type: integer
-  /api/ticket/{id}:
-    post:
-      summary: Buy a new ticket
-      tags:
-        - store
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: Succesfuly bought a ticket.
-        '401':
-          description: Authorization information is missing or invalid.
-        '403':
-          description: Forbidden!
-        '500':
-          description: Unexpected error.
-      security:
-        - bearerAuth: [ ]
+        - UserToken: [ ]
+        - BusinessToken: [ ]
 
   /api/endpoints: #View all endpoints
     summary: get all endpoints
@@ -455,10 +418,6 @@ paths:
                   location: 'here',
                   privateEndpoint: true
                 }]
-        '401':
-          description: Authorization information is missing or invalid.
-        '403':
-          description: Forbidden!
         '500':
           description: Unexpected error.
   /api/endpoints/{id}: #view endpoint information
@@ -492,10 +451,6 @@ paths:
                     type: string
                   privateEndpoint:
                     type: boolean
-        '401':
-          description: Authorization information is missing or invalid.
-        '403':
-          description: Forbidden!
         '500':
           description: Unexpected error.
 
@@ -533,7 +488,8 @@ paths:
         '500':
           description: Unexpected error.
       security:
-        - bearerAuth: [ ]
+        - UserToken: [ ]
+        - BusinessToken: [ ]
   /api/sendSmallPackage: #Send small package
     post:
       summary: request and send a small package pod
@@ -570,7 +526,8 @@ paths:
         '500':
           description: Unexpected error.
       security:
-        - bearerAuth: [ ]
+        - UserToken: [ ]
+        - BusinessToken: [ ]
   /api/sendLargePackage: #Send large package
     post:
       summary: request and send a large package pod (businesses only)
@@ -607,7 +564,7 @@ paths:
         '500':
           description: Unexpected error.
       security:
-        - bearerAuth: [ ]
+        - BusinessToken: [ ]
 
   /api/routeInfo/{id}:
     description: Get route information.
@@ -645,9 +602,9 @@ paths:
           description: Forbidden!
         '500':
           description: Unexpected error.
-
       security:
-        - bearerAuth: [ ]
+        - UserToken: [ ]
+        - BusinessToken: [ ]
   /api/travel:
     description: travel from one point to another.
     post:
@@ -686,7 +643,7 @@ paths:
         '500':
             description: Unexpected error.
       security:
-        - bearerAuth: [ ]
+        - UserToken: [ ]
 
   /api/ping:
     get:
