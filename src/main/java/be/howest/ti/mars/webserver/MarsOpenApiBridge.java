@@ -1,15 +1,17 @@
 package be.howest.ti.mars.webserver;
 import be.howest.ti.mars.logic.controller.BaseAccount;
+import be.howest.ti.mars.logic.controller.BusinessAccount;
 import be.howest.ti.mars.logic.controller.MarsController;
 import be.howest.ti.mars.logic.controller.UserAccount;
+import be.howest.ti.mars.logic.controller.security.AccountToken;
 import be.howest.ti.mars.logic.controller.security.SecureHash;
-import be.howest.ti.mars.logic.controller.security.UserToken;
 import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 class MarsOpenApiBridge {
     private final MarsController controller;
@@ -63,36 +65,58 @@ class MarsOpenApiBridge {
         return null;
     }
 
-    public Object viewFriends (RoutingContext ctx){
+    public Object viewFriends(RoutingContext ctx) {
         UserAccount user = (UserAccount) getAccount(ctx);
         return user.getFriends().stream()
-                                .map(BaseAccount::getUsername)
-                                .collect(Collectors.toList());
+                .map(BaseAccount::getUsername)
+                .collect(Collectors.toList());
     }
 
-    public Object addFriend (RoutingContext ctx){
+    public Object addFriend(RoutingContext ctx) {
         UserAccount user = (UserAccount) getAccount(ctx);
         String friendName = ctx.request().getParam("fName");
-        return controller.addFriend(user,friendName);
+        return controller.addFriend(user, friendName);
     }
-    public Object removeFriend (RoutingContext ctx){
+
+    public Object removeFriend(RoutingContext ctx) {
         UserAccount user = (UserAccount) getAccount(ctx);
         String friendName = ctx.request().getParam("fName");
-        return controller.removeFriend(user,friendName);
+        return controller.removeFriend(user, friendName);
     }
 
     public Object viewSubscriptions(RoutingContext ctx) {
         return controller.getSubscriptions();
     }
 
-    public boolean verifyAccountToken(RoutingContext ctx) {
-        return getAccount(ctx) != null;
+    public boolean verifyUserAccountToken(RoutingContext ctx) {
+        return getUserAccount(ctx) != null;
+    }
+
+    public boolean verifyBusinessAccountToken(RoutingContext ctx) {
+        return getBusinessAccount(ctx) != null;
     }
 
     private BaseAccount getAccount(RoutingContext ctx) {
-        UserToken userToken = Json.decodeValue(new JsonObject().put("token", getBearerToken(ctx)).toString(), UserToken.class);
-        return controller.getAccounts().stream()
-                .filter(acc -> userToken.equals(acc.getUserToken()))
+        AccountToken accountToken = Json.decodeValue(new JsonObject().put("token", getBearerToken(ctx)).toString(), AccountToken.class);
+        return Stream.concat(
+                controller.getUserAccounts().stream(),
+                controller.getBusinessAccounts().stream())
+                .filter(acc -> accountToken.equals(acc.getUserToken()))
+                .findAny()
+                .orElse(null);
+    }
+
+    private UserAccount getUserAccount(RoutingContext ctx) {
+        AccountToken accountToken = Json.decodeValue(new JsonObject().put("token", getBearerToken(ctx)).toString(), AccountToken.class);
+        return controller.getUserAccounts().stream()
+                .filter(acc -> accountToken.equals(acc.getUserToken()))
+                .findAny()
+                .orElse(null);
+    }
+    private BusinessAccount getBusinessAccount(RoutingContext ctx) {
+        AccountToken accountToken = Json.decodeValue(new JsonObject().put("token", getBearerToken(ctx)).toString(), AccountToken.class);
+        return controller.getBusinessAccounts().stream()
+                .filter(acc -> accountToken.equals(acc.getUserToken()))
                 .findAny()
                 .orElse(null);
     }

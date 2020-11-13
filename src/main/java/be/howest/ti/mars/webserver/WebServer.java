@@ -119,7 +119,10 @@ public class WebServer extends AbstractVerticle {
         factory.addGlobalHandler(createCorsHandler());
 
         // Verify the accounts token for all secured operations
-        factory.addSecurityHandler("bearerAuth", this::verifyAccountToken);
+        factory.addSecurityHandler("UserToken", this::verifyUserAccountToken);
+
+        // Verify the accounts token for all secured operations
+        factory.addSecurityHandler("BusinessToken", this::verifyBusinessAccountToken);
 
         // Add all route handlers
         addRoutes(factory);
@@ -133,6 +136,8 @@ public class WebServer extends AbstractVerticle {
 
         return router;
     }
+
+
 
     private void addRoutes(OpenAPI3RouterFactory factory) {
         addRouteWithCtxFunction(factory, "getMessage", bridge::getMessage);
@@ -236,8 +241,11 @@ public class WebServer extends AbstractVerticle {
         return result;
     }
 
-    private void verifyAccountToken(RoutingContext ctx) {
-        verifyToken(ctx, bridge::verifyAccountToken);
+    private void verifyUserAccountToken(RoutingContext ctx) {
+        verifyToken(ctx, bridge::verifyUserAccountToken);
+    }
+    private void verifyBusinessAccountToken(RoutingContext ctx) {
+        verifyToken(ctx, bridge::verifyBusinessAccountToken);
     }
 
     private void verifyToken(RoutingContext ctx, Predicate<RoutingContext> check) {
