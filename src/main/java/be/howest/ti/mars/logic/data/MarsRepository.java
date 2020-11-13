@@ -24,7 +24,13 @@ public class MarsRepository implements MarsRepoInt {
 
     @Override
     public void addEndpoint(String endpoint) {
-
+        String SQL_INSERT_ENDPOINT = "INSERT INTO ENDPOINTS(name) VALUES(?)";
+        try (Connection con = MarsConnection.getConnection();
+             PreparedStatement stmt = con.prepareStatement(SQL_INSERT_ENDPOINT)){
+            stmt.setString(1, endpoint);
+        } catch (SQLException ex) {
+            throw new DatabaseException("Can't add endpoint!");
+        }
     }
 
     @Override
