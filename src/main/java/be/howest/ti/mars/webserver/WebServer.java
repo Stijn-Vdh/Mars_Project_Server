@@ -205,6 +205,7 @@ public class WebServer extends AbstractVerticle {
 
         } catch (Throwable throwable) {
             LOGGER.log(Level.SEVERE, () -> String.format("onInternalServerError at %s", ctx.request().absoluteURI()));
+            throwable.printStackTrace();
             replyWithFailure(ctx, 500, "Internal Server Error", null);
         }
     }
