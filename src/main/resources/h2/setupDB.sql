@@ -9,7 +9,6 @@ create table users
 	homeAddress varchar(125),
 	sharesLocation boolean,
 	subscriptionID int,
-	businessAccount boolean,
 	CONSTRAINT userName_pk Primary Key (name)
 );
 
@@ -69,6 +68,8 @@ create table deliveries
 (
 	deliveryID int auto_increment,
 	deliveryType varchar(25),
+	`from` varchar(50),
+    destination varchar(50),
 	`when` date
 );
 
