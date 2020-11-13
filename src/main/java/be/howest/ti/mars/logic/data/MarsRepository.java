@@ -25,11 +25,6 @@ public class MarsRepository implements MarsRepoInt {
     }
 
     @Override
-    public Set<UserAccount> getUsers() {
-        return null;
-    }
-
-    @Override
     public void addUser(UserAccount user) {
         String SQL_INSERT_USER =
                 "INSERT INTO USERS(homeEndpointID, name, password, homeAddress, sharesLocation, subscriptionID, businessAccount) VALUES(?,?,?,?,?,?,?)";

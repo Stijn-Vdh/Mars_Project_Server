@@ -10,7 +10,6 @@ public interface MarsRepoInt {
     void addEndpoint(String endpoint);
 
     // User
-    Set<UserAccount> getUsers();
     void addUser(UserAccount user);
     void ShareLocation(UserAccount user, Boolean shareLocation);
 
