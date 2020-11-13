@@ -68,9 +68,9 @@ create table deliveries
 (
 	deliveryID int auto_increment,
 	deliveryType varchar(25),
-	`from` varchar(50),
-    destination varchar(50),
-	`when` date
+	`from` int,
+    destination int,
+	`date` date
 );
 
 create table deliveries_businesses

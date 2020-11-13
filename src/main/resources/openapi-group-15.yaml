@@ -534,62 +534,29 @@ paths:
           description: Unexpected error.
       security:
         - bearerAuth: [ ]
-  /api/sendSmallPackage: #Send small package
+
+  /api/sendPackage: #Add Delivery
     post:
-      summary: request and send a small package pod
+      operationId: sendPackage
+      summary: request and send a package pod
       tags:
         - delivery
       requestBody:
-        description: provide correct information for a small package pod.
+        description: provide correct information for a small or large package.
         required: true
         content:
           application/json:
             schema:
               type: object
               properties:
-                business:
-                  type: boolean
+                deliveryType:
+                  type: string
                 from:
                   type: integer
                 destination:
                   type: integer
-      responses:
-        '200':
-          description: package sent
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  deliveryID:
-                    type: integer
-        '401':
-          description: Authorization information is missing or invalid.
-        '403':
-          description: Forbidden!
-        '500':
-          description: Unexpected error.
-      security:
-        - bearerAuth: [ ]
-  /api/sendLargePackage: #Send large package
-    post:
-      summary: request and send a large package pod (businesses only)
-      tags:
-        - delivery
-      requestBody:
-        description: provide correct information for a large package pod.
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                businessID:
-                  type: integer
-                from:
-                  type: integer
-                destination:
-                  type: integer
+                date:
+                  type: string
       responses:
         '200':
           description: package sent

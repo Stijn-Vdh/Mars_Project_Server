@@ -1,35 +1,33 @@
 package be.howest.ti.mars.logic.controller;
-
-import java.util.Date;
 import java.util.Objects;
 
 public class Delivery {
 
     private final String deliveryType;
-    private final String source;
-    private final String destination;
-    private final Date date;
+    private final int sourceID;
+    private final int destinationID;
+    private final String date;
 
-    public Delivery(String deliveryType, String source, String destination, Date date) {
+    public Delivery(String deliveryType, int source, int destination, String date) {
         this.deliveryType = deliveryType;
-        this.source = source;
-        this.destination = destination;
+        this.sourceID = source;
+        this.destinationID = destination;
         this.date = date;
     }
-    
+
     public String getDeliveryType() {
         return deliveryType;
     }
 
-    public String getSource() {
-        return source;
+    public int getSourceID() {
+        return sourceID;
     }
 
-    public String getDestination() {
-        return destination;
+    public int getDestinationID() {
+        return destinationID;
     }
 
-    public Date getDate() {
+    public String getDate() {
         return date;
     }
 
@@ -39,13 +37,13 @@ public class Delivery {
         if (o == null || getClass() != o.getClass()) return false;
         Delivery delivery = (Delivery) o;
         return Objects.equals(deliveryType, delivery.deliveryType) &&
-                Objects.equals(source, delivery.source) &&
-                Objects.equals(destination, delivery.destination) &&
+                Objects.equals(sourceID, delivery.sourceID) &&
+                Objects.equals(destinationID, delivery.destinationID) &&
                 Objects.equals(date, delivery.date);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(deliveryType, source, destination, date);
+        return Objects.hash(deliveryType, sourceID, destinationID, date);
     }
 }
