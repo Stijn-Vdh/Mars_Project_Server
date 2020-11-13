@@ -1,6 +1,7 @@
 package be.howest.ti.mars.logic.data;
 
 import be.howest.ti.mars.logic.controller.BusinessAccount;
+import be.howest.ti.mars.logic.controller.Delivery;
 import be.howest.ti.mars.logic.controller.Subscription;
 import be.howest.ti.mars.logic.controller.UserAccount;
 
@@ -32,10 +33,8 @@ public interface MarsRepoInt {
     void cancelTravel(UserAccount user, String trip);
 
     // Deliveries
-    Set<String> getDeliveries(); // todo:  String moet delivery class worden
-    void sendSmallPackage(UserAccount user, String delivery);
-    void sendLargePackage(UserAccount user, String delivery);
-    void addDelivery(String delivery);
+    Set<Delivery> getDeliveries();
+    void addDelivery(Delivery delivery);
 
     // Subscriptions
     Set<Subscription> getSubscriptions();

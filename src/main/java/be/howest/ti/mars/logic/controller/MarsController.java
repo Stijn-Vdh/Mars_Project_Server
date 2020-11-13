@@ -5,6 +5,9 @@ import be.howest.ti.mars.logic.controller.exceptions.UsernameException;
 import be.howest.ti.mars.logic.controller.security.AccountToken;
 import be.howest.ti.mars.logic.data.MarsRepository;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -42,6 +45,18 @@ public class MarsController {
 
 
     }
+
+    public void createDelivery(String deliveryType, int from, int destination, String date){
+        Date convertedDate = null;
+        try {
+            convertedDate = new SimpleDateFormat("dd-MM-yyyy").parse(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        Delivery delivery = new Delivery(deliveryType, from, destination, date);
+        repo.addDelivery(delivery);
+    }
+
 
     public byte[] login(String name, String password) {
         BaseAccount account = Stream.concat(
@@ -81,4 +96,5 @@ public class MarsController {
         assert friendAccount != null;
         return user.removeFriend(friendAccount).getUsername();
     }
+
 }
