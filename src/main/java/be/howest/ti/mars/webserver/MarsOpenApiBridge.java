@@ -2,7 +2,6 @@ package be.howest.ti.mars.webserver;
 
 import be.howest.ti.mars.logic.controller.BaseAccount;
 import be.howest.ti.mars.logic.controller.MarsController;
-import be.howest.ti.mars.logic.controller.UserAccount;
 import be.howest.ti.mars.logic.controller.security.UserToken;
 import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.json.Json;
@@ -24,14 +23,17 @@ class MarsOpenApiBridge {
         return controller.getMessage();
     }
 
-    public Object createUser(RoutingContext ctx) {
-        logger.info("createUser");
+    public Object createAccount(RoutingContext ctx) {
+        logger.info("createAccount");
 
         JsonObject json = ctx.getBodyAsJson();
-        controller.createUser(json.getString("name"),
-                json.getString("password"),
+        controller.createAccount(json.getString("name"),
+                SecureHash.getHashEncoded(json.getString("password")),
                 json.getString("homeAddress"),
-                String.valueOf(json.getInteger("homeEndpointID")));
+                json.getInteger("homeEndpointID"),
+                json.getBoolean("businessAccount")
+        );
+
         return null; // doesnt allow void
     }
 
@@ -39,7 +41,7 @@ class MarsOpenApiBridge {
         logger.info("login");
 
         JsonObject json = ctx.getBodyAsJson();
-        return controller.login(json.getString("name"), json.getString("password"));
+        return controller.login(json.getString("name"), SecureHash.getHashEncoded(json.getString("password")));
     }
 
     public Object logout(RoutingContext ctx) {

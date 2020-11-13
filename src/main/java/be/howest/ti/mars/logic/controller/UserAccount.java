@@ -11,11 +11,11 @@ public class UserAccount extends BaseAccount {
     private List<UserAccount> friends;
     MarsRepository repo = new MarsRepository();
 
-    public UserAccount( String username, String password, String homeAddressEndpoint, String address) {
+    public UserAccount( String username, String password, int homeAddressEndpoint, String address) {
         super(homeAddressEndpoint, password, username, address);
     }
 
-    public UserAccount(String username, String password, String homeAddressEndpoint, String address, UserToken userToken) {
+    public UserAccount(String username, String password, int homeAddressEndpoint, String address, UserToken userToken) {
         super(userToken, homeAddressEndpoint, password, username, address);
         friends = new LinkedList<>(repo.getFriends(this));
     }

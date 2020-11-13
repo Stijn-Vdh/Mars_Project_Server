@@ -20,8 +20,15 @@ public class MarsController {
         return accounts;
     }
 
-    public void createUser(String name, String password, String endpoint, String address) {
-        BaseAccount account = new UserAccount(name, password, endpoint, address, null);
+    public void createAccount(String name, String password, String address, int endpoint, boolean isBusiness) {
+        BaseAccount account;
+        if (isBusiness) {
+            account = new BusinessAccount(name, password, endpoint, address, null);
+        } else {
+            account = new UserAccount(name, password, endpoint, address, null);
+            UserAccount user = (UserAccount) account;
+            repo.addUser(user);
+        }
 
         if (!accounts.add(account)) { // username exists already
             throw new UsernameException("Username (" + name + ") is already taken");

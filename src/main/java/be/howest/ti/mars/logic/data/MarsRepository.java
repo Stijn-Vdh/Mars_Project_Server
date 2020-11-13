@@ -2,6 +2,8 @@ package be.howest.ti.mars.logic.data;
 
 import be.howest.ti.mars.logic.controller.Subscription;
 import be.howest.ti.mars.logic.controller.UserAccount;
+import be.howest.ti.mars.logic.controller.exceptions.DatabaseException;
+import org.h2.engine.Database;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -31,10 +33,24 @@ public class MarsRepository implements MarsRepoInt {
 
     @Override
     public void addUser(UserAccount user) {
-
+        String SQL_INSERT_USER =
+                "INSERT INTO USERS(homeEndpointID, name, password, homeAddress, sharesLocation, subscriptionID, businessAccount) VALUES(?,?,?,?,?,?,?)";
+        try (Connection con = MarsConnection.getConnection();
+             PreparedStatement stmt = con.prepareStatement(SQL_INSERT_USER)) {
+            stmt.setInt(1, user.getHomeAddressEndpoint());
+            stmt.setString(2, user.getUsername());
+            stmt.setString(3, user.getPassword());
+            stmt.setString(4, user.getAddress());
+            stmt.setBoolean(5, false);
+            stmt.setInt(6, 0);
+            stmt.setBoolean(7, false);
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            throw new DatabaseException("Cannot add user!");
+        }
     }
 
-    @Override
+        @Override
     public void ShareLocation(UserAccount user, Boolean shareLocation) {
 
     }

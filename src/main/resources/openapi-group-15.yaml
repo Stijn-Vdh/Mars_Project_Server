@@ -79,12 +79,12 @@ paths:
       security:
         - bearerAuth: [ ]
 
-  /api/createUser:
-    summary: create a user.
-    description: creat a new user.
+  /api/createAccount:
+    summary: create an account
+    description: creates a new account
     post:
-      operationId: createUser
-      summary: create a user.
+      operationId: createAccount
+      summary: create an account
       tags:
         - user
       requestBody:
@@ -101,7 +101,7 @@ paths:
                   type: string
                 homeEndpointID:
                   type: integer
-                businessAcount:
+                businessAccount:
                   type: boolean
                 password:
                   type: string
