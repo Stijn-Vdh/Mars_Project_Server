@@ -20,23 +20,8 @@ public class UserToken {
     }
 
     public UserToken(String username) { // 100% prevent duplicates, UUIDs are not 100% unique
-        token = hashToken(new Random(System.currentTimeMillis()).nextInt(5000) + username);   //makes PRNG "random"
+        token = SecureHash.getUniqueHash(new Random(System.currentTimeMillis()).nextInt(5000) + username);   //makes PRNG "random", random int isn't really needed
     }
-
-    private byte[] hashToken(String token) { //according to internet PBKDF2 is more secure than SHA-512 since its slower to crack
-        SecureRandom random = new SecureRandom(); //reduces collisions
-        byte[] salt = new byte[64];
-        random.nextBytes(salt);
-        KeySpec spec = new PBEKeySpec(token.toCharArray(), salt, 65536, 512);
-
-        try {
-            SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
-            return factory.generateSecret(spec).getEncoded();
-        } catch (InvalidKeySpecException | NoSuchAlgorithmException ex) {
-            throw new IllegalStateException("Invalid SecretKeyFactory", ex);
-        }
-    }
-
 
     @JsonCreator
     public UserToken(@JsonProperty("token") byte[] token) {
