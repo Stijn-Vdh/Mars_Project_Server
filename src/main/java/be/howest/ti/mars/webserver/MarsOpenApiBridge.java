@@ -1,5 +1,4 @@
 package be.howest.ti.mars.webserver;
-
 import be.howest.ti.mars.logic.controller.BaseAccount;
 import be.howest.ti.mars.logic.controller.MarsController;
 import be.howest.ti.mars.logic.controller.UserAccount;
@@ -9,9 +8,7 @@ import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
-
 import java.util.logging.Logger;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 class MarsOpenApiBridge {
@@ -40,6 +37,19 @@ class MarsOpenApiBridge {
 
         return null; // doesnt allow void
     }
+
+    public Object sendPackage(RoutingContext ctx){
+        logger.info("addDelivery");
+
+        JsonObject json = ctx.getBodyAsJson();
+        controller.createDelivery(json.getString("deliveryType"),
+                json.getInteger("from"),
+                json.getInteger("destination"),
+                json.getString("date")
+                );
+        return null;
+    }
+
 
     public Object login(RoutingContext ctx) {
         logger.info("login");
@@ -95,4 +105,5 @@ class MarsOpenApiBridge {
             return header.substring(AUTHORIZATION_TOKEN_PREFIX.length());
         }
     }
+
 }
