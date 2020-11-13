@@ -189,6 +189,7 @@ paths:
 
   /api/friend: #Get all our friends
     get:
+      operationId: viewFriends
       summary: Get all your friends.
       tags:
         - friend

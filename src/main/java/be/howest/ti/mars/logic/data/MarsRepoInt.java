@@ -16,8 +16,8 @@ public interface MarsRepoInt {
 
     // Friends
     Set<UserAccount> getFriends(UserAccount user);
-    void addFriend(int userID, int friendID);
-    void removeFriend(int userID, int friendID);
+    void addFriend(String name, String friendName);
+    void removeFriend(String name, String friendName);
     void getFriendLocation(int friendID);
 
     // Business

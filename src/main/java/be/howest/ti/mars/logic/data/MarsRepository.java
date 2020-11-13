@@ -41,16 +41,39 @@ public class MarsRepository implements MarsRepoInt {
 
     @Override
     public Set<UserAccount> getFriends(UserAccount user) {
-        return null;
+        Set<UserAccount> friends = new HashSet<>();
+        String SQL_SELECT_ALL_FRIENDS = "select f.friendid, u.* from friends f join users u on u.userid = f.userid where u.name like ?";
+
+        try(Connection con = MarsConnection.getConnection();
+            PreparedStatement stmt = con.prepareStatement(SQL_SELECT_ALL_FRIENDS))
+        {
+            stmt.setString(1, '%'+user.getUsername()+'%');
+
+            try(ResultSet rs = stmt.executeQuery()){
+                while(rs.next()){
+                    int hID = rs.getInt("homeEndpointID");
+                    String name = rs.getString("name");
+                    String pwd = rs.getString("password");
+                    String homeAddress = rs.getString("homeAddress");
+
+                    UserAccount sub = new UserAccount(name,pwd,""+hID,homeAddress, null);
+                    friends.add(sub);
+                }
+            }
+
+        }catch (SQLException ex){
+            logger.log(Level.WARNING, ex.getMessage(), ex);
+        }
+        return friends;
     }
 
     @Override
-    public void addFriend(int userID, int friendID) {
+    public void addFriend(String name, String friendName) {
 
     }
 
     @Override
-    public void removeFriend(int userID, int friendID) {
+    public void removeFriend(String name, String friendName) {
 
     }
 

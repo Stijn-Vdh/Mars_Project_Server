@@ -88,7 +88,6 @@ create table friends
 (
 	friendID int not null,
 	userID int not null,
-	name varchar(50),
 	CONSTRAINT f_userID_fk FOREIGN KEY (userID) REFERENCES users(userID),
 	CONSTRAINT friendID_fk FOREIGN KEY (friendID) REFERENCES users(userID)
 )
