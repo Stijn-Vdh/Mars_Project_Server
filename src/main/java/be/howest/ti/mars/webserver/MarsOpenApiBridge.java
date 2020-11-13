@@ -2,6 +2,7 @@ package be.howest.ti.mars.webserver;
 
 import be.howest.ti.mars.logic.controller.BaseAccount;
 import be.howest.ti.mars.logic.controller.MarsController;
+import be.howest.ti.mars.logic.controller.UserAccount;
 import be.howest.ti.mars.logic.controller.security.UserToken;
 import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.json.Json;
@@ -43,6 +44,22 @@ class MarsOpenApiBridge {
 
     public Object logout(RoutingContext ctx) {
         controller.logout(getAccount(ctx));
+        return null;
+    }
+
+    public Object viewFriends (RoutingContext ctx){
+        UserAccount user = (UserAccount) getAccount(ctx);
+        return user.getFriends();
+    }
+
+    public Object addFriend (RoutingContext ctx){
+        UserAccount user = (UserAccount) getAccount(ctx);
+
+        String friendName = ctx.request().getParam("name");
+
+        return controller.addFriend(user,friendName);
+    }
+    public Object removeFriend (RoutingContext ctx){
         return null;
     }
 
