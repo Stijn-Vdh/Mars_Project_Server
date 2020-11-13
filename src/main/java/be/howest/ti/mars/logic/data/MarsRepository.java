@@ -8,6 +8,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -49,8 +51,8 @@ public class MarsRepository implements MarsRepoInt {
     }
 
     @Override
-    public Set<String> getFriends(UserAccount user) {
-        Set<String> friends = new HashSet<>();
+    public List<UserAccount> getFriends(UserAccount user) {
+        List<UserAccount> friends = new LinkedList<>();
         String SQL_SELECT_ALL_FRIENDS = "select f.friendName, u.* from friends f join users u on u.name = f.userName where u.name like ?";
 
         try(Connection con = MarsConnection.getConnection();
@@ -62,8 +64,13 @@ public class MarsRepository implements MarsRepoInt {
                 while(rs.next()){
 
                     String name = rs.getString("name");
+                    String pwd = rs.getString("password");
+                    int endpointID = rs.getInt("homeEndpointID");
+                    String addr = rs.getString("homeAddress");
 
-                    friends.add(name);
+                    UserAccount friend = new UserAccount(name,pwd,endpointID,addr,null);
+
+                    friends.add(friend);
                 }
             }
 

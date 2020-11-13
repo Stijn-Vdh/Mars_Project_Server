@@ -3,6 +3,7 @@ package be.howest.ti.mars.logic.data;
 import be.howest.ti.mars.logic.controller.Subscription;
 import be.howest.ti.mars.logic.controller.UserAccount;
 
+import java.util.List;
 import java.util.Set;
 
 public interface MarsRepoInt {
@@ -14,7 +15,7 @@ public interface MarsRepoInt {
     void ShareLocation(UserAccount user, Boolean shareLocation);
 
     // Friends
-    Set<String> getFriends(UserAccount user);
+    List<UserAccount> getFriends(UserAccount user);
     void beFriend(String name, String friendName);
     void removeFriend(String name, String friendName);
     void getFriendLocation(int friendID);
