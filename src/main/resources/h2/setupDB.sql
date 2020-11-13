@@ -5,18 +5,20 @@ create table users
 	userID int auto_increment,
 	homeEndpointID int,
 	name varchar(50),
-	password varchar(30),
+	password varchar(512),
 	homeAddress varchar(125),
 	sharesLocation boolean,
 	subscriptionID int,
-	businessAccount boolean,
 	CONSTRAINT userID_pk Primary Key (userID)
 );
 
 create table businesses
 (
 	businessID int auto_increment,
+	homeEndpointID int,
 	name varchar(50),
+	password varchar(512),
+	homeAddress varchar(125),
 	subscriptionID int,
 	CONSTRAINT businessID_pk Primary Key (businessID)
 );
