@@ -119,7 +119,10 @@ public class WebServer extends AbstractVerticle {
         factory.addGlobalHandler(createCorsHandler());
 
         // Verify the accounts token for all secured operations
-        factory.addSecurityHandler("bearerAuth", this::verifyAccountToken);
+        factory.addSecurityHandler("UserToken", this::verifyAccountToken);
+
+        // Verify the accounts token for all secured operations
+        factory.addSecurityHandler("BusinessToken", this::verifyAccountToken);
 
         // Add all route handlers
         addRoutes(factory);

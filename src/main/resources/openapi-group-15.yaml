@@ -392,7 +392,6 @@ paths:
         '500':
           description: Unexpected error.
       security:
-        - UserToken: [ ]
         - BusinessToken: [ ]
 
   /api/endpoints: #View all endpoints

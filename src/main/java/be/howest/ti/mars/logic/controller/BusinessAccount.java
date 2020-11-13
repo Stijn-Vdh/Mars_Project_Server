@@ -7,5 +7,7 @@ public class BusinessAccount extends BaseAccount {
         super(userToken, homeAddressEndpoint, password, username, address);
     }
 
-    
+    public BusinessAccount(String name) {
+        super(name);
+    }
 }

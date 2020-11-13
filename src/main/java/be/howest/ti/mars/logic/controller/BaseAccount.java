@@ -23,6 +23,10 @@ public class BaseAccount {
         this.address = address;
     }
 
+    public BaseAccount(String name) {
+        this(null,0,"",name,"");
+    }
+
     public UserToken getUserToken() {
         return userToken;
     }

@@ -19,6 +19,10 @@ public class UserAccount extends BaseAccount {
         return repo.getFriends(this);
     }
 
+    public UserAccount(String name) {
+        super(name);
+    }
+
     public UserAccount addFriend(UserAccount friend){
         repo.beFriend(getUsername(), friend.getUsername());
         return friend;
