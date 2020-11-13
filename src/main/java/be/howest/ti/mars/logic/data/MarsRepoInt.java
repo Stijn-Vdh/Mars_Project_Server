@@ -15,7 +15,7 @@ public interface MarsRepoInt {
     void ShareLocation(UserAccount user, Boolean shareLocation);
 
     // Friends
-    Set<UserAccount> getFriends(UserAccount user);
+    Set<String> getFriends(UserAccount user);
     void beFriend(String name, String friendName);
     void removeFriend(String name, String friendName);
     void getFriendLocation(int friendID);

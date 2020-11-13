@@ -54,8 +54,8 @@ public class MarsRepository implements MarsRepoInt {
     }
 
     @Override
-    public Set<UserAccount> getFriends(UserAccount user) {
-        Set<UserAccount> friends = new HashSet<>();
+    public Set<String> getFriends(UserAccount user) {
+        Set<String> friends = new HashSet<>();
         String SQL_SELECT_ALL_FRIENDS = "select f.friendName, u.* from friends f join users u on u.name = f.userName where u.name like ?";
 
         try(Connection con = MarsConnection.getConnection();
@@ -65,13 +65,10 @@ public class MarsRepository implements MarsRepoInt {
 
             try(ResultSet rs = stmt.executeQuery()){
                 while(rs.next()){
-                    int hID = rs.getInt("homeEndpointID");
-                    String name = rs.getString("name");
-                    String pwd = rs.getString("password");
-                    String homeAddress = rs.getString("homeAddress");
 
-                    UserAccount sub = new UserAccount(name,pwd,hID,homeAddress, null);
-                    friends.add(sub);
+                    String name = rs.getString("name");
+
+                    friends.add(name);
                 }
             }
 

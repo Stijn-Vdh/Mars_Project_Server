@@ -17,7 +17,7 @@ public class UserAccount extends BaseAccount {
 
     public UserAccount(String username, String password, int homeAddressEndpoint, String address, UserToken userToken) {
         super(userToken, homeAddressEndpoint, password, username, address);
-        friends = new LinkedList<>(repo.getFriends(this));
+        friends = new LinkedList<>();
     }
 
     public List<UserAccount> getFriends(){
