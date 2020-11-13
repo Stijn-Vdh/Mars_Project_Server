@@ -24,14 +24,17 @@ class MarsOpenApiBridge {
         return controller.getMessage();
     }
 
-    public Object createUser(RoutingContext ctx) {
-        logger.info("createUser");
+    public Object createAccount(RoutingContext ctx) {
+        logger.info("createAccount");
 
         JsonObject json = ctx.getBodyAsJson();
         controller.createUser(json.getString("name"),
                 SecureHash.getHashEncoded(json.getString("password")),
                 json.getString("homeAddress"),
-                String.valueOf(json.getInteger("homeEndpointID")));
+                String.valueOf(json.getInteger("homeEndpointID")),
+                json.getBoolean("businessAccount")
+        );
+
         return null; // doesnt allow void
     }
 
