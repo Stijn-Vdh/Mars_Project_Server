@@ -3,18 +3,16 @@ info:
   title: 'MTTS'
   description: 'Through an easily accessible network of travel tubes we want to  allow goods
                     and people to travel more efficiently than ever.'
-  version: 0.0.1
+  version: 0.1.0 # semantic versioning, in develop starts at 0.1.0, when in production move to 1.0.0
 servers:
   - url: http://localhost:8080/
     description: 'Local development implementation'
   - url: https://project-ii.ti.howest.be/mars-15
     description: 'Public web api'
+
 components:
   securitySchemes:
-    UserToken:
-      type: http
-      scheme: bearer
-    BusinessToken:
+    Token:
       type: http
       scheme: bearer
 
@@ -53,6 +51,9 @@ paths:
                   type: string
                 password:
                   type: string
+              required:
+                - name
+                - password
       responses:
         '200':
           description: Succesfully logged in.
@@ -80,8 +81,7 @@ paths:
         '5XX':
           description: Unexpected error.
       security:
-        - UserToken: [ ]
-        - BusinessToken: []
+        - Token: []
 
   /api/createAccount:
     summary: create an account
@@ -109,6 +109,12 @@ paths:
                   type: boolean
                 password:
                   type: string
+              required:
+                - name
+                - password
+                - businessAccount
+                - homeAddress
+                - homeEndpointID
       responses:
         '200':
           description: user created
@@ -149,7 +155,7 @@ paths:
                   homeAdress: "Colony 1, residence 15",
                   homeEndpoint: 5,
                   subscription: "Unlimited",
-                  subscriptionID: "5"
+                  subscriptionID: 5
                 }
         '401':
           description: Authorization information is missing or invalid.
@@ -158,8 +164,7 @@ paths:
         '500':
           description: Internal error.
       security:
-        - UserToken: [ ]
-        - BusinessToken: [ ]
+        - Token: []
   /api/user/{id}/shareLocation:
     description: Share your location with your friends.
     post:
@@ -182,7 +187,7 @@ paths:
         '5XX':
           description: Unexpected error.
       security:
-        - UserToken: [ ]
+        - Token: [User]
 
   /api/friend: #Get all our friends
     get:
@@ -196,19 +201,9 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  userID:
-                    type: integer
-                  name:
+                type: array
+                items:
                     type: string
-                example: [ {
-                  userID: 1,
-                  name: 'Debby'
-                },{
-                  userID: 5,
-                  name: 'Frank'
-                } ]
         '401':
           description: Authorization information is missing or invalid.
         '403':
@@ -216,7 +211,7 @@ paths:
         '500':
           description: Internal error.
       security:
-        - UserToken: [ ]
+        - Token: [User]
   /api/friend/{fName}: #Add a friend or delete one
     parameters:
       - in: path
@@ -240,7 +235,7 @@ paths:
         '500':
           description: Internal error.
       security:
-        - UserToken: [ ]
+        - Token: [User]
     delete:
         summary: Delete a friend.
         operationId: removeFriend
@@ -256,7 +251,7 @@ paths:
           '500':
             description: Internal error.
         security:
-          - UserToken: [ ]
+          - Token: [User]
   /api/friend/{id}/location: # Get the location of a current friend
       description: Get the current location of one of your friends.
       get:
@@ -281,7 +276,7 @@ paths:
           default:
             description: This friend does not share his location with others.
         security:
-          - UserToken: [ ]
+          - Token: [User]
 
   /api/subscription:
     description: subscription.
@@ -336,8 +331,7 @@ paths:
         '500':
           description: Internal error.
       security:
-        - UserToken: [ ]
-        - BusinessToken: [ ]
+        - Token: []
     delete:
       tags:
         - store
@@ -352,8 +346,7 @@ paths:
         '500':
           description: Unexpected error.
       security:
-        - UserToken: [ ]
-        - BusinessToken: [ ]
+        - Token: []
   /api/subscriptionInfo/{id}:
     description: collect statistics about your business
     get:
@@ -392,7 +385,7 @@ paths:
         '500':
           description: Unexpected error.
       security:
-        - BusinessToken: [ ]
+        - Token: [Business]
 
   /api/endpoints: #View all endpoints
     summary: get all endpoints
@@ -487,8 +480,7 @@ paths:
         '500':
           description: Unexpected error.
       security:
-        - UserToken: [ ]
-        - BusinessToken: [ ]
+        - Token: []
   /api/sendPackage: #Add Delivery
     post:
       operationId: sendPackage
@@ -528,7 +520,7 @@ paths:
         '500':
           description: Unexpected error.
       security:
-        - BusinessToken: [ ]
+        - Token: []
 
   /api/routeInfo/{id}:
     description: Get route information.
@@ -544,7 +536,7 @@ paths:
             type: integer
       responses:
         '200':
-          description: Succesfuly bought a ticket.
+          description: Succesfully bought a ticket.
           content:
             application/json:
               schema:
@@ -567,8 +559,7 @@ paths:
         '500':
           description: Unexpected error.
       security:
-        - UserToken: [ ]
-        - BusinessToken: [ ]
+        - Token: []
   /api/travel:
     description: travel from one point to another.
     post:
@@ -590,6 +581,10 @@ paths:
                 podType:
                   type: string
                   enum: [ standard, luxury ]
+              required:
+                - from
+                - destination
+                - podType
       responses:
         '200':
           description: Succesfuly requested a travel pod
@@ -607,7 +602,7 @@ paths:
         '500':
             description: Unexpected error.
       security:
-        - UserToken: [ ]
+        - Token: [User]
 
   /api/ping:
     get:

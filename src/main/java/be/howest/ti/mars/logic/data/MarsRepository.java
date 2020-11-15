@@ -5,7 +5,6 @@ import be.howest.ti.mars.logic.controller.Delivery;
 import be.howest.ti.mars.logic.controller.Subscription;
 import be.howest.ti.mars.logic.controller.UserAccount;
 import be.howest.ti.mars.logic.controller.exceptions.DatabaseException;
-import jdk.jfr.StackTrace;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
