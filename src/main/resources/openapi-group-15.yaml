@@ -3,7 +3,7 @@ info:
   title: 'MTTS'
   description: 'Through an easily accessible network of travel tubes we want to  allow goods
                     and people to travel more efficiently than ever.'
-  version: 0.0.1
+  version: 0.1.0 # semantic versioning, in develop starts at 0.1.0, when in production move to 1.0.0
 servers:
   - url: http://localhost:8080/
     description: 'Local development implementation'
@@ -11,7 +11,7 @@ servers:
     description: 'Public web api'
 components:
   securitySchemes:
-    bearerAuth:
+    Token:
       type: http
       scheme: bearer
 
@@ -50,6 +50,9 @@ paths:
                   type: string
                 password:
                   type: string
+              required:
+                - name
+                - password
       responses:
         '200':
           description: Succesfully logged in.
@@ -77,7 +80,7 @@ paths:
         '5XX':
           description: Unexpected error.
       security:
-        - bearerAuth: [ ]
+        - Token: []
 
   /api/createAccount:
     summary: create an account
@@ -105,6 +108,12 @@ paths:
                   type: boolean
                 password:
                   type: string
+              required:
+                - name
+                - password
+                - businessAccount
+                - homeAddress
+                - homeEndpointID
       responses:
         '200':
           description: user created
@@ -112,20 +121,13 @@ paths:
           description: username already is taken
         '500':
           description: Internal error.
-  /api/user/{id}: #get account information
-    summary: get user information
-    description: get user information
+  /api/accountInformation: #get your account information
+    summary: get your account information
+    description: get your account information
     get:
       summary: get user information.
       tags:
         - user
-      parameters:
-        - in: path
-          name: id
-          schema:
-            type: integer
-          required: true
-          description: give the id of the user
       responses:
         '200':
           description: list of an endpoint given their id
@@ -142,8 +144,6 @@ paths:
                     type: string
                   homeEndpointID:
                     type: integer
-                  password:
-                    type: string
                   subscription:
                     type: string
                   subscriptionID:
@@ -153,34 +153,40 @@ paths:
                   name: "Debby",
                   homeAdress: "Colony 1, residence 15",
                   homeEndpoint: 5,
-                  password: "DFdes6'(Dfeiqdsfv64501d*",
                   subscription: "Unlimited",
-                  subscriptionID: "5"
+                  subscriptionID: 5
                 }
         '401':
           description: Authorization information is missing or invalid.
         '403':
           description: Forbidden!
+        '500':
+          description: Internal error.
       security:
-        - bearerAuth: [ ]
+        - Token: []
   /api/shareLocation:
     description: Share your location with your friends.
     post:
       summary: Share your location with your friends.
       tags:
         - user
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
       responses:
         '200':
           description: Succesfuly shared your location with your friends.
         '401':
           description: Authorization information is missing or invalid.
-
         '403':
             description: Forbidden!
         '5XX':
           description: Unexpected error.
       security:
-        - bearerAuth: [ ]
+        - Token: [User]
     delete:
       summary: Stop sharing your location with your friends.
       tags:
@@ -211,25 +217,17 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  userID:
-                    type: integer
-                  name:
+                type: array
+                items:
                     type: string
-                example: [ {
-                  userID: 1,
-                  name: 'Debby'
-                },{
-                  userID: 5,
-                  name: 'Frank'
-                } ]
         '401':
           description: Authorization information is missing or invalid.
         '403':
           description: Forbidden!
+        '500':
+          description: Internal error.
       security:
-        - bearerAuth: [ ]
+        - Token: [User]
   /api/friend/{fName}: #Add a friend or delete one
     parameters:
       - in: path
@@ -248,10 +246,12 @@ paths:
           description: Succesfuly added a friend.
         '401':
           description: Authorization information is missing or invalid.
-        '5XX':
-          description: Unexpected error.
+        '403':
+          description: Forbidden!
+        '500':
+          description: Internal error.
       security:
-        - bearerAuth: [ ]
+        - Token: [User]
     delete:
         summary: Delete a friend.
         operationId: removeFriend
@@ -264,10 +264,10 @@ paths:
             description: Authorization information is missing or invalid.
           '403':
             description: Forbidden!
-          '5XX':
-            description: Unexpected error.
+          '500':
+            description: Internal error.
         security:
-          - bearerAuth: [ ]
+          - Token: [User]
   /api/friend/{id}/location: # Get the location of a current friend
       description: Get the current location of one of your friends.
       get:
@@ -287,12 +287,12 @@ paths:
             description: Authorization information is missing or invalid.
           '403':
             description: Forbidden!
-          '5XX':
+          '500':
             description: Unexpected error.
           default:
             description: This friend does not share his location with others.
         security:
-          - bearerAuth: [ ]
+          - Token: [User]
 
   /api/subscription:
     description: subscription.
@@ -322,6 +322,8 @@ paths:
                   subscriptionID: 2,
                   subscriptionName: 'Professional'
                 } ]
+        '500':
+          description: Internal error.
     post:
       summary: Buy subscription
       tags:
@@ -345,7 +347,7 @@ paths:
         '500':
           description: Internal error.
       security:
-        - bearerAuth: [ ]
+        - Token: []
     delete:
       tags:
         - store
@@ -359,9 +361,8 @@ paths:
             description: Forbidden!
         '500':
           description: Unexpected error.
-
       security:
-        - bearerAuth: [ ]
+        - Token: []
   /api/subscriptionInfo/{id}:
     description: collect statistics about your business
     get:
@@ -400,7 +401,7 @@ paths:
         '500':
           description: Unexpected error.
       security:
-        - bearerAuth: [ ]
+        - Token: [Business]
 
   /api/endpoints: #View all endpoints
     summary: get all endpoints
@@ -425,10 +426,6 @@ paths:
                   location: 'here',
                   privateEndpoint: true
                 }]
-        '401':
-          description: Authorization information is missing or invalid.
-        '403':
-          description: Forbidden!
         '500':
           description: Unexpected error.
   /api/endpoints/{id}: #view endpoint information
@@ -462,10 +459,6 @@ paths:
                     type: string
                   privateEndpoint:
                     type: boolean
-        '401':
-          description: Authorization information is missing or invalid.
-        '403':
-          description: Forbidden!
         '500':
           description: Unexpected error.
 
@@ -503,26 +496,29 @@ paths:
         '500':
           description: Unexpected error.
       security:
-        - bearerAuth: [ ]
-  /api/sendSmallPackage: #Send small package
+        - Token: []
+  /api/sendPackage: #Add Delivery
     post:
-      summary: request and send a small package pod
+      operationId: sendPackage
+      summary: request and send a package pod
       tags:
         - delivery
       requestBody:
-        description: provide correct information for a small package pod.
+        description: provide correct information for a small or large package.
         required: true
         content:
           application/json:
             schema:
               type: object
               properties:
-                business:
-                  type: boolean
+                deliveryType:
+                  type: string
                 from:
                   type: integer
                 destination:
                   type: integer
+                date:
+                  type: string
       responses:
         '200':
           description: package sent
@@ -540,44 +536,7 @@ paths:
         '500':
           description: Unexpected error.
       security:
-        - bearerAuth: [ ]
-  /api/sendLargePackage: #Send large package
-    post:
-      summary: request and send a large package pod (businesses only)
-      tags:
-        - delivery
-      requestBody:
-        description: provide correct information for a large package pod.
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                businessID:
-                  type: integer
-                from:
-                  type: integer
-                destination:
-                  type: integer
-      responses:
-        '200':
-          description: package sent
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  deliveryID:
-                    type: integer
-        '401':
-          description: Authorization information is missing or invalid.
-        '403':
-          description: Forbidden!
-        '500':
-          description: Unexpected error.
-      security:
-        - bearerAuth: [ ]
+        - Token: []
 
   /api/routeInfo/{id}:
     description: Get route information.
@@ -593,7 +552,7 @@ paths:
             type: integer
       responses:
         '200':
-          description: Succesfuly bought a ticket.
+          description: Succesfully bought a ticket.
           content:
             application/json:
               schema:
@@ -615,9 +574,8 @@ paths:
           description: Forbidden!
         '500':
           description: Unexpected error.
-
       security:
-        - bearerAuth: [ ]
+        - Token: []
   /api/travel:
     description: travel from one point to another.
     post:
@@ -639,6 +597,10 @@ paths:
                 podType:
                   type: string
                   enum: [ standard, luxury ]
+              required:
+                - from
+                - destination
+                - podType
       responses:
         '200':
           description: Succesfuly requested a travel pod
@@ -656,7 +618,7 @@ paths:
         '500':
             description: Unexpected error.
       security:
-        - bearerAuth: [ ]
+        - Token: [User]
 
   /api/ping:
     get:

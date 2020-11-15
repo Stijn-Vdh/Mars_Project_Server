@@ -118,8 +118,14 @@ public class WebServer extends AbstractVerticle {
         // Allow Cross-Origin Resource Sharing (CORS) from all clients
         factory.addGlobalHandler(createCorsHandler());
 
-        // Verify the accounts token for all secured operations
-        factory.addSecurityHandler("bearerAuth", this::verifyAccountToken);
+        // Verify the user token for all secured operations
+        factory.addSecuritySchemaScopeValidator("Token","User", this::verifyUserAccountToken);
+
+        // Verify the business token for all secured operations
+        factory.addSecuritySchemaScopeValidator("Token","Business", this::verifyBusinessAccountToken);
+
+        // Both tokens are allowed
+        factory.addSecurityHandler("Token",this::verifyAccountToken);
 
         // Add all route handlers
         addRoutes(factory);
@@ -143,8 +149,10 @@ public class WebServer extends AbstractVerticle {
         addRouteWithCtxFunction(factory, "viewFriends", bridge::viewFriends);
         addRouteWithCtxFunction(factory, "addFriend", bridge::addFriend);
         addRouteWithCtxFunction(factory, "removeFriend", bridge::removeFriend);
+        addRouteWithCtxFunction(factory, "sendPackage", bridge::sendPackage);
 
     }
+
 
     private void addRouteWithCtxFunction(OpenAPI3RouterFactory factory, String operationId, Function<RoutingContext, Object> bridgeFunction) {
         factory.addHandlerByOperationId(operationId, ctx -> handleResult(bridgeFunction.apply(ctx), ctx));
@@ -234,14 +242,16 @@ public class WebServer extends AbstractVerticle {
         return result;
     }
 
-    private void verifyAccountToken(RoutingContext ctx) {
-        verifyToken(ctx, bridge::verifyAccountToken);
+    private void verifyUserAccountToken(RoutingContext ctx) {
+        verifyToken(ctx, bridge::verifyUserAccountToken);
+    }
+    private void verifyBusinessAccountToken(RoutingContext ctx) {
+        verifyToken(ctx, bridge::verifyBusinessAccountToken);
     }
 
     private void verifyToken(RoutingContext ctx, Predicate<RoutingContext> check) {
-        String token = bridge.getBearerToken(ctx);
 
-        if (token == null) {
+        if (bridge.getBearerToken(ctx) == null) {
             ctx.fail(401); // Unauthorized  due to wrong or absent header format
         } else if (check.test(ctx)) {
             ctx.next();
@@ -249,5 +259,17 @@ public class WebServer extends AbstractVerticle {
             ctx.fail(403); // forbidden
         }
     }
+
+    private void verifyAccountToken(RoutingContext ctx) {
+
+        if ( bridge.getBearerToken(ctx) == null) {
+            ctx.fail(401); // Unauthorized  due to wrong or absent header format
+        } else if (bridge.verifyUserAccountToken(ctx) || bridge.verifyBusinessAccountToken(ctx)) {
+            ctx.next();
+        } else {
+            ctx.fail(403); // forbidden
+        }
+    }
+
 
 }
