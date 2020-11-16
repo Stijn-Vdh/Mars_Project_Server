@@ -79,7 +79,7 @@ public class MarsRepository implements MarsRepoInt {
     @Override
     public List<UserAccount> getFriends(UserAccount user) {
         List<UserAccount> friends = new LinkedList<>();
-        String SQL_SELECT_ALL_FRIENDS = "select f.friendName, u.* from friends f join users u on u.name = f.userName where u.name like ?";
+        String SQL_SELECT_ALL_FRIENDS = "select f.friendName, u.* from friends f join users u on u.name = f.userName where u.name=?";
 
         try (Connection con = MarsConnection.getConnection();
              PreparedStatement stmt = con.prepareStatement(SQL_SELECT_ALL_FRIENDS)) {

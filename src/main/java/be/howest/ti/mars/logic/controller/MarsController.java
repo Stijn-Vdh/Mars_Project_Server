@@ -118,7 +118,7 @@ public class MarsController {
 
     public Object stopSubscription(BusinessAccount businessAccount) {
         repo.stopSubscription(businessAccount);
-        return "We are sorry for you to stop you current subscription.";
+        return "We are sorry that you have discontinued your current subscription.";
     }
 
     public Object viewSubscriptionInfo(BusinessAccount businessAccount) {

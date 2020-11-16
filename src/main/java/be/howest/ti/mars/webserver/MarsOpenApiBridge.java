@@ -109,12 +109,7 @@ class MarsOpenApiBridge {
     }
 
     public Object viewSubscriptionInfo(RoutingContext ctx) {
-
-        if (verifyBusinessAccountToken(ctx)) {
-            return controller.viewSubscriptionInfo(getBusinessAccount(ctx));
-        } else {
-            return "This feature is only for businesses.";
-        }
+        return controller.viewSubscriptionInfo(getBusinessAccount(ctx));
     }
 
     public boolean verifyUserAccountToken(RoutingContext ctx) {
