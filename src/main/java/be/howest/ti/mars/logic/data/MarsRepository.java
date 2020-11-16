@@ -205,12 +205,12 @@ public class MarsRepository implements MarsRepoInt {
             while(rs.next()){
                 int id = rs.getInt("subscriptionID");
                 String name = rs.getString("name");
-                int remainingSmallPods_thisMonth = rs.getInt("remainingSmallPods_thisDay");
-                int remainingLargePods_thisMonth = rs.getInt("remainingLargePods_thisDay");
+                int remainingSmallPods_thisDay = rs.getInt("remainingSmallPods_thisDay");
+                int remainingLargePods_thisDay = rs.getInt("remainingLargePods_thisDay");
                 int dedicatedPods = rs.getInt("amountOfDedicatedPods");
 
 
-                Subscription sub = new Subscription(id, name, remainingSmallPods_thisMonth, remainingLargePods_thisMonth, dedicatedPods);
+                Subscription sub = new Subscription(id, name, remainingSmallPods_thisDay, remainingLargePods_thisDay, dedicatedPods);
                 subscriptions.add(sub);
             }
         }catch (SQLException ex){
