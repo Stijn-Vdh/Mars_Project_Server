@@ -117,4 +117,8 @@ public class MarsController {
         repo.stopSubscription(businessAccount);
         return null;
     }
+
+    public Object viewSubscriptionInfo(BusinessAccount businessAccount) {
+        return repo.getSubscriptionInfo(businessAccount.getUsername());
+    }
 }

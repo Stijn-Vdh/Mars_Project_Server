@@ -109,6 +109,15 @@ class MarsOpenApiBridge {
         }
     }
 
+    public Object viewSubscriptionInfo(RoutingContext ctx) {
+
+        if (verifyBusinessAccountToken(ctx)){
+            return controller.viewSubscriptionInfo(getBusinessAccount(ctx));
+        }else{
+            return null;
+        }
+    }
+
     public boolean verifyUserAccountToken(RoutingContext ctx) {
         return getUserAccount(ctx) != null;
     }
@@ -150,6 +159,7 @@ class MarsOpenApiBridge {
             return header.substring(AUTHORIZATION_TOKEN_PREFIX.length());
         }
     }
+
 
 
 }

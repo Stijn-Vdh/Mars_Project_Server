@@ -39,7 +39,7 @@ public interface MarsRepoInt {
 
     // Subscriptions
     List<Subscription> getSubscriptions();
-    void getSubscriptionInfo(int businessID);
+    Subscription getSubscriptionInfo(String businessName);
     void buySubscription (UserAccount user, String subscription);
     void buySubscription (BusinessAccount business, String subscription);
     void stopSubscription (UserAccount user);

@@ -349,19 +349,13 @@ paths:
           description: Unexpected error.
       security:
         - Token: []
-  /api/subscriptionInfo/{id}:
+  /api/subscriptionInfo:
     description: collect statistics about your business
     get:
+      operationId: viewSubscriptionInfo
       summary: Collect statistics about your business.
       tags:
         - business
-      parameters:
-        - in: path
-          name: id
-          schema:
-            type: integer
-          required: true
-          description: give the id of your business
       responses:
         '200':
           description: Succesfully collect all the data.
