@@ -100,6 +100,7 @@ public class MarsRepository implements MarsRepoInt {
 
         }catch (SQLException ex){
             logger.log(Level.WARNING, ex.getMessage(), ex);
+            throw new DatabaseException("Can't view all your friends.");
         }
         return friends;
     }
@@ -116,6 +117,7 @@ public class MarsRepository implements MarsRepoInt {
             stmt.executeUpdate();
         } catch (SQLException ex) {
             logger.log(Level.WARNING, ex.getMessage());
+            throw new DatabaseException("Can't add a friend.");
         }
     }
 
@@ -131,6 +133,7 @@ public class MarsRepository implements MarsRepoInt {
             stmt.executeUpdate();
         } catch (SQLException ex) {
             logger.log(Level.WARNING, ex.getMessage());
+            throw new DatabaseException("Can't remove a friend.");
         }
 
     }
@@ -214,7 +217,8 @@ public class MarsRepository implements MarsRepoInt {
                 subscriptions.add(sub);
             }
         }catch (SQLException ex){
-               logger.log(Level.WARNING, ex.getMessage(), ex);
+            logger.log(Level.WARNING, ex.getMessage(), ex);
+            throw new DatabaseException("Can't get subscriptions.");
         }
         return subscriptions;
     }
@@ -222,7 +226,6 @@ public class MarsRepository implements MarsRepoInt {
     @Override
     public Subscription getSubscriptionInfo(String businessName) {
         String SQL_SELECT_SUBSCRIPTION_INFO = "select * from businesses_subscriptions where businessname=?";
-        System.out.println(businessName);
         try (Connection con = MarsConnection.getConnection();
              PreparedStatement stmt = con.prepareStatement(SQL_SELECT_SUBSCRIPTION_INFO);
              ){
@@ -260,6 +263,7 @@ public class MarsRepository implements MarsRepoInt {
             stmt.executeUpdate();
         }catch (SQLException ex){
             logger.log(Level.WARNING, ex.getMessage(), ex);
+            throw new DatabaseException("Can't buy a subscription.");
         }
 
         try(Connection con = MarsConnection.getConnection();
@@ -269,6 +273,7 @@ public class MarsRepository implements MarsRepoInt {
             stmt.executeUpdate();
         }catch (SQLException ex){
             logger.log(Level.WARNING, ex.getMessage(), ex);
+            throw new DatabaseException("Can't buy a subscription.");
         }
     }
 
@@ -305,6 +310,7 @@ public class MarsRepository implements MarsRepoInt {
             stmt.executeUpdate();
         }catch (SQLException ex){
             logger.log(Level.WARNING, ex.getMessage(), ex);
+            throw new DatabaseException("Can't buy a subscription.");
         }
 
         try(Connection con = MarsConnection.getConnection();
@@ -318,6 +324,7 @@ public class MarsRepository implements MarsRepoInt {
             stmt.executeUpdate();
         }catch (SQLException ex){
             logger.log(Level.WARNING, ex.getMessage(), ex);
+            throw new DatabaseException("Can't buy a subscription.");
         }
     }
 
@@ -334,6 +341,7 @@ public class MarsRepository implements MarsRepoInt {
             stmt.executeUpdate();
         }catch (SQLException ex){
             logger.log(Level.WARNING, ex.getMessage(), ex);
+            throw new DatabaseException("Can't stop a subscription.");
         }
 
         try(Connection con = MarsConnection.getConnection();
@@ -342,6 +350,7 @@ public class MarsRepository implements MarsRepoInt {
             stmt.executeUpdate();
         }catch (SQLException ex){
             logger.log(Level.WARNING, ex.getMessage(), ex);
+            throw new DatabaseException("Can't stop a subscription.");
         }
     }
 
@@ -358,6 +367,7 @@ public class MarsRepository implements MarsRepoInt {
             stmt.executeUpdate();
         }catch (SQLException ex){
             logger.log(Level.WARNING, ex.getMessage(), ex);
+            throw new DatabaseException("Can't stop a subscription.");
         }
 
         try(Connection con = MarsConnection.getConnection();
@@ -366,6 +376,7 @@ public class MarsRepository implements MarsRepoInt {
             stmt.executeUpdate();
         }catch (SQLException ex){
             logger.log(Level.WARNING, ex.getMessage(), ex);
+            throw new DatabaseException("Can't stop a subscription.");
         }
     }
 }
