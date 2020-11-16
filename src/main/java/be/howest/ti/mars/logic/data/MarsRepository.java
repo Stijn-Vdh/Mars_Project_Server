@@ -2,17 +2,18 @@ package be.howest.ti.mars.logic.data;
 
 import be.howest.ti.mars.logic.controller.BaseAccount;
 import be.howest.ti.mars.logic.controller.BusinessAccount;
+import be.howest.ti.mars.logic.controller.Delivery;
 import be.howest.ti.mars.logic.controller.Subscription;
 import be.howest.ti.mars.logic.controller.UserAccount;
 import be.howest.ti.mars.logic.controller.exceptions.DatabaseException;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -160,24 +161,31 @@ public class MarsRepository implements MarsRepoInt {
     }
 
     @Override
-    public Set<String> getDeliveries() {
+    public Set<Delivery> getDeliveries() {
         return null;
     }
 
     @Override
-    public void sendSmallPackage(UserAccount user, String delivery) {
+    public void addDelivery(Delivery delivery) {
+        String SQL_ADD_DELIVERY = "INSERT INTO DELIVERIES(deliveryType, `from`, destination, `date`) VALUES(?,?,?,?)";
+        try(Connection con = MarsConnection.getConnection();
+            PreparedStatement stmt = con.prepareStatement(SQL_ADD_DELIVERY))
+     {
+         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+         Date parsed = format.parse(delivery.getDate());
+         java.sql.Date sqlDate = new java.sql.Date(parsed.getTime());
 
+         stmt.setString(1, delivery.getDeliveryType());
+         stmt.setInt(2, delivery.getSourceID());
+         stmt.setInt(3, delivery.getDestinationID());
+         stmt.setDate(4, sqlDate);
+         stmt.executeUpdate();
+        } catch (SQLException | ParseException e) {
+            System.out.println(e);
+           throw new DatabaseException("Can't add delivery!");
+        }
     }
 
-    @Override
-    public void sendLargePackage(UserAccount user, String delivery) {
-
-    }
-
-    @Override
-    public void addDelivery(String delivery) {
-
-    }
 
     @Override
     public List<Subscription> getSubscriptions() {
