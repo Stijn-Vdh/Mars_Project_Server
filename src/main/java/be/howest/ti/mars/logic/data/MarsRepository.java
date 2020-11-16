@@ -205,8 +205,12 @@ public class MarsRepository implements MarsRepoInt {
             while(rs.next()){
                 int id = rs.getInt("subscriptionID");
                 String name = rs.getString("name");
+                int remainingSmallPods_thisMonth = rs.getInt("remainingSmallPods_thisDay");
+                int remainingLargePods_thisMonth = rs.getInt("remainingLargePods_thisDay");
+                int dedicatedPods = rs.getInt("amountOfDedicatedPods");
 
-                Subscription sub = new Subscription(id, name);
+
+                Subscription sub = new Subscription(id, name, remainingSmallPods_thisMonth, remainingLargePods_thisMonth, dedicatedPods);
                 subscriptions.add(sub);
             }
         }catch (SQLException ex){
@@ -254,13 +258,30 @@ public class MarsRepository implements MarsRepoInt {
                 .filter(sub -> sub.getName().equals(subscription))
                 .mapToInt(Subscription::getId).sum();
 
+        int remainingSmallPods_thisDay = getSubscriptions().stream()
+                .filter(sub -> sub.getName().equals(subscription))
+                .mapToInt(Subscription::getRemainingSmallPods_thisMonth).sum();
+
+        int remainingLargePods_thisDay = getSubscriptions().stream()
+                .filter(sub -> sub.getName().equals(subscription))
+                .mapToInt(Subscription::getRemainingLargePods_thisMonth).sum();
+
+        int dedicatedPods = getSubscriptions().stream()
+                .filter(sub -> sub.getName().equals(subscription))
+                .mapToInt(Subscription::getAmountOfDedicatedPods).sum();
+
         String SQL_UPDATE_BUSINESS = "UPDATE BUSINESSES SET subscriptionID=? where name=?";
-        String SQL_INSERT_BUSINESS_SUB = "INSERT INTO BUSINESSES_SUBSCRIPTIONS(businessName,subscriptionID) values(?,?)";
+        String SQL_INSERT_BUSINESS_SUB = "INSERT INTO BUSINESSES_SUBSCRIPTIONS" +
+                                        "(businessName,subscriptionID, " +
+                                        "remainingSmallPods_thisDay,remainingLargePods_thisDay," +
+                                        "amountOfDedicatedPods) " +
+                                        "values(?,?,?,?,?)";
 
         try(Connection con = MarsConnection.getConnection();
             PreparedStatement stmt = con.prepareStatement(SQL_UPDATE_BUSINESS)){
             stmt.setInt(1, id);
             stmt.setString(2, business.getUsername());
+
             stmt.executeUpdate();
         }catch (SQLException ex){
             logger.log(Level.WARNING, ex.getMessage(), ex);
@@ -270,6 +291,10 @@ public class MarsRepository implements MarsRepoInt {
             PreparedStatement stmt = con.prepareStatement(SQL_INSERT_BUSINESS_SUB)){
             stmt.setString(1, business.getUsername());
             stmt.setInt(2, id);
+            stmt.setInt(3, remainingSmallPods_thisDay);
+            stmt.setInt(4, remainingLargePods_thisDay);
+            stmt.setInt(5, dedicatedPods);
+
             stmt.executeUpdate();
         }catch (SQLException ex){
             logger.log(Level.WARNING, ex.getMessage(), ex);

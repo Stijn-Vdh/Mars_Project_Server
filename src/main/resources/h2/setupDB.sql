@@ -27,6 +27,9 @@ create table subscriptions
 (
 	subscriptionID int auto_increment,
 	name varchar(50),
+    remainingSmallPods_thisMonth int,
+    remainingLargePods_thisMonth int,
+    amountOfDedicatedPods int,
 	CONSTRAINT subscriptionID_pk PRIMARY KEY (subscriptionID)
 );
 
@@ -42,6 +45,9 @@ create table businesses_subscriptions
 (
 	businessName varchar(50) not null,
 	subscriptionID int not null,
+	remainingSmallPods_thisMonth int,
+	remainingLargePods_thisMonth int,
+	amountOfDedicatedPods int,
 	CONSTRAINT businessName_fk FOREIGN KEY (businessName) REFERENCES businesses(name),
 	CONSTRAINT b_subscriptionID_fk FOREIGN KEY (subscriptionID) REFERENCES subscriptions(subscriptionID)
 );
