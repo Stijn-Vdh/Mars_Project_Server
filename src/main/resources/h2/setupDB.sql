@@ -27,8 +27,8 @@ create table subscriptions
 (
 	subscriptionID int auto_increment,
 	name varchar(50),
-    remainingSmallPods_thisMonth int,
-    remainingLargePods_thisMonth int,
+    remainingSmallPods_thisDay int,
+    remainingLargePods_thisDay int,
     amountOfDedicatedPods int,
 	CONSTRAINT subscriptionID_pk PRIMARY KEY (subscriptionID)
 );
