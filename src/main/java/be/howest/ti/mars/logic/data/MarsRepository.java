@@ -1,5 +1,6 @@
 package be.howest.ti.mars.logic.data;
 
+import be.howest.ti.mars.logic.controller.BaseAccount;
 import be.howest.ti.mars.logic.controller.BusinessAccount;
 import be.howest.ti.mars.logic.controller.Delivery;
 import be.howest.ti.mars.logic.controller.Subscription;
@@ -193,8 +194,8 @@ public class MarsRepository implements MarsRepoInt {
 
 
     @Override
-    public Set<Subscription> getSubscriptions() {
-        Set<Subscription> subscriptions = new HashSet<>();
+    public List<Subscription> getSubscriptions() {
+        List<Subscription> subscriptions = new LinkedList<>();
         String SQL_SELECT_ALL_SUBSCRIPTIONS = "select * from subscriptions";
 
         try(Connection con = MarsConnection.getConnection();
@@ -221,21 +222,105 @@ public class MarsRepository implements MarsRepoInt {
 
     @Override
     public void buySubscription(UserAccount user, String subscription) {
+        int id = getSubscriptions().stream()
+                                .filter(sub -> sub.getName().equals(subscription))
+                                .mapToInt(Subscription::getId).sum();
 
+        String SQL_UPDATE_USER = "UPDATE USERS SET subscriptionID=? where name=?";
+        String SQL_INSERT_USER_SUB = "INSERT INTO USERS_SUBSCRIPTIONS(userName,subscriptionID) values(?,?)";
+
+        try(Connection con = MarsConnection.getConnection();
+            PreparedStatement stmt = con.prepareStatement(SQL_UPDATE_USER)){
+            stmt.setInt(1, id);
+            stmt.setString(2, user.getUsername());
+            stmt.executeUpdate();
+        }catch (SQLException ex){
+            logger.log(Level.WARNING, ex.getMessage(), ex);
+        }
+
+        try(Connection con = MarsConnection.getConnection();
+            PreparedStatement stmt = con.prepareStatement(SQL_INSERT_USER_SUB)){
+            stmt.setString(1, user.getUsername());
+            stmt.setInt(2, id);
+            stmt.executeUpdate();
+        }catch (SQLException ex){
+            logger.log(Level.WARNING, ex.getMessage(), ex);
+        }
     }
 
     @Override
-    public void buySubscription(String business, String subscription) {
+    public void buySubscription(BusinessAccount business, String subscription) {
+        int id = getSubscriptions().stream()
+                .filter(sub -> sub.getName().equals(subscription))
+                .mapToInt(Subscription::getId).sum();
 
+        String SQL_UPDATE_BUSINESS = "UPDATE BUSINESSES SET subscriptionID=? where name=?";
+        String SQL_INSERT_BUSINESS_SUB = "INSERT INTO BUSINESSES_SUBSCRIPTIONS(businessName,subscriptionID) values(?,?)";
+
+        try(Connection con = MarsConnection.getConnection();
+            PreparedStatement stmt = con.prepareStatement(SQL_UPDATE_BUSINESS)){
+            stmt.setInt(1, id);
+            stmt.setString(2, business.getUsername());
+            stmt.executeUpdate();
+        }catch (SQLException ex){
+            logger.log(Level.WARNING, ex.getMessage(), ex);
+        }
+
+        try(Connection con = MarsConnection.getConnection();
+            PreparedStatement stmt = con.prepareStatement(SQL_INSERT_BUSINESS_SUB)){
+            stmt.setString(1, business.getUsername());
+            stmt.setInt(2, id);
+            stmt.executeUpdate();
+        }catch (SQLException ex){
+            logger.log(Level.WARNING, ex.getMessage(), ex);
+        }
     }
 
     @Override
-    public void removeSubscription(UserAccount user, String subscription) {
+    public void stopSubscription(UserAccount user) {
+        int idNoDescriptionActive = 0;
+        String SQL_UPDATE_BUSINESS = "UPDATE USERS SET subscriptionID=? where name=?";
+        String SQL_DELETE_BUSINESS_SUB = "DELETE FROM USERS_SUBSCRIPTIONS where userName=?";
 
+        try(Connection con = MarsConnection.getConnection();
+            PreparedStatement stmt = con.prepareStatement(SQL_UPDATE_BUSINESS)){
+            stmt.setInt(1, idNoDescriptionActive);
+            stmt.setString(2, user.getUsername());
+            stmt.executeUpdate();
+        }catch (SQLException ex){
+            logger.log(Level.WARNING, ex.getMessage(), ex);
+        }
+
+        try(Connection con = MarsConnection.getConnection();
+            PreparedStatement stmt = con.prepareStatement(SQL_DELETE_BUSINESS_SUB)){
+            stmt.setString(1, user.getUsername());
+            stmt.executeUpdate();
+        }catch (SQLException ex){
+            logger.log(Level.WARNING, ex.getMessage(), ex);
+        }
     }
 
     @Override
-    public void removeSubscription(String business, String subscription) {
+    public void stopSubscription(BusinessAccount business) {
+        int idNoDescriptionActive = 0;
+        String SQL_UPDATE_BUSINESS = "UPDATE BUSINESSES SET subscriptionID=? where name=?";
+        String SQL_DELETE_BUSINESS_SUB = "DELETE FROM BUSINESSES_SUBSCRIPTIONS where businessName=?";
 
+        try(Connection con = MarsConnection.getConnection();
+            PreparedStatement stmt = con.prepareStatement(SQL_UPDATE_BUSINESS)){
+            stmt.setInt(1, idNoDescriptionActive);
+            stmt.setString(2, business.getUsername());
+            stmt.executeUpdate();
+        }catch (SQLException ex){
+            logger.log(Level.WARNING, ex.getMessage(), ex);
+        }
+
+        try(Connection con = MarsConnection.getConnection();
+            PreparedStatement stmt = con.prepareStatement(SQL_DELETE_BUSINESS_SUB)){
+            stmt.setString(1, business.getUsername());
+            stmt.executeUpdate();
+        }catch (SQLException ex){
+            logger.log(Level.WARNING, ex.getMessage(), ex);
+        }
     }
 }

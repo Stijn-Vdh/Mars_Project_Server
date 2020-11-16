@@ -310,6 +310,7 @@ paths:
           description: Internal error.
     post:
       summary: Buy subscription
+      operationId: buySubscription
       tags:
         - store
       requestBody:
@@ -333,6 +334,7 @@ paths:
       security:
         - Token: []
     delete:
+      operationId: stopSubscription
       tags:
         - store
       summary: Stop your currently active subscription

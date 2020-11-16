@@ -140,6 +140,8 @@ public class WebServer extends AbstractVerticle {
         return router;
     }
 
+
+
     private void addRoutes(OpenAPI3RouterFactory factory) {
         addRouteWithCtxFunction(factory, "getMessage", bridge::getMessage);
         addRouteWithCtxFunction(factory, "createAccount", bridge::createAccount);
@@ -150,6 +152,8 @@ public class WebServer extends AbstractVerticle {
         addRouteWithCtxFunction(factory, "addFriend", bridge::addFriend);
         addRouteWithCtxFunction(factory, "removeFriend", bridge::removeFriend);
         addRouteWithCtxFunction(factory, "sendPackage", bridge::sendPackage);
+        addRouteWithCtxFunction(factory, "buySubscription", bridge::buySubscription);
+        addRouteWithCtxFunction(factory, "stopSubscription", bridge::stopSubscription);
 
     }
 

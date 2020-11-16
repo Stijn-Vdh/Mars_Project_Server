@@ -87,6 +87,27 @@ class MarsOpenApiBridge {
     public Object viewSubscriptions(RoutingContext ctx) {
         return controller.getSubscriptions();
     }
+    public Object buySubscription(RoutingContext ctx) {
+        JsonObject json = ctx.getBodyAsJson();
+        String subscriptionName = json.getString("subscriptionName");
+
+        if (verifyUserAccountToken(ctx)){
+            return controller.buyUserSubscription(getUserAccount(ctx), subscriptionName);
+        }else{
+            return controller.buyBusinessSubscription(getBusinessAccount(ctx), subscriptionName);
+        }
+    }
+
+    public Object stopSubscription(RoutingContext ctx) {
+        JsonObject json = ctx.getBodyAsJson();
+
+
+        if (verifyUserAccountToken(ctx)){
+            return controller.stopSubscription(getUserAccount(ctx));
+        }else{
+            return controller.stopSubscription(getBusinessAccount(ctx));
+        }
+    }
 
     public boolean verifyUserAccountToken(RoutingContext ctx) {
         return getUserAccount(ctx) != null;
@@ -129,5 +150,6 @@ class MarsOpenApiBridge {
             return header.substring(AUTHORIZATION_TOKEN_PREFIX.length());
         }
     }
+
 
 }

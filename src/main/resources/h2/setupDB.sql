@@ -32,17 +32,17 @@ create table subscriptions
 
 create table users_subscriptions
 (
-	userID int not null,
+	userName varchar(50) not null,
 	subscriptionID int not null,
-	CONSTRAINT userID_fk FOREIGN KEY (userID) REFERENCES users(userID),
+	CONSTRAINT userID_fk FOREIGN KEY (userName) REFERENCES users(name),
 	CONSTRAINT u_subscriptionID_fk FOREIGN KEY (subscriptionID) REFERENCES subscriptions(subscriptionID)
 );
 
 create table businesses_subscriptions
 (
-	businessID int not null,
+	businessName varchar(50) not null,
 	subscriptionID int not null,
-	CONSTRAINT businessID_fk FOREIGN KEY (businessID) REFERENCES businesses(businessID),
+	CONSTRAINT businessName_fk FOREIGN KEY (businessName) REFERENCES businesses(name),
 	CONSTRAINT b_subscriptionID_fk FOREIGN KEY (subscriptionID) REFERENCES subscriptions(subscriptionID)
 );
 
