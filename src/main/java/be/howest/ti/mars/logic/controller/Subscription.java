@@ -5,19 +5,19 @@ import java.util.Objects;
 public class Subscription {
     private final int id;
     private final String name;
-    private final int remainingSmallPods_thisMonth;
-    private final int remainingLargePods_thisMonth;
+    private final int remainingSmallPods_thisDay;
+    private final int remainingLargePods_thisDay;
     private final int amountOfDedicatedPods;
 
     public Subscription(int id, String name) {
         this(id, name, 0,0, 0);
     }
 
-    public Subscription (int id, String name, int remainingSmallPods_thisMonth, int remainingLargePods_thisMonth, int amountOfDedicatedPods){
+    public Subscription (int id, String name, int remainingSmallPods_thisDay, int remainingLargePods_thisDay, int amountOfDedicatedPods){
         this.id = id;
         this.name = name;
-        this.remainingSmallPods_thisMonth = remainingSmallPods_thisMonth;
-        this.remainingLargePods_thisMonth = remainingLargePods_thisMonth;
+        this.remainingSmallPods_thisDay = remainingSmallPods_thisDay;
+        this.remainingLargePods_thisDay = remainingLargePods_thisDay;
         this.amountOfDedicatedPods = amountOfDedicatedPods;
     }
 
@@ -29,12 +29,12 @@ public class Subscription {
         return name;
     }
 
-    public int getRemainingSmallPods_thisMonth() {
-        return remainingSmallPods_thisMonth;
+    public int getRemainingSmallPods_thisDay() {
+        return remainingSmallPods_thisDay;
     }
 
-    public int getRemainingLargePods_thisMonth() {
-        return remainingLargePods_thisMonth;
+    public int getRemainingLargePods_thisDay() {
+        return remainingLargePods_thisDay;
     }
 
     public int getAmountOfDedicatedPods() {

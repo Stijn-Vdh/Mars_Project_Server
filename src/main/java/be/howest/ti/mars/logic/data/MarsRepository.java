@@ -260,11 +260,11 @@ public class MarsRepository implements MarsRepoInt {
 
         int remainingSmallPods_thisDay = getSubscriptions().stream()
                 .filter(sub -> sub.getName().equals(subscription))
-                .mapToInt(Subscription::getRemainingSmallPods_thisMonth).sum();
+                .mapToInt(Subscription::getRemainingSmallPods_thisDay).sum();
 
         int remainingLargePods_thisDay = getSubscriptions().stream()
                 .filter(sub -> sub.getName().equals(subscription))
-                .mapToInt(Subscription::getRemainingLargePods_thisMonth).sum();
+                .mapToInt(Subscription::getRemainingLargePods_thisDay).sum();
 
         int dedicatedPods = getSubscriptions().stream()
                 .filter(sub -> sub.getName().equals(subscription))
