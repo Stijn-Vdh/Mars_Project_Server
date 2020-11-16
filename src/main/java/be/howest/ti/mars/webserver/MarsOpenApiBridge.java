@@ -91,18 +91,18 @@ class MarsOpenApiBridge {
         JsonObject json = ctx.getBodyAsJson();
         String subscriptionName = json.getString("subscriptionName");
 
-        if (isUserAccountToken(ctx)){
+        if (verifyUserAccountToken(ctx)){
             return controller.buyUserSubscription(getUserAccount(ctx), subscriptionName);
         }else{
             return controller.buyBusinessSubscription(getBusinessAccount(ctx), subscriptionName);
         }
     }
 
-    public boolean isUserAccountToken(RoutingContext ctx) {
+    public boolean verifyUserAccountToken(RoutingContext ctx) {
         return getUserAccount(ctx) != null;
     }
 
-    public boolean isBusinessAccountToken(RoutingContext ctx) {
+    public boolean verifyBusinessAccountToken(RoutingContext ctx) {
         return getBusinessAccount(ctx) != null;
     }
 
