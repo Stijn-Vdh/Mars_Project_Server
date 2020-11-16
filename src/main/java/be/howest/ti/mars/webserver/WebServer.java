@@ -119,13 +119,13 @@ public class WebServer extends AbstractVerticle {
         factory.addGlobalHandler(createCorsHandler());
 
         // Verify the user token for all secured operations
-        factory.addSecuritySchemaScopeValidator("Token","User", this::verifyUserAccountToken);
+        factory.addSecuritySchemaScopeValidator("Token", "User", this::verifyUserAccountToken);
 
         // Verify the business token for all secured operations
-        factory.addSecuritySchemaScopeValidator("Token","Business", this::verifyBusinessAccountToken);
+        factory.addSecuritySchemaScopeValidator("Token", "Business", this::verifyBusinessAccountToken);
 
         // Both tokens are allowed
-        factory.addSecurityHandler("Token",this::verifyAccountToken);
+        factory.addSecurityHandler("Token", this::verifyAccountToken);
 
         // Add all route handlers
         addRoutes(factory);
@@ -139,7 +139,6 @@ public class WebServer extends AbstractVerticle {
 
         return router;
     }
-
 
 
     private void addRoutes(OpenAPI3RouterFactory factory) {
@@ -249,6 +248,7 @@ public class WebServer extends AbstractVerticle {
     private void verifyUserAccountToken(RoutingContext ctx) {
         verifyToken(ctx, bridge::verifyUserAccountToken);
     }
+
     private void verifyBusinessAccountToken(RoutingContext ctx) {
         verifyToken(ctx, bridge::verifyBusinessAccountToken);
     }
@@ -266,7 +266,7 @@ public class WebServer extends AbstractVerticle {
 
     private void verifyAccountToken(RoutingContext ctx) {
 
-        if ( bridge.getBearerToken(ctx) == null) {
+        if (bridge.getBearerToken(ctx) == null) {
             ctx.fail(401); // Unauthorized  due to wrong or absent header format
         } else if (bridge.verifyUserAccountToken(ctx) || bridge.verifyBusinessAccountToken(ctx)) {
             ctx.next();

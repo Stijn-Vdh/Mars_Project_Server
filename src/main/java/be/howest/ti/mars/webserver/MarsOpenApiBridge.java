@@ -1,4 +1,5 @@
 package be.howest.ti.mars.webserver;
+
 import be.howest.ti.mars.logic.controller.BaseAccount;
 import be.howest.ti.mars.logic.controller.BusinessAccount;
 import be.howest.ti.mars.logic.controller.MarsController;
@@ -9,6 +10,7 @@ import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
+
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -37,10 +39,10 @@ class MarsOpenApiBridge {
                 json.getBoolean("businessAccount")
         );
 
-        return null; // doesnt allow void
+        return "Successfully created an account";
     }
 
-    public Object sendPackage(RoutingContext ctx){
+    public Object sendPackage(RoutingContext ctx) {
         logger.info("addDelivery");
 
         JsonObject json = ctx.getBodyAsJson();
@@ -48,10 +50,9 @@ class MarsOpenApiBridge {
                 json.getInteger("from"),
                 json.getInteger("destination"),
                 json.getString("date")
-                );
+        );
         return null;
     }
-
 
     public Object login(RoutingContext ctx) {
         logger.info("login");
@@ -62,7 +63,7 @@ class MarsOpenApiBridge {
 
     public Object logout(RoutingContext ctx) {
         controller.logout(getAccount(ctx));
-        return null;
+        return "Bye bye";
     }
 
     public Object viewFriends(RoutingContext ctx) {
@@ -87,34 +88,32 @@ class MarsOpenApiBridge {
     public Object viewSubscriptions(RoutingContext ctx) {
         return controller.getSubscriptions();
     }
+
     public Object buySubscription(RoutingContext ctx) {
         JsonObject json = ctx.getBodyAsJson();
         String subscriptionName = json.getString("subscriptionName");
 
-        if (verifyUserAccountToken(ctx)){
+        if (verifyUserAccountToken(ctx)) {
             return controller.buyUserSubscription(getUserAccount(ctx), subscriptionName);
-        }else{
+        } else {
             return controller.buyBusinessSubscription(getBusinessAccount(ctx), subscriptionName);
         }
     }
 
     public Object stopSubscription(RoutingContext ctx) {
-        JsonObject json = ctx.getBodyAsJson();
-
-
-        if (verifyUserAccountToken(ctx)){
+        if (verifyUserAccountToken(ctx)) {
             return controller.stopSubscription(getUserAccount(ctx));
-        }else{
+        } else {
             return controller.stopSubscription(getBusinessAccount(ctx));
         }
     }
 
     public Object viewSubscriptionInfo(RoutingContext ctx) {
 
-        if (verifyBusinessAccountToken(ctx)){
+        if (verifyBusinessAccountToken(ctx)) {
             return controller.viewSubscriptionInfo(getBusinessAccount(ctx));
-        }else{
-            return null;
+        } else {
+            return "This feature is only for businesses.";
         }
     }
 
@@ -125,6 +124,10 @@ class MarsOpenApiBridge {
     public boolean verifyBusinessAccountToken(RoutingContext ctx) {
         return getBusinessAccount(ctx) != null;
     }
+
+
+
+    //------------------------------------------------------------------------------------------------------------------
 
     private BaseAccount getAccount(RoutingContext ctx) {
         AccountToken accountToken = Json.decodeValue(new JsonObject().put("token", getBearerToken(ctx)).toString(), AccountToken.class);
@@ -143,6 +146,7 @@ class MarsOpenApiBridge {
                 .findAny()
                 .orElse(null);
     }
+
     private BusinessAccount getBusinessAccount(RoutingContext ctx) {
         AccountToken accountToken = Json.decodeValue(new JsonObject().put("token", getBearerToken(ctx)).toString(), AccountToken.class);
         return controller.getBusinessAccounts().stream()
@@ -159,7 +163,6 @@ class MarsOpenApiBridge {
             return header.substring(AUTHORIZATION_TOKEN_PREFIX.length());
         }
     }
-
 
 
 }

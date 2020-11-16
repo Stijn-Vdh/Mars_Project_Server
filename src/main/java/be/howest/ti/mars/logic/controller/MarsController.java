@@ -4,6 +4,7 @@ import be.howest.ti.mars.logic.controller.exceptions.AuthenticationException;
 import be.howest.ti.mars.logic.controller.exceptions.UsernameException;
 import be.howest.ti.mars.logic.controller.security.AccountToken;
 import be.howest.ti.mars.logic.data.MarsRepository;
+
 import java.util.*;
 
 import java.text.ParseException;
@@ -25,6 +26,7 @@ public class MarsController {
     public Set<UserAccount> getUserAccounts() {
         return userAccounts;
     }
+
     public Set<BusinessAccount> getBusinessAccounts() {
         return businessAccounts;
     }
@@ -32,13 +34,13 @@ public class MarsController {
     public void createAccount(String name, String password, String address, int endpoint, boolean isBusiness) {
         if (isBusiness) {
             BusinessAccount account = new BusinessAccount(name, password, endpoint, address, null);
-            if ( userAccounts.contains(new UserAccount(name)) || !businessAccounts.add(account)) { // username exists already
+            if (userAccounts.contains(new UserAccount(name)) || !businessAccounts.add(account)) { // username exists already
                 throw new UsernameException("Username (" + name + ") is already taken");
             }
             repo.addBusiness(account);
         } else {
             UserAccount account = new UserAccount(name, password, endpoint, address, null);
-            if ( businessAccounts.contains(new BusinessAccount(name)) || !userAccounts.add(account)) { // username exists already
+            if (businessAccounts.contains(new BusinessAccount(name)) || !userAccounts.add(account)) { // username exists already
                 throw new UsernameException("Username (" + name + ") is already taken");
             }
             repo.addUser(account);
@@ -47,7 +49,7 @@ public class MarsController {
 
     }
 
-    public void createDelivery(String deliveryType, int from, int destination, String date){
+    public void createDelivery(String deliveryType, int from, int destination, String date) {
         Date convertedDate = null;
         try {
             convertedDate = new SimpleDateFormat("dd-MM-yyyy").parse(date);
@@ -82,12 +84,12 @@ public class MarsController {
         return repo.getSubscriptions();
     }
 
-    public Object addFriend(UserAccount user,String friendName) {
+    public Object addFriend(UserAccount user, String friendName) {
         UserAccount friendAccount = userAccounts.stream()
                 .filter(acc -> acc.getUsername().equals(friendName))
                 .findAny().orElse(null);
         assert friendAccount != null;
-        return user.addFriend(friendAccount).getUsername();
+        return "You just added a friend called:" + user.addFriend(friendAccount).getUsername();
     }
 
     public Object removeFriend(UserAccount user, String friendName) {
@@ -95,27 +97,28 @@ public class MarsController {
                 .filter(acc -> acc.getUsername().equals(friendName))
                 .findAny().orElse(null);
         assert friendAccount != null;
-        return user.removeFriend(friendAccount).getUsername();
+        return "You just removed a friend called:" + user.removeFriend(friendAccount).getUsername();
     }
 
 
     public Object buyBusinessSubscription(BusinessAccount businessAccount, String subscriptionName) {
         repo.buySubscription(businessAccount, subscriptionName);
-        return null;
+        return "Thank you for buying a subscription.";
     }
 
     public Object buyUserSubscription(UserAccount userAccount, String subscriptionName) {
         repo.buySubscription(userAccount, subscriptionName);
-        return null;
+        return "Thank you for buying a subscription.";
     }
 
     public Object stopSubscription(UserAccount userAccount) {
         repo.stopSubscription(userAccount);
-        return null;
+        return "We are sorry for you to stop you current subscription.";
     }
+
     public Object stopSubscription(BusinessAccount businessAccount) {
         repo.stopSubscription(businessAccount);
-        return null;
+        return "We are sorry for you to stop you current subscription.";
     }
 
     public Object viewSubscriptionInfo(BusinessAccount businessAccount) {
