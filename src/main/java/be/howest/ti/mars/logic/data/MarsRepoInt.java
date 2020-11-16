@@ -42,8 +42,8 @@ public interface MarsRepoInt {
     void getSubscriptionInfo(int businessID);
     void buySubscription (UserAccount user, String subscription);
     void buySubscription (BusinessAccount business, String subscription);
-    void removeSubscription (UserAccount user, String subscription);
-    void removeSubscription (String business, String subscription);
+    void stopSubscription (UserAccount user);
+    void stopSubscription (BusinessAccount business);
 
 
 

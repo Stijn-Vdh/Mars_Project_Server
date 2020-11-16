@@ -40,9 +40,9 @@ create table users_subscriptions
 
 create table businesses_subscriptions
 (
-	businessID int not null,
+	businessName varchar(50) not null,
 	subscriptionID int not null,
-	CONSTRAINT businessID_fk FOREIGN KEY (businessID) REFERENCES businesses(businessID),
+	CONSTRAINT businessName_fk FOREIGN KEY (businessName) REFERENCES businesses(name),
 	CONSTRAINT b_subscriptionID_fk FOREIGN KEY (subscriptionID) REFERENCES subscriptions(subscriptionID)
 );
 

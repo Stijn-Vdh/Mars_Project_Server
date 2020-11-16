@@ -334,6 +334,7 @@ paths:
       security:
         - Token: []
     delete:
+      operationId: stopSubscription
       tags:
         - store
       summary: Stop your currently active subscription

@@ -244,16 +244,43 @@ public class MarsRepository implements MarsRepoInt {
 
     @Override
     public void buySubscription(BusinessAccount business, String subscription) {
+        int id = getSubscriptions().stream()
+                .filter(sub -> sub.getName().equals(subscription))
+                .mapToInt(Subscription::getId).sum();
+
+        String SQL_UPDATE_BUSINESS = "UPDATE BUSINESSES SET subscriptionID=? where name=?";
+        String SQL_INSERT_BUSINESS_SUB = "INSERT INTO BUSINESSES_SUBSCRIPTIONS(businessName,subscriptionID) values(?,?)";
+
+        try(Connection con = MarsConnection.getConnection();
+            PreparedStatement stmt = con.prepareStatement(SQL_UPDATE_BUSINESS)){
+            stmt.setInt(1, id);
+            stmt.setString(2, business.getUsername());
+            stmt.executeUpdate();
+        }catch (SQLException ex){
+            logger.log(Level.WARNING, ex.getMessage(), ex);
+        }
+
+        try(Connection con = MarsConnection.getConnection();
+            PreparedStatement stmt = con.prepareStatement(SQL_INSERT_BUSINESS_SUB)){
+            stmt.setString(1, business.getUsername());
+            stmt.setInt(2, id);
+            stmt.executeUpdate();
+        }catch (SQLException ex){
+            logger.log(Level.WARNING, ex.getMessage(), ex);
+        }
+    }
+
+    @Override
+    public void stopSubscription(UserAccount user) {
+
 
     }
 
     @Override
-    public void removeSubscription(UserAccount user, String subscription) {
+    public void stopSubscription(BusinessAccount business) {
 
     }
 
-    @Override
-    public void removeSubscription(String business, String subscription) {
 
-    }
+
 }

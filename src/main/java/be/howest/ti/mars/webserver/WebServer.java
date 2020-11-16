@@ -153,6 +153,7 @@ public class WebServer extends AbstractVerticle {
         addRouteWithCtxFunction(factory, "removeFriend", bridge::removeFriend);
         addRouteWithCtxFunction(factory, "sendPackage", bridge::sendPackage);
         addRouteWithCtxFunction(factory, "buySubscription", bridge::buySubscription);
+        addRouteWithCtxFunction(factory, "stopSubscription", bridge::stopSubscription);
 
     }
 

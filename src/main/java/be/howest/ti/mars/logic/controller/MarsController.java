@@ -108,4 +108,13 @@ public class MarsController {
         repo.buySubscription(userAccount, subscriptionName);
         return null;
     }
+
+    public Object stopSubscription(UserAccount userAccount) {
+        repo.stopSubscription(userAccount);
+        return null;
+    }
+    public Object stopSubscription(BusinessAccount businessAccount) {
+        repo.stopSubscription(businessAccount);
+        return null;
+    }
 }
