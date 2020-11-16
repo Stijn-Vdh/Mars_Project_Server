@@ -45,8 +45,8 @@ create table businesses_subscriptions
 (
 	businessName varchar(50) not null,
 	subscriptionID int not null,
-	remainingSmallPods_thisMonth int,
-	remainingLargePods_thisMonth int,
+	remainingSmallPods_thisDay int,
+	remainingLargePods_thisDay int,
 	amountOfDedicatedPods int,
 	CONSTRAINT businessName_fk FOREIGN KEY (businessName) REFERENCES businesses(name),
 	CONSTRAINT b_subscriptionID_fk FOREIGN KEY (subscriptionID) REFERENCES subscriptions(subscriptionID)
