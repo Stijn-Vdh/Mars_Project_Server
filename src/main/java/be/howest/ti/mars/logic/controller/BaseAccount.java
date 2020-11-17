@@ -4,7 +4,7 @@ import be.howest.ti.mars.logic.controller.security.AccountToken;
 
 import java.util.Objects;
 
-public class BaseAccount {
+public abstract class BaseAccount {
     private AccountToken accountToken;
     private final int homeAddressEndpoint; //replace with endpoint class
     private final String password; // needs to be replaced with Password class which will contain hashed version
