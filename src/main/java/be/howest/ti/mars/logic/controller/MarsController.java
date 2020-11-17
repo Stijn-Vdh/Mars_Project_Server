@@ -24,6 +24,7 @@ public class MarsController {
     public Set<UserAccount> getUserAccounts() {
         return userAccounts;
     }
+
     public Set<BusinessAccount> getBusinessAccounts() {
         return businessAccounts;
     }
@@ -31,13 +32,13 @@ public class MarsController {
     public void createAccount(String name, String password, String address, int endpoint, boolean isBusiness) {
         if (isBusiness) {
             BusinessAccount account = new BusinessAccount(name, password, endpoint, address, null);
-            if ( userAccounts.contains(new UserAccount(name)) || !businessAccounts.add(account)) { // username exists already
+            if (userAccounts.contains(new UserAccount(name)) || !businessAccounts.add(account)) { // username exists already
                 throw new UsernameException("Username (" + name + ") is already taken");
             }
             repo.addBusiness(account);
         } else {
             UserAccount account = new UserAccount(name, password, endpoint, address, null);
-            if ( businessAccounts.contains(new BusinessAccount(name)) || !userAccounts.add(account)) { // username exists already
+            if (businessAccounts.contains(new BusinessAccount(name)) || !userAccounts.add(account)) { // username exists already
                 throw new UsernameException("Username (" + name + ") is already taken");
             }
             repo.addUser(account);
@@ -46,7 +47,7 @@ public class MarsController {
 
     }
 
-    public void createDelivery(String deliveryType, int from, int destination, String date){
+    public void createDelivery(String deliveryType, int from, int destination, String date) {
         Date convertedDate = null;
         try {
             convertedDate = new SimpleDateFormat("dd-MM-yyyy").parse(date);
@@ -81,7 +82,7 @@ public class MarsController {
         return repo.getSubscriptions();
     }
 
-    public Object addFriend(UserAccount user,String friendName) {
+    public Object addFriend(UserAccount user, String friendName) {
         UserAccount friendAccount = userAccounts.stream()
                 .filter(acc -> acc.getUsername().equals(friendName))
                 .findAny().orElse(null);
@@ -97,4 +98,7 @@ public class MarsController {
         return user.removeFriend(friendAccount).getUsername();
     }
 
+    public MarsRepository getRepo() {
+        return repo;
+    }
 }

@@ -1,4 +1,5 @@
 package be.howest.ti.mars.webserver;
+
 import be.howest.ti.mars.logic.controller.BaseAccount;
 import be.howest.ti.mars.logic.controller.BusinessAccount;
 import be.howest.ti.mars.logic.controller.MarsController;
@@ -9,6 +10,7 @@ import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
+
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -40,7 +42,7 @@ class MarsOpenApiBridge {
         return null; // doesnt allow void
     }
 
-    public Object sendPackage(RoutingContext ctx){
+    public Object sendPackage(RoutingContext ctx) {
         logger.info("addDelivery");
 
         JsonObject json = ctx.getBodyAsJson();
@@ -48,7 +50,7 @@ class MarsOpenApiBridge {
                 json.getInteger("from"),
                 json.getInteger("destination"),
                 json.getString("date")
-                );
+        );
         return null;
     }
 
@@ -113,6 +115,7 @@ class MarsOpenApiBridge {
                 .findAny()
                 .orElse(null);
     }
+
     private BusinessAccount getBusinessAccount(RoutingContext ctx) {
         AccountToken accountToken = Json.decodeValue(new JsonObject().put("token", getBearerToken(ctx)).toString(), AccountToken.class);
         return controller.getBusinessAccounts().stream()
@@ -130,4 +133,7 @@ class MarsOpenApiBridge {
         }
     }
 
+    public Object getEndpoints(RoutingContext routingContext) {
+        return controller.getRepo().getEndpoints();
+    }
 }
