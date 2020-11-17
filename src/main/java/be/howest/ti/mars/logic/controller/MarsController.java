@@ -98,6 +98,9 @@ public class MarsController {
         return "You just removed a friend called:" + user.removeFriend(friendAccount).getUsername();
     }
 
+    public Object getFriends(UserAccount user) {
+        return repo.getFriends(user);
+    }
 
     public Object buyBusinessSubscription(BusinessAccount businessAccount, String subscriptionName) {
         repo.buySubscription(businessAccount, subscriptionName);
