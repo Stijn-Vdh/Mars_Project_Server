@@ -92,14 +92,43 @@ public class MarsRepository implements MarsRepoInt {
     }
 
     @Override
-    public void ShareLocation(UserAccount user, Boolean shareLocation) {
+    public void shareLocation(UserAccount user) {
+        String SQL_UPDATE_USER = "UPDATE USERS SET sharesLocation=? where name=?";
 
+        try (Connection con = MarsConnection.getConnection();
+             PreparedStatement stmt = con.prepareStatement(SQL_UPDATE_USER)) {
+
+            stmt.setBoolean(1, true);
+            stmt.setString(2, user.getUsername());
+
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            logger.log(Level.WARNING, ex.getMessage(), ex);
+            throw new DatabaseException("Could not share location.");
+        }
+    }
+
+    @Override
+    public void stopSharingLocation(UserAccount user) {
+        String SQL_UPDATE_USER = "UPDATE USERS SET sharesLocation=? where name=?";
+
+        try (Connection con = MarsConnection.getConnection();
+             PreparedStatement stmt = con.prepareStatement(SQL_UPDATE_USER)) {
+
+            stmt.setBoolean(1, false);
+            stmt.setString(2, user.getUsername());
+
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            logger.log(Level.WARNING, ex.getMessage(), ex);
+            throw new DatabaseException("Could not share location.");
+        }
     }
 
     @Override
     public List<JsonObject> getFriends(UserAccount user) {
         List<JsonObject> friends = new LinkedList<>();
-        String SQL_SELECT_ALL_FRIENDS = "select f.friendName, u.* from friends f join users u on u.name = f.userName where u.name=?";
+        String SQL_SELECT_ALL_FRIENDS = "select * from friends f left join users u on u.name = f.friendName where f.userName=?";
 
         try (Connection con = MarsConnection.getConnection();
              PreparedStatement stmt = con.prepareStatement(SQL_SELECT_ALL_FRIENDS)) {
@@ -395,4 +424,6 @@ public class MarsRepository implements MarsRepoInt {
             throw new DatabaseException("Can't stop a subscription.");
         }
     }
+
+
 }

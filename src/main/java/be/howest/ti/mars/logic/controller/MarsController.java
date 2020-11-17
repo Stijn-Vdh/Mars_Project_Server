@@ -82,6 +82,10 @@ public class MarsController {
         return repo.getSubscriptions();
     }
 
+    public Object getFriends(UserAccount user) {
+        return repo.getFriends(user);
+    }
+
     public Object addFriend(UserAccount user, String friendName) {
         UserAccount friendAccount = userAccounts.stream()
                 .filter(acc -> acc.getUsername().equals(friendName))
@@ -98,9 +102,6 @@ public class MarsController {
         return "You just removed a friend called:" + user.removeFriend(friendAccount).getUsername();
     }
 
-    public Object getFriends(UserAccount user) {
-        return repo.getFriends(user);
-    }
 
     public Object buyBusinessSubscription(BusinessAccount businessAccount, String subscriptionName) {
         repo.buySubscription(businessAccount, subscriptionName);
@@ -126,8 +127,15 @@ public class MarsController {
         return repo.getSubscriptionInfo(businessAccount.getUsername());
     }
 
-
     public MarsRepository getRepo() {
         return repo;
+    }
+
+    public void shareLocation(UserAccount userAccount) {
+        repo.shareLocation(userAccount);
+    }
+
+    public void stopSharingLocation(UserAccount userAccount) {
+        repo.stopSharingLocation(userAccount);
     }
 }

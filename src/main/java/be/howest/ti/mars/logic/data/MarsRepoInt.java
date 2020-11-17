@@ -18,7 +18,9 @@ public interface MarsRepoInt {
     // User
     void addUser(UserAccount user);
 
-    void ShareLocation(UserAccount user, Boolean shareLocation);
+    void shareLocation(UserAccount user);
+
+    void stopSharingLocation(UserAccount userAccount);
 
     // Friends
     List<JsonObject> getFriends(UserAccount user);
@@ -58,6 +60,4 @@ public interface MarsRepoInt {
     void stopSubscription(UserAccount user);
 
     void stopSubscription(BusinessAccount business);
-
-
 }

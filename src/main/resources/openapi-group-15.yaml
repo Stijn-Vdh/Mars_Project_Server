@@ -180,18 +180,13 @@ paths:
           description: Internal error.
       security:
         - Token: [ ]
-  /api/shareLocation:
+  /api/user/shareLocation:
     description: Share your location with your friends.
     post:
+      operationId: shareLocation
       summary: Share your location with your friends.
       tags:
         - user
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer
       responses:
         '200':
           description: Succesfuly shared your location with your friends.
@@ -201,19 +196,16 @@ paths:
           description: Forbidden!
         '5XX':
           description: Unexpected error.
-      security:
-        - Token: [ User ]
     delete:
+      operationId: stopSharingLocation
       summary: Stop sharing your location with your friends.
       tags:
         - user
       responses:
         '200':
-          description: Succesfuly stopped sharing your location with your friends.
+          description: Succesfuly Stoped sharing your location with your friends.
         '401':
           description: Authorization information is missing or invalid.
-        '402':
-          description: The location wasn't being shared already.
         '403':
           description: Forbidden!
         '5XX':
