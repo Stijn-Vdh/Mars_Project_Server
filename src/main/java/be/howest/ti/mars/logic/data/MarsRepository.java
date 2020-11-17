@@ -6,6 +6,8 @@ import be.howest.ti.mars.logic.controller.Delivery;
 import be.howest.ti.mars.logic.controller.Subscription;
 import be.howest.ti.mars.logic.controller.UserAccount;
 import be.howest.ti.mars.logic.controller.exceptions.DatabaseException;
+import io.vertx.core.json.Json;
+import io.vertx.core.json.JsonObject;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -77,9 +79,8 @@ public class MarsRepository implements MarsRepoInt {
     }
 
     @Override
-    public List<UserAccount> getFriends(UserAccount user) {
-        System.out.println(user.getUsername());
-        List<UserAccount> friends = new LinkedList<>();
+    public List<JsonObject> getFriends(UserAccount user) {
+        List<JsonObject> friends = new LinkedList<>();
         String SQL_SELECT_ALL_FRIENDS = "select f.friendName, u.* from friends f join users u on u.name = f.userName where u.name=?";
 
         try (Connection con = MarsConnection.getConnection();
@@ -88,13 +89,18 @@ public class MarsRepository implements MarsRepoInt {
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     String name = rs.getString("friendName");
-                    String pwd = rs.getString("password");
                     int endpointID = rs.getInt("homeEndpointID");
                     String addr = rs.getString("homeAddress");
                     boolean shares = rs.getBoolean("sharesLocation");
 
-                    UserAccount friend = new UserAccount(name, pwd, endpointID, addr, shares, null);
-                    friends.add(friend);
+                    JsonObject json = new JsonObject();
+
+                    json.put("name:", name);
+                    json.put("sharesLocation:", shares);
+                    json.put("homeAddress:", addr);
+                    json.put("homeEndpointID:", endpointID);
+
+                    friends.add(json);
                 }
             }
 
