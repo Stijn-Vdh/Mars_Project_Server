@@ -116,6 +116,7 @@ paths:
               properties:
                 name:
                   type: string
+                  minLength: 1
                 homeAddress:
                   type: string
                 homeEndpointID:
@@ -124,6 +125,7 @@ paths:
                   type: boolean
                 password:
                   type: string
+                  minLength: 1
               required:
                 - name
                 - password
