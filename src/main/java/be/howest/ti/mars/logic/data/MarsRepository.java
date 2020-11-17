@@ -3,6 +3,7 @@ package be.howest.ti.mars.logic.data;
 import be.howest.ti.mars.logic.controller.*;
 import be.howest.ti.mars.logic.controller.converters.ShortEndpoint;
 import be.howest.ti.mars.logic.controller.exceptions.DatabaseException;
+import be.howest.ti.mars.logic.controller.exceptions.EndpointException;
 import io.vertx.core.json.JsonObject;
 
 import java.sql.Connection;
@@ -17,6 +18,7 @@ import java.util.logging.Logger;
 
 public class MarsRepository implements MarsRepoInt {
     private static final Logger logger = Logger.getLogger(MarsRepository.class.getName());
+    private static final String SQL_GET_ENDPOINT = "SELECT * FROM ENDPOINTS WHERE ID = ?";
 
     @Override
     public Set<ShortEndpoint> getEndpoints() { //will be short for the meantime
@@ -53,7 +55,21 @@ public class MarsRepository implements MarsRepoInt {
 
     @Override
     public Endpoint getEndpoint(int id) {
-        return null;
+        try (Connection con = MarsConnection.getConnection();
+             PreparedStatement stmt = con.prepareStatement(SQL_GET_ENDPOINT);
+        ) {
+            stmt.setInt(1, id);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return new Endpoint(id, rs.getString("name"), true, "todo", false);
+                } else {
+                    throw new EndpointException("Endpoint with ID (" + id + ") doesn't exist!");
+                }
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+            throw new DatabaseException("Cannot retrieve endpoint with id: " + id + "!");
+        }
     }
 
     @Override
