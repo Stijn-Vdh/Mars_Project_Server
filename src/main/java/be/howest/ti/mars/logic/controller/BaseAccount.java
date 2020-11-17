@@ -61,12 +61,12 @@ public abstract class BaseAccount {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         BaseAccount that = (BaseAccount) o;
-        return username.equals(that.username);
+        return username.equalsIgnoreCase(that.username);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(username);
+        return Objects.hash(username.toLowerCase());
     }
 
 

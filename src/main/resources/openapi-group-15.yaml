@@ -103,7 +103,7 @@ paths:
     description: creates a new account
     post:
       operationId: createAccount
-      summary: create an account
+      summary: create an account, username is case-insensitive
       tags:
         - user
       requestBody:
@@ -116,6 +116,7 @@ paths:
               properties:
                 name:
                   type: string
+                  minLength: 1
                 homeAddress:
                   type: string
                 homeEndpointID:
@@ -124,6 +125,7 @@ paths:
                   type: boolean
                 password:
                   type: string
+                  minLength: 1
               required:
                 - name
                 - password
