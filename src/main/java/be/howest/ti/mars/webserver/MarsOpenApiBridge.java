@@ -110,6 +110,19 @@ class MarsOpenApiBridge {
         return controller.viewSubscriptionInfo(getBusinessAccount(ctx));
     }
 
+    public Object shareLocation(RoutingContext ctx) {
+        controller.shareLocation(getUserAccount(ctx));
+        return "Now sharing location with friends.";
+    }
+
+    public Object stopSharingLocation(RoutingContext ctx) {
+        controller.stopSharingLocation(getUserAccount(ctx));
+        return "Not sharing location anymore with friends.";
+    }
+
+
+    //------------------------------------------------------------------------------------------------------------------
+
     public boolean verifyUserAccountToken(RoutingContext ctx) {
         return getUserAccount(ctx) != null;
     }
@@ -117,10 +130,6 @@ class MarsOpenApiBridge {
     public boolean verifyBusinessAccountToken(RoutingContext ctx) {
         return getBusinessAccount(ctx) != null;
     }
-
-
-
-    //------------------------------------------------------------------------------------------------------------------
 
     private BaseAccount getAccount(RoutingContext ctx) {
         AccountToken accountToken = Json.decodeValue(new JsonObject().put("token", getBearerToken(ctx)).toString(), AccountToken.class);
