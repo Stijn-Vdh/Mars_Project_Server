@@ -110,7 +110,7 @@ public class MarsRepository implements MarsRepoInt {
     @Override
     public List<JsonObject> getFriends(UserAccount user) {
         List<JsonObject> friends = new LinkedList<>();
-        String SQL_SELECT_ALL_FRIENDS = "select f.friendName, u.* from friends f join users u on u.name = f.userName where u.name=?";
+        String SQL_SELECT_ALL_FRIENDS = "select * from friends f left join users u on u.name = f.friendName where f.userName=?";
 
         try (Connection con = MarsConnection.getConnection();
              PreparedStatement stmt = con.prepareStatement(SQL_SELECT_ALL_FRIENDS)) {
