@@ -81,7 +81,7 @@ paths:
         '5XX':
           description: Unexpected error.
       security:
-        - Token: []
+        - Token: [ ]
 
   /api/createAccount:
     summary: create an account
@@ -164,7 +164,7 @@ paths:
         '500':
           description: Internal error.
       security:
-        - Token: []
+        - Token: [ ]
   /api/user/{id}/shareLocation:
     description: Share your location with your friends.
     post:
@@ -183,11 +183,11 @@ paths:
         '401':
           description: Authorization information is missing or invalid.
         '403':
-            description: Forbidden!
+          description: Forbidden!
         '5XX':
           description: Unexpected error.
       security:
-        - Token: [User]
+        - Token: [ User ]
 
   /api/friend: #Get all our friends
     get:
@@ -203,7 +203,7 @@ paths:
               schema:
                 type: array
                 items:
-                    type: string
+                  type: string
         '401':
           description: Authorization information is missing or invalid.
         '403':
@@ -211,7 +211,7 @@ paths:
         '500':
           description: Internal error.
       security:
-        - Token: [User]
+        - Token: [ User ]
   /api/friend/{fName}: #Add a friend or delete one
     parameters:
       - in: path
@@ -235,48 +235,48 @@ paths:
         '500':
           description: Internal error.
       security:
-        - Token: [User]
+        - Token: [ User ]
     delete:
-        summary: Delete a friend.
-        operationId: removeFriend
-        tags:
-          - friend
-        responses:
-          '200':
-            description: Succesfuly deleted a friend.
-          '401':
-            description: Authorization information is missing or invalid.
-          '403':
-            description: Forbidden!
-          '500':
-            description: Internal error.
-        security:
-          - Token: [User]
+      summary: Delete a friend.
+      operationId: removeFriend
+      tags:
+        - friend
+      responses:
+        '200':
+          description: Succesfuly deleted a friend.
+        '401':
+          description: Authorization information is missing or invalid.
+        '403':
+          description: Forbidden!
+        '500':
+          description: Internal error.
+      security:
+        - Token: [ User ]
   /api/friend/{id}/location: # Get the location of a current friend
-      description: Get the current location of one of your friends.
-      get:
-        summary: Get the current location of one of your friends.
-        tags:
-          - friend
-        parameters:
-          - in: path
-            name: id
-            required: true
-            schema:
-              type: integer
-        responses:
-          '200':
-            description: Succesfuly retrieved the location of your friend.
-          '401':
-            description: Authorization information is missing or invalid.
-          '403':
-            description: Forbidden!
-          '500':
-            description: Unexpected error.
-          default:
-            description: This friend does not share his location with others.
-        security:
-          - Token: [User]
+    description: Get the current location of one of your friends.
+    get:
+      summary: Get the current location of one of your friends.
+      tags:
+        - friend
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Succesfuly retrieved the location of your friend.
+        '401':
+          description: Authorization information is missing or invalid.
+        '403':
+          description: Forbidden!
+        '500':
+          description: Unexpected error.
+        default:
+          description: This friend does not share his location with others.
+      security:
+        - Token: [ User ]
 
   /api/subscription:
     description: subscription.
@@ -332,7 +332,7 @@ paths:
         '500':
           description: Internal error.
       security:
-        - Token: []
+        - Token: [ ]
     delete:
       operationId: stopSubscription
       tags:
@@ -344,24 +344,18 @@ paths:
         '401':
           description: Authorization information is missing or invalid.
         '403':
-            description: Forbidden!
+          description: Forbidden!
         '500':
           description: Unexpected error.
       security:
-        - Token: []
-  /api/subscriptionInfo/{id}:
+        - Token: [ ]
+  /api/subscriptionInfo:
     description: collect statistics about your business
     get:
+      operationId: viewSubscriptionInfo
       summary: Collect statistics about your business.
       tags:
         - business
-      parameters:
-        - in: path
-          name: id
-          schema:
-            type: integer
-          required: true
-          description: give the id of your business
       responses:
         '200':
           description: Succesfully collect all the data.
@@ -387,7 +381,7 @@ paths:
         '500':
           description: Unexpected error.
       security:
-        - Token: [Business]
+        - Token: [ Business ]
 
   /api/endpoints: #View all endpoints
     summary: get all endpoints
@@ -411,7 +405,7 @@ paths:
                   available: true,
                   location: 'here',
                   privateEndpoint: true
-                }]
+                } ]
         '500':
           description: Unexpected error.
   /api/endpoints/{id}: #view endpoint information
@@ -482,7 +476,7 @@ paths:
         '500':
           description: Unexpected error.
       security:
-        - Token: []
+        - Token: [ ]
   /api/sendPackage: #Add Delivery
     post:
       operationId: sendPackage
@@ -522,7 +516,7 @@ paths:
         '500':
           description: Unexpected error.
       security:
-        - Token: []
+        - Token: [ ]
 
   /api/routeInfo/{id}:
     description: Get route information.
@@ -561,7 +555,7 @@ paths:
         '500':
           description: Unexpected error.
       security:
-        - Token: []
+        - Token: [ ]
   /api/travel:
     description: travel from one point to another.
     post:
@@ -600,11 +594,11 @@ paths:
         '401':
           description: Authorization information is missing or invalid.
         '403':
-            description: Forbidden!
+          description: Forbidden!
         '500':
-            description: Unexpected error.
+          description: Unexpected error.
       security:
-        - Token: [User]
+        - Token: [ User ]
 
   /api/ping:
     get:
