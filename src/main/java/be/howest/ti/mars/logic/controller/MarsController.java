@@ -4,7 +4,7 @@ import be.howest.ti.mars.logic.controller.exceptions.AuthenticationException;
 import be.howest.ti.mars.logic.controller.exceptions.UsernameException;
 import be.howest.ti.mars.logic.controller.security.AccountToken;
 import be.howest.ti.mars.logic.data.MarsRepository;
-
+import java.util.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -87,7 +87,7 @@ public class MarsController {
                 .filter(acc -> acc.getUsername().equals(friendName))
                 .findAny().orElse(null);
         assert friendAccount != null;
-        return user.addFriend(friendAccount).getUsername();
+        return "You just added a friend called:" + user.addFriend(friendAccount).getUsername();
     }
 
     public Object removeFriend(UserAccount user, String friendName) {
@@ -95,8 +95,34 @@ public class MarsController {
                 .filter(acc -> acc.getUsername().equals(friendName))
                 .findAny().orElse(null);
         assert friendAccount != null;
-        return user.removeFriend(friendAccount).getUsername();
+        return "You just removed a friend called:" + user.removeFriend(friendAccount).getUsername();
     }
+
+
+    public Object buyBusinessSubscription(BusinessAccount businessAccount, String subscriptionName) {
+        repo.buySubscription(businessAccount, subscriptionName);
+        return "Thank you for buying a subscription.";
+    }
+
+    public Object buyUserSubscription(UserAccount userAccount, String subscriptionName) {
+        repo.buySubscription(userAccount, subscriptionName);
+        return "Thank you for buying a subscription.";
+    }
+
+    public Object stopSubscription(UserAccount userAccount) {
+        repo.stopSubscription(userAccount);
+        return "We are sorry for you to stop you current subscription.";
+    }
+
+    public Object stopSubscription(BusinessAccount businessAccount) {
+        repo.stopSubscription(businessAccount);
+        return "We are sorry that you have discontinued your current subscription.";
+    }
+
+    public Object viewSubscriptionInfo(BusinessAccount businessAccount) {
+        return repo.getSubscriptionInfo(businessAccount.getUsername());
+    }
+
 
     public MarsRepository getRepo() {
         return repo;

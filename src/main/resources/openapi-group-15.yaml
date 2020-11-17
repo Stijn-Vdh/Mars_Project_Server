@@ -284,31 +284,6 @@ paths:
           description: Internal error.
       security:
         - Token: [ User ]
-  /api/friend/{id}/location: # Get the location of a current friend
-    description: Get the current location of one of your friends.
-    get:
-      summary: Get the current location of one of your friends.
-      tags:
-        - friend
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: Succesfuly retrieved the location of your friend.
-        '401':
-          description: Authorization information is missing or invalid.
-        '403':
-          description: Forbidden!
-        '500':
-          description: Unexpected error.
-        default:
-          description: This friend does not share his location with others.
-      security:
-        - Token: [ User ]
 
   /api/subscription:
     description: subscription.
@@ -342,6 +317,7 @@ paths:
           description: Internal error.
     post:
       summary: Buy subscription
+      operationId: buySubscription
       tags:
         - store
       requestBody:
@@ -365,6 +341,7 @@ paths:
       security:
         - Token: [ ]
     delete:
+      operationId: stopSubscription
       tags:
         - store
       summary: Stop your currently active subscription
@@ -379,19 +356,13 @@ paths:
           description: Unexpected error.
       security:
         - Token: [ ]
-  /api/subscriptionInfo/{id}:
+  /api/subscriptionInfo:
     description: collect statistics about your business
     get:
+      operationId: viewSubscriptionInfo
       summary: Collect statistics about your business.
       tags:
         - business
-      parameters:
-        - in: path
-          name: id
-          schema:
-            type: integer
-          required: true
-          description: give the id of your business
       responses:
         '200':
           description: Succesfully collect all the data.

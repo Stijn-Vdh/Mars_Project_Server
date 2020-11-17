@@ -25,25 +25,31 @@ create table businesses
 
 create table subscriptions
 (
-    subscriptionID int auto_increment,
-    name           varchar(50),
-    CONSTRAINT subscriptionID_pk PRIMARY KEY (subscriptionID)
+	subscriptionID int auto_increment,
+	name varchar(50),
+    remainingSmallPods_thisDay int,
+    remainingLargePods_thisDay int,
+    amountOfDedicatedPods int,
+	CONSTRAINT subscriptionID_pk PRIMARY KEY (subscriptionID)
 );
 
 create table users_subscriptions
 (
-    userID         int not null,
-    subscriptionID int not null,
-    CONSTRAINT userID_fk FOREIGN KEY (userID) REFERENCES users (userID),
-    CONSTRAINT u_subscriptionID_fk FOREIGN KEY (subscriptionID) REFERENCES subscriptions (subscriptionID)
+	userName varchar(50) not null,
+	subscriptionID int not null,
+	CONSTRAINT userID_fk FOREIGN KEY (userName) REFERENCES users(name),
+	CONSTRAINT u_subscriptionID_fk FOREIGN KEY (subscriptionID) REFERENCES subscriptions(subscriptionID)
 );
 
 create table businesses_subscriptions
 (
-    businessID     int not null,
-    subscriptionID int not null,
-    CONSTRAINT businessID_fk FOREIGN KEY (businessID) REFERENCES businesses (businessID),
-    CONSTRAINT b_subscriptionID_fk FOREIGN KEY (subscriptionID) REFERENCES subscriptions (subscriptionID)
+	businessName varchar(50) not null,
+	subscriptionID int not null,
+	remainingSmallPods_thisDay int,
+	remainingLargePods_thisDay int,
+	amountOfDedicatedPods int,
+	CONSTRAINT businessName_fk FOREIGN KEY (businessName) REFERENCES businesses(name),
+	CONSTRAINT b_subscriptionID_fk FOREIGN KEY (subscriptionID) REFERENCES subscriptions(subscriptionID)
 );
 
 create table trips

@@ -119,13 +119,13 @@ public class WebServer extends AbstractVerticle {
         factory.addGlobalHandler(createCorsHandler());
 
         // Verify the user token for all secured operations
-        factory.addSecuritySchemaScopeValidator("Token","User", this::verifyUserAccountToken);
+        factory.addSecuritySchemaScopeValidator("Token", "User", this::verifyUserAccountToken);
 
         // Verify the business token for all secured operations
-        factory.addSecuritySchemaScopeValidator("Token","Business", this::verifyBusinessAccountToken);
+        factory.addSecuritySchemaScopeValidator("Token", "Business", this::verifyBusinessAccountToken);
 
         // Both tokens are allowed
-        factory.addSecurityHandler("Token",this::verifyAccountToken);
+        factory.addSecurityHandler("Token", this::verifyAccountToken);
 
         // Add all route handlers
         addRoutes(factory);
@@ -151,6 +151,10 @@ public class WebServer extends AbstractVerticle {
         addRouteWithCtxFunction(factory, "removeFriend", bridge::removeFriend);
         addRouteWithCtxFunction(factory, "sendPackage", bridge::sendPackage);
         addRouteWithCtxFunction(factory, "getEndpoints", bridge::getEndpoints);
+        addRouteWithCtxFunction(factory, "buySubscription", bridge::buySubscription);
+        addRouteWithCtxFunction(factory, "stopSubscription", bridge::stopSubscription);
+        addRouteWithCtxFunction(factory, "viewSubscriptionInfo", bridge::viewSubscriptionInfo);
+
     }
 
     private void addRouteWithCtxFunction(OpenAPI3RouterFactory factory, String operationId, Function<RoutingContext, Object> bridgeFunction) {
@@ -173,16 +177,15 @@ public class WebServer extends AbstractVerticle {
 
     private CorsHandler createCorsHandler() {
         return CorsHandler.create(".*.")
-                .allowedHeader("Access-Control-Allow-Headers: Authorization")
                 .allowedHeader("x-requested-with")
-                .allowedHeader("Access-Control-Allow-Credentials")
                 .allowedHeader("Access-Control-Allow-Origin")
                 .allowedHeader("origin")
                 .allowedHeader("Content-Type")
                 .allowedHeader("accept")
-                .allowCredentials(true)
                 .allowedMethod(HttpMethod.GET)
                 .allowedMethod(HttpMethod.POST)
+                .allowedMethod(HttpMethod.OPTIONS)
+                .allowedMethod(HttpMethod.PATCH)
                 .allowedMethod(HttpMethod.DELETE)
                 .allowedMethod(HttpMethod.PUT);
     }
@@ -244,6 +247,7 @@ public class WebServer extends AbstractVerticle {
     private void verifyUserAccountToken(RoutingContext ctx) {
         verifyToken(ctx, bridge::verifyUserAccountToken);
     }
+
     private void verifyBusinessAccountToken(RoutingContext ctx) {
         verifyToken(ctx, bridge::verifyBusinessAccountToken);
     }
@@ -261,7 +265,7 @@ public class WebServer extends AbstractVerticle {
 
     private void verifyAccountToken(RoutingContext ctx) {
 
-        if ( bridge.getBearerToken(ctx) == null) {
+        if (bridge.getBearerToken(ctx) == null) {
             ctx.fail(401); // Unauthorized  due to wrong or absent header format
         } else if (bridge.verifyUserAccountToken(ctx) || bridge.verifyBusinessAccountToken(ctx)) {
             ctx.next();
