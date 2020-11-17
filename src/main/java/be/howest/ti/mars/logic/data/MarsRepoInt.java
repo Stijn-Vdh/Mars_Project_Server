@@ -4,12 +4,13 @@ import be.howest.ti.mars.logic.controller.BusinessAccount;
 import be.howest.ti.mars.logic.controller.Delivery;
 import be.howest.ti.mars.logic.controller.Subscription;
 import be.howest.ti.mars.logic.controller.UserAccount;
+import be.howest.ti.mars.logic.controller.converters.ShortEndpoint;
 
 import java.util.List;
 import java.util.Set;
 
 public interface MarsRepoInt {
-    Set<String> getEndpoints(); // todo: String moet endpoint class worden
+    Set<ShortEndpoint> getEndpoints(); // todo: String moet endpoint class worden
     void addEndpoint(String endpoint);
 
     // User

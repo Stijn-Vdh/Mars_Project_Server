@@ -1,5 +1,7 @@
 package be.howest.ti.mars.logic.controller;
 
+import java.util.Objects;
+
 public class Endpoint {
 
     private final int id;
@@ -15,6 +17,19 @@ public class Endpoint {
         this.available = available;
         this.location = location;
         this.privateEndpoint = privateEndpoint;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Endpoint endpoint = (Endpoint) o;
+        return id == endpoint.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 
     public int getId() {

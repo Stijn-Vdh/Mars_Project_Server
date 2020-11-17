@@ -4,6 +4,7 @@ import be.howest.ti.mars.logic.controller.BusinessAccount;
 import be.howest.ti.mars.logic.controller.Delivery;
 import be.howest.ti.mars.logic.controller.Subscription;
 import be.howest.ti.mars.logic.controller.UserAccount;
+import be.howest.ti.mars.logic.controller.converters.ShortEndpoint;
 import be.howest.ti.mars.logic.controller.exceptions.DatabaseException;
 
 import java.sql.Connection;
@@ -18,9 +19,27 @@ import java.util.logging.Logger;
 
 public class MarsRepository implements MarsRepoInt {
     private static final Logger logger = Logger.getLogger(MarsRepository.class.getName());
+
     @Override
-    public Set<String> getEndpoints() {
-        return null;
+    public Set<ShortEndpoint> getEndpoints() { //will be short for the meantime
+        String SQL_GET_ENDPOINTS = "SELECT * FROM ENDPOINTS";
+        Set<ShortEndpoint> endpoints = new HashSet<>();
+
+        try (
+                Connection con = MarsConnection.getConnection();
+                PreparedStatement stmt = con.prepareStatement(SQL_GET_ENDPOINTS);
+        ) {
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    endpoints.add(new ShortEndpoint(rs.getInt("id"), rs.getString("name")));
+                }
+            }
+        } catch (SQLException throwable) {
+            throwable.printStackTrace();
+            throw new DatabaseException("Cannot retrieve endpoints");
+        }
+        return endpoints;
     }
 
     @Override
@@ -50,7 +69,7 @@ public class MarsRepository implements MarsRepoInt {
     public void addBusiness(BusinessAccount business) {
         String SQL_INSERT_USER = "INSERT INTO BUSINESSES(homeEndpointID, name, password, homeAddress, subscriptionID) VALUES(?,?,?,?,?)";
         try (Connection con = MarsConnection.getConnection();
-             PreparedStatement stmt = con.prepareStatement(SQL_INSERT_USER)){
+             PreparedStatement stmt = con.prepareStatement(SQL_INSERT_USER)) {
             stmt.setInt(1, business.getHomeAddressEndpoint());
             stmt.setString(2, business.getUsername());
             stmt.setString(3, business.getPassword());
@@ -63,7 +82,7 @@ public class MarsRepository implements MarsRepoInt {
 
     }
 
-        @Override
+    @Override
     public void ShareLocation(UserAccount user, Boolean shareLocation) {
 
     }
@@ -73,25 +92,24 @@ public class MarsRepository implements MarsRepoInt {
         List<UserAccount> friends = new LinkedList<>();
         String SQL_SELECT_ALL_FRIENDS = "select f.friendName, u.* from friends f join users u on u.name = f.userName where u.name like ?";
 
-        try(Connection con = MarsConnection.getConnection();
-            PreparedStatement stmt = con.prepareStatement(SQL_SELECT_ALL_FRIENDS))
-        {
-            stmt.setString(1, '%'+user.getUsername()+'%');
+        try (Connection con = MarsConnection.getConnection();
+             PreparedStatement stmt = con.prepareStatement(SQL_SELECT_ALL_FRIENDS)) {
+            stmt.setString(1, '%' + user.getUsername() + '%');
 
-            try(ResultSet rs = stmt.executeQuery()){
-                while(rs.next()){
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
 
                     String name = rs.getString("friendName");
                     String pwd = rs.getString("password");
                     int endpointID = rs.getInt("homeEndpointID");
                     String addr = rs.getString("homeAddress");
 
-                    UserAccount friend = new UserAccount(name,pwd,endpointID,addr,null);
+                    UserAccount friend = new UserAccount(name, pwd, endpointID, addr, null);
                     friends.add(friend);
                 }
             }
 
-        }catch (SQLException ex){
+        } catch (SQLException ex) {
             logger.log(Level.WARNING, ex.getMessage(), ex);
         }
         return friends;
@@ -100,11 +118,10 @@ public class MarsRepository implements MarsRepoInt {
     @Override
     public void beFriend(String name, String friendName) {
         String SQL_INSERT_FRIEND = "Insert into friends(friendName, userName) values(?,?)";
-        try(Connection con = MarsConnection.getConnection();
-            PreparedStatement stmt = con.prepareStatement(SQL_INSERT_FRIEND))
-        {
-            stmt.setString(1,friendName);
-            stmt.setString(2,name);
+        try (Connection con = MarsConnection.getConnection();
+             PreparedStatement stmt = con.prepareStatement(SQL_INSERT_FRIEND)) {
+            stmt.setString(1, friendName);
+            stmt.setString(2, name);
 
             stmt.executeUpdate();
         } catch (SQLException ex) {
@@ -115,11 +132,10 @@ public class MarsRepository implements MarsRepoInt {
     @Override
     public void removeFriend(String name, String friendName) {
         String SQL_DELETE_FRIEND = "DELETE FROM friends WHERE friendName=? AND userName=?";
-        try(Connection con = MarsConnection.getConnection();
-            PreparedStatement stmt = con.prepareStatement(SQL_DELETE_FRIEND))
-        {
-            stmt.setString(1,friendName);
-            stmt.setString(2,name);
+        try (Connection con = MarsConnection.getConnection();
+             PreparedStatement stmt = con.prepareStatement(SQL_DELETE_FRIEND)) {
+            stmt.setString(1, friendName);
+            stmt.setString(2, name);
 
             stmt.executeUpdate();
         } catch (SQLException ex) {
@@ -167,21 +183,20 @@ public class MarsRepository implements MarsRepoInt {
     @Override
     public void addDelivery(Delivery delivery) {
         String SQL_ADD_DELIVERY = "INSERT INTO DELIVERIES(deliveryType, `from`, destination, `date`) VALUES(?,?,?,?)";
-        try(Connection con = MarsConnection.getConnection();
-            PreparedStatement stmt = con.prepareStatement(SQL_ADD_DELIVERY))
-     {
-         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-         Date parsed = format.parse(delivery.getDate());
-         java.sql.Date sqlDate = new java.sql.Date(parsed.getTime());
+        try (Connection con = MarsConnection.getConnection();
+             PreparedStatement stmt = con.prepareStatement(SQL_ADD_DELIVERY)) {
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+            Date parsed = format.parse(delivery.getDate());
+            java.sql.Date sqlDate = new java.sql.Date(parsed.getTime());
 
-         stmt.setString(1, delivery.getDeliveryType());
-         stmt.setInt(2, delivery.getSourceID());
-         stmt.setInt(3, delivery.getDestinationID());
-         stmt.setDate(4, sqlDate);
-         stmt.executeUpdate();
+            stmt.setString(1, delivery.getDeliveryType());
+            stmt.setInt(2, delivery.getSourceID());
+            stmt.setInt(3, delivery.getDestinationID());
+            stmt.setDate(4, sqlDate);
+            stmt.executeUpdate();
         } catch (SQLException | ParseException e) {
             System.out.println(e);
-           throw new DatabaseException("Can't add delivery!");
+            throw new DatabaseException("Can't add delivery!");
         }
     }
 
@@ -191,19 +206,19 @@ public class MarsRepository implements MarsRepoInt {
         Set<Subscription> subscriptions = new HashSet<>();
         String SQL_SELECT_ALL_SUBSCRIPTIONS = "select * from subscriptions";
 
-        try(Connection con = MarsConnection.getConnection();
-            PreparedStatement stmt = con.prepareStatement(SQL_SELECT_ALL_SUBSCRIPTIONS);
-            ResultSet rs = stmt.executeQuery()){
+        try (Connection con = MarsConnection.getConnection();
+             PreparedStatement stmt = con.prepareStatement(SQL_SELECT_ALL_SUBSCRIPTIONS);
+             ResultSet rs = stmt.executeQuery()) {
 
-            while(rs.next()){
+            while (rs.next()) {
                 int id = rs.getInt("subscriptionID");
                 String name = rs.getString("name");
 
                 Subscription sub = new Subscription(id, name);
                 subscriptions.add(sub);
             }
-        }catch (SQLException ex){
-               logger.log(Level.WARNING, ex.getMessage(), ex);
+        } catch (SQLException ex) {
+            logger.log(Level.WARNING, ex.getMessage(), ex);
         }
         return subscriptions;
     }
