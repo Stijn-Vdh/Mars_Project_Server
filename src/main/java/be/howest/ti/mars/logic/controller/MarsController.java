@@ -130,4 +130,11 @@ public class MarsController {
     }
 
 
+    public void shareLocation(UserAccount userAccount) {
+        repo.shareLocation(userAccount);
+    }
+
+    public void stopSharingLocation(UserAccount userAccount) {
+        repo.stopSharingLocation(userAccount);
+    }
 }

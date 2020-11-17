@@ -74,8 +74,37 @@ public class MarsRepository implements MarsRepoInt {
     }
 
     @Override
-    public void ShareLocation(UserAccount user, Boolean shareLocation) {
+    public void shareLocation(UserAccount user) {
+        String SQL_UPDATE_USER = "UPDATE USERS SET sharesLocation=? where name=?";
 
+        try (Connection con = MarsConnection.getConnection();
+             PreparedStatement stmt = con.prepareStatement(SQL_UPDATE_USER)) {
+
+            stmt.setBoolean(1, true);
+            stmt.setString(2, user.getUsername());
+
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            logger.log(Level.WARNING, ex.getMessage(), ex);
+            throw new DatabaseException("Could not share location.");
+        }
+    }
+
+    @Override
+    public void stopSharingLocation(UserAccount user) {
+        String SQL_UPDATE_USER = "UPDATE USERS SET sharesLocation=? where name=?";
+
+        try (Connection con = MarsConnection.getConnection();
+             PreparedStatement stmt = con.prepareStatement(SQL_UPDATE_USER)) {
+
+            stmt.setBoolean(1, false);
+            stmt.setString(2, user.getUsername());
+
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            logger.log(Level.WARNING, ex.getMessage(), ex);
+            throw new DatabaseException("Could not share location.");
+        }
     }
 
     @Override
@@ -377,4 +406,6 @@ public class MarsRepository implements MarsRepoInt {
             throw new DatabaseException("Can't stop a subscription.");
         }
     }
+
+
 }
