@@ -84,6 +84,10 @@ public class MarsController {
         return repo.getSubscriptions();
     }
 
+    public Object getFriends(UserAccount user) {
+        return repo.getFriends(user);
+    }
+
     public Object addFriend(UserAccount user, String friendName) {
         UserAccount friendAccount = userAccounts.stream()
                 .filter(acc -> acc.getUsername().equals(friendName))
@@ -124,4 +128,6 @@ public class MarsController {
     public Object viewSubscriptionInfo(BusinessAccount businessAccount) {
         return repo.getSubscriptionInfo(businessAccount.getUsername());
     }
+
+
 }

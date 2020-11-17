@@ -78,22 +78,22 @@ public class MarsRepository implements MarsRepoInt {
 
     @Override
     public List<UserAccount> getFriends(UserAccount user) {
+        System.out.println(user.getUsername());
         List<UserAccount> friends = new LinkedList<>();
         String SQL_SELECT_ALL_FRIENDS = "select f.friendName, u.* from friends f join users u on u.name = f.userName where u.name=?";
 
         try (Connection con = MarsConnection.getConnection();
              PreparedStatement stmt = con.prepareStatement(SQL_SELECT_ALL_FRIENDS)) {
-            stmt.setString(1, '%' + user.getUsername() + '%');
-
+            stmt.setString(1, user.getUsername());
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-
                     String name = rs.getString("friendName");
                     String pwd = rs.getString("password");
                     int endpointID = rs.getInt("homeEndpointID");
                     String addr = rs.getString("homeAddress");
+                    boolean shares = rs.getBoolean("sharesLocation");
 
-                    UserAccount friend = new UserAccount(name, pwd, endpointID, addr, null);
+                    UserAccount friend = new UserAccount(name, pwd, endpointID, addr, shares, null);
                     friends.add(friend);
                 }
             }
@@ -133,11 +133,6 @@ public class MarsRepository implements MarsRepoInt {
             logger.log(Level.WARNING, ex.getMessage());
             throw new DatabaseException("Can't remove a friend.");
         }
-
-    }
-
-    @Override
-    public void getFriendLocation(int friendID) {
 
     }
 

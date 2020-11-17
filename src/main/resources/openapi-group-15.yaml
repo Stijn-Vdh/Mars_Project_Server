@@ -252,31 +252,6 @@ paths:
           description: Internal error.
       security:
         - Token: [ User ]
-  /api/friend/{id}/location: # Get the location of a current friend
-    description: Get the current location of one of your friends.
-    get:
-      summary: Get the current location of one of your friends.
-      tags:
-        - friend
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: Succesfuly retrieved the location of your friend.
-        '401':
-          description: Authorization information is missing or invalid.
-        '403':
-          description: Forbidden!
-        '500':
-          description: Unexpected error.
-        default:
-          description: This friend does not share his location with others.
-      security:
-        - Token: [ User ]
 
   /api/subscription:
     description: subscription.

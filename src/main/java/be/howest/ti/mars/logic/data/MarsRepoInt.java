@@ -26,8 +26,6 @@ public interface MarsRepoInt {
 
     void removeFriend(String name, String friendName);
 
-    void getFriendLocation(int friendID);
-
     // Business
     Set<String> getBusinesses(); // todo:  String moet business class worden
 
