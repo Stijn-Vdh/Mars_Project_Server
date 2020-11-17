@@ -1,13 +1,8 @@
 package be.howest.ti.mars.logic.data;
 
-import be.howest.ti.mars.logic.controller.BaseAccount;
-import be.howest.ti.mars.logic.controller.BusinessAccount;
-import be.howest.ti.mars.logic.controller.Delivery;
-import be.howest.ti.mars.logic.controller.Subscription;
-import be.howest.ti.mars.logic.controller.UserAccount;
+import be.howest.ti.mars.logic.controller.*;
 import be.howest.ti.mars.logic.controller.converters.ShortEndpoint;
 import be.howest.ti.mars.logic.controller.exceptions.DatabaseException;
-import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
 
 import java.sql.Connection;
@@ -54,6 +49,11 @@ public class MarsRepository implements MarsRepoInt {
         } catch (SQLException ex) {
             throw new DatabaseException("Can't add endpoint!");
         }
+    }
+
+    @Override
+    public Endpoint getEndpoint(int id) {
+        return null;
     }
 
     @Override
