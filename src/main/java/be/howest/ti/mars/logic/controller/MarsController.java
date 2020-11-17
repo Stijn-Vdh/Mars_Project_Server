@@ -78,7 +78,7 @@ public class MarsController {
         account.setUserToken(null);
     }
 
-    public Set<Subscription> getSubscriptions() {
+    public List<Subscription> getSubscriptions() {
         return repo.getSubscriptions();
     }
 
