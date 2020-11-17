@@ -63,7 +63,7 @@ public class MarsController {
         BaseAccount account = Stream.concat(
                 userAccounts.stream(),
                 businessAccounts.stream())
-                .filter(acc -> acc.getUsername().equals(name) && acc.getPassword().equals(password))
+                .filter(acc -> acc.getUsername().equalsIgnoreCase(name) && acc.getPassword().equals(password))
                 .findAny().orElse(null);
 
         if (account == null) {   // pw and name doesnt match

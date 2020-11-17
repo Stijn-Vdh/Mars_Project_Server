@@ -103,7 +103,7 @@ paths:
     description: creates a new account
     post:
       operationId: createAccount
-      summary: create an account
+      summary: create an account, username is case-insensitive
       tags:
         - user
       requestBody:
