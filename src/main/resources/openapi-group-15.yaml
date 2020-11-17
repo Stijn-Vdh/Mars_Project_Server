@@ -9,12 +9,27 @@ servers:
     description: 'Local development implementation'
   - url: https://project-ii.ti.howest.be/mars-15
     description: 'Public web api'
-
 components:
   securitySchemes:
     Token:
       type: http
       scheme: bearer
+  schemas:
+    shortEndpoint:
+      required:
+        - id
+        - name
+      description: Returns the id and name of an endpoint
+      type: object
+      properties:
+        name:
+          type: string
+        id:
+          type: integer
+      example:
+        id: 10
+        name: Jerry Park
+
 
 paths:
   /api/message:
@@ -367,9 +382,9 @@ paths:
       security:
         - Token: [ Business ]
 
-  /api/endpoints: #View all endpoints
+  /api/endpoints:
     summary: get all endpoints
-    description: Get all enpoints
+    description: returns endpoint name and id
     get:
       operationId: 'getEndpoints'
       tags:
@@ -382,13 +397,10 @@ paths:
               schema:
                 type: array
                 items:
-                  type: object
+                  $ref: '#/components/schemas/shortEndpoint'
                 example: [ {
                   id: '1',
-                  name: 'Endpoint home',
-                  available: true,
-                  location: 'here',
-                  privateEndpoint: true
+                  name: 'Endpoint home'
                 } ]
         '500':
           description: Unexpected error.

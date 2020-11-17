@@ -5,6 +5,7 @@ import be.howest.ti.mars.logic.controller.BusinessAccount;
 import be.howest.ti.mars.logic.controller.Delivery;
 import be.howest.ti.mars.logic.controller.Subscription;
 import be.howest.ti.mars.logic.controller.UserAccount;
+import be.howest.ti.mars.logic.controller.converters.ShortEndpoint;
 import be.howest.ti.mars.logic.controller.exceptions.DatabaseException;
 import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
@@ -23,8 +24,25 @@ public class MarsRepository implements MarsRepoInt {
     private static final Logger logger = Logger.getLogger(MarsRepository.class.getName());
 
     @Override
-    public Set<String> getEndpoints() {
-        return null;
+    public Set<ShortEndpoint> getEndpoints() { //will be short for the meantime
+        String SQL_GET_ENDPOINTS = "SELECT * FROM ENDPOINTS";
+        Set<ShortEndpoint> endpoints = new HashSet<>();
+
+        try (
+                Connection con = MarsConnection.getConnection();
+                PreparedStatement stmt = con.prepareStatement(SQL_GET_ENDPOINTS);
+        ) {
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    endpoints.add(new ShortEndpoint(rs.getInt("id"), rs.getString("name")));
+                }
+            }
+        } catch (SQLException throwable) {
+            throwable.printStackTrace();
+            throw new DatabaseException("Cannot retrieve endpoints");
+        }
+        return endpoints;
     }
 
     @Override

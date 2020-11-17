@@ -10,7 +10,6 @@ import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
-
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -166,5 +165,7 @@ class MarsOpenApiBridge {
         }
     }
 
-
+    public Object getEndpoints(RoutingContext routingContext) {
+        return controller.getRepo().getEndpoints();
+    }
 }

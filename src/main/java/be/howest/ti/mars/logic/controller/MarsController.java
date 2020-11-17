@@ -4,9 +4,7 @@ import be.howest.ti.mars.logic.controller.exceptions.AuthenticationException;
 import be.howest.ti.mars.logic.controller.exceptions.UsernameException;
 import be.howest.ti.mars.logic.controller.security.AccountToken;
 import be.howest.ti.mars.logic.data.MarsRepository;
-
 import java.util.*;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -129,6 +127,9 @@ public class MarsController {
         return repo.getSubscriptionInfo(businessAccount.getUsername());
     }
 
+    public MarsRepository getRepo() {
+        return repo;
+    }
 
     public void shareLocation(UserAccount userAccount) {
         repo.shareLocation(userAccount);

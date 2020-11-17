@@ -5,7 +5,10 @@ import org.h2.tools.Server;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -27,7 +30,8 @@ public class MarsConnection {
     private String password;
     private String url;
 
-    private MarsConnection() { }
+    private MarsConnection() {
+    }
 
     public static MarsConnection getInstance() {
         return INSTANCE;
@@ -45,32 +49,34 @@ public class MarsConnection {
         INSTANCE.dbWebConsole = Server.createWebServer(
                 "-ifNotExists",
                 "-webPort", String.valueOf(console)).start();
-        try{
+        try {
             initDatabase();
 
-        }catch (SQLException | IOException ex){
-            logger.log(Level.WARNING,ex.getMessage(), ex);
+        } catch (SQLException | IOException ex) {
+            logger.log(Level.WARNING, ex.getMessage(), ex);
         }
 
-        try{
+        try {
             addSubscriptionsToDb();
-        }catch (SQLException | IOException ex){
-            logger.log(Level.WARNING,ex.getMessage(), ex);
+            addEndpointsDB();
+        } catch (SQLException | IOException ex) {
+            logger.log(Level.WARNING, ex.getMessage(), ex);
 
         }
 
     }
 
-    public static Connection getConnection() throws SQLException{
-        return DriverManager.getConnection(INSTANCE.url,INSTANCE.username, INSTANCE.password);
+
+    public static Connection getConnection() throws SQLException {
+        return DriverManager.getConnection(INSTANCE.url, INSTANCE.username, INSTANCE.password);
     }
 
-    private static void executeScript(String filename) throws IOException, SQLException{
+    private static void executeScript(String filename) throws IOException, SQLException {
         String createDbSql = readFile(filename);
-        try(
-            Connection connection = getConnection();
-            PreparedStatement stmt = connection.prepareStatement(createDbSql)
-        ){
+        try (
+                Connection connection = getConnection();
+                PreparedStatement stmt = connection.prepareStatement(createDbSql)
+        ) {
             stmt.executeUpdate();
         }
     }
@@ -83,7 +89,12 @@ public class MarsConnection {
     private static void initDatabase() throws SQLException, IOException {
         executeScript("src/main/resources/h2/setupDB.sql");
     }
-    private static void addSubscriptionsToDb() throws SQLException, IOException{
+
+    private static void addSubscriptionsToDb() throws SQLException, IOException {
         executeScript("src/main/resources/h2/initSubscriptionsDB.sql");
+    }
+
+    private static void addEndpointsDB() throws IOException, SQLException {
+        executeScript("src/main/resources/h2/initEndpointsDB.sql");
     }
 }

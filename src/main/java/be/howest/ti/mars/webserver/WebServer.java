@@ -140,7 +140,6 @@ public class WebServer extends AbstractVerticle {
         return router;
     }
 
-
     private void addRoutes(OpenAPI3RouterFactory factory) {
         addRouteWithCtxFunction(factory, "getMessage", bridge::getMessage);
         addRouteWithCtxFunction(factory, "createAccount", bridge::createAccount);
@@ -151,6 +150,7 @@ public class WebServer extends AbstractVerticle {
         addRouteWithCtxFunction(factory, "addFriend", bridge::addFriend);
         addRouteWithCtxFunction(factory, "removeFriend", bridge::removeFriend);
         addRouteWithCtxFunction(factory, "sendPackage", bridge::sendPackage);
+        addRouteWithCtxFunction(factory, "getEndpoints", bridge::getEndpoints);
         addRouteWithCtxFunction(factory, "buySubscription", bridge::buySubscription);
         addRouteWithCtxFunction(factory, "stopSubscription", bridge::stopSubscription);
         addRouteWithCtxFunction(factory, "viewSubscriptionInfo", bridge::viewSubscriptionInfo);
@@ -158,7 +158,6 @@ public class WebServer extends AbstractVerticle {
         addRouteWithCtxFunction(factory, "stopSharingLocation", bridge::stopSharingLocation);
 
     }
-
 
     private void addRouteWithCtxFunction(OpenAPI3RouterFactory factory, String operationId, Function<RoutingContext, Object> bridgeFunction) {
         factory.addHandlerByOperationId(operationId, ctx -> handleResult(bridgeFunction.apply(ctx), ctx));
