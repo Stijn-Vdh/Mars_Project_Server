@@ -5,6 +5,7 @@ import be.howest.ti.mars.logic.controller.BusinessAccount;
 import be.howest.ti.mars.logic.controller.Delivery;
 import be.howest.ti.mars.logic.controller.Subscription;
 import be.howest.ti.mars.logic.controller.UserAccount;
+import io.vertx.core.json.JsonObject;
 
 import java.util.List;
 import java.util.Set;
@@ -20,13 +21,11 @@ public interface MarsRepoInt {
     void ShareLocation(UserAccount user, Boolean shareLocation);
 
     // Friends
-    List<UserAccount> getFriends(UserAccount user);
+    List<JsonObject> getFriends(UserAccount user);
 
     void beFriend(String name, String friendName);
 
     void removeFriend(String name, String friendName);
-
-    void getFriendLocation(int friendID);
 
     // Business
     Set<String> getBusinesses(); // todo:  String moet business class worden

@@ -6,6 +6,7 @@ import java.util.List;
 
 public class UserAccount extends BaseAccount {
     MarsRepository repo = new MarsRepository();
+    private boolean sharesLocation = false;
 
     public UserAccount( String username, String password, int homeAddressEndpoint, String address) {
         super(homeAddressEndpoint, password, username, address);
@@ -15,8 +16,9 @@ public class UserAccount extends BaseAccount {
         super(accountToken, homeAddressEndpoint, password, username, address);
     }
 
-    public List<UserAccount> getFriends(){
-        return repo.getFriends(this);
+    public UserAccount(String username, String password, int homeAddressEndpoint, String address, boolean sharesLocation, AccountToken accountToken) {
+        super(accountToken, homeAddressEndpoint, password, username, address);
+        this.sharesLocation = sharesLocation;
     }
 
     public UserAccount(String name) {
@@ -31,5 +33,9 @@ public class UserAccount extends BaseAccount {
     public UserAccount removeFriend(UserAccount friend){
         repo.removeFriend(getUsername(), friend.getUsername());
         return friend;
+    }
+
+    public boolean isSharesLocation(){
+        return sharesLocation;
     }
 }

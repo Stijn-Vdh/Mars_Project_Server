@@ -67,20 +67,18 @@ class MarsOpenApiBridge {
     }
 
     public Object viewFriends(RoutingContext ctx) {
-        UserAccount user = (UserAccount) getAccount(ctx);
-        return user.getFriends().stream()
-                .map(BaseAccount::getUsername)
-                .collect(Collectors.toList());
+        UserAccount user = getUserAccount(ctx);
+        return controller.getFriends(user);
     }
 
     public Object addFriend(RoutingContext ctx) {
-        UserAccount user = (UserAccount) getAccount(ctx);
+        UserAccount user = getUserAccount(ctx);
         String friendName = ctx.request().getParam("fName");
         return controller.addFriend(user, friendName);
     }
 
     public Object removeFriend(RoutingContext ctx) {
-        UserAccount user = (UserAccount) getAccount(ctx);
+        UserAccount user = getUserAccount(ctx);
         String friendName = ctx.request().getParam("fName");
         return controller.removeFriend(user, friendName);
     }
