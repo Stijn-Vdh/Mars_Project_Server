@@ -10,6 +10,7 @@ import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
+
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -67,9 +68,9 @@ class MarsOpenApiBridge {
     }
 
     public Object getAccountInformation(RoutingContext ctx) {
-        if (verifyUserAccountToken(ctx)){
+        if (verifyUserAccountToken(ctx)) {
             return controller.getAccountInformation(getAccount(ctx), true);
-        }else{
+        } else {
             return controller.getAccountInformation(getAccount(ctx), false);
         }
     }
@@ -139,19 +140,19 @@ class MarsOpenApiBridge {
     public Object favoriteEndpoint(RoutingContext ctx) {
         int endpointID = Integer.parseInt(ctx.request().getParam("id"));
         if (verifyUserAccountToken(ctx)){
-            controller.favoriteEndpoint_Users(getUserAccount(ctx),endpointID);
+            controller.favoriteEndpoint(getAccount(ctx), endpointID, true);
         }else{
-           controller.favoriteEndpoint_Business(getBusinessAccount(ctx),endpointID);
+            controller.favoriteEndpoint(getAccount(ctx), endpointID, false);
         }
         return null;
     }
 
     public Object unfavoriteEndpoint(RoutingContext ctx) {
         int endpointID = Integer.parseInt(ctx.request().getParam("id"));
-        if (verifyUserAccountToken(ctx)){
-            controller.unFavoriteEndpoint_Users(getUserAccount(ctx),endpointID);
-        }else{
-            controller.unFavoriteEndpoint_Business(getBusinessAccount(ctx),endpointID);
+        if (verifyUserAccountToken(ctx)) {
+            controller.unFavoriteEndpoint(getAccount(ctx), endpointID, true);
+        } else {
+            controller.unFavoriteEndpoint(getAccount(ctx), endpointID, false);
         }
         return null;
     }
@@ -201,7 +202,6 @@ class MarsOpenApiBridge {
             return header.substring(AUTHORIZATION_TOKEN_PREFIX.length());
         }
     }
-
 
 
 }
