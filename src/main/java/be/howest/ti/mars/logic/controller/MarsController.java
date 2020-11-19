@@ -138,4 +138,11 @@ public class MarsController {
     public void stopSharingLocation(UserAccount userAccount) {
         repo.stopSharingLocation(userAccount);
     }
+
+    public void favoriteEndpoint_Users(UserAccount userAccount, int id) {
+        repo.favoriteEndpoint_Users(userAccount, id);
+    }
+    public void favoriteEndpoint_Business(BusinessAccount businessAccount, int id) {
+        repo.favoriteEndpoint_Businesses(businessAccount, id);
+    }
 }

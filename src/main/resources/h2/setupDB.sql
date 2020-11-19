@@ -108,7 +108,7 @@ create table favorite_trips_users
     userName varchar(50) not null,
     endpointID int not null,
     constraint f_userNameF_fk FOREIGN KEY (userName) REFERENCES users (name),
-    constraint endpointID_fk FOREIGN KEY (endpointID) REFERENCES endpoints (id)
+    constraint fu_endpointID_fk FOREIGN KEY (endpointID) REFERENCES endpoints (id)
 );
 
 create table favorite_trips_businesses
@@ -116,6 +116,6 @@ create table favorite_trips_businesses
     businessName varchar(50) not null,
     endpointID int not null,
     constraint f_businessName_fk FOREIGN KEY (businessName) REFERENCES businesses (name),
-    constraint endpointID_fk FOREIGN KEY (endpointID) REFERENCES endpoints (id)
+    constraint fb_endpointID_fk FOREIGN KEY (endpointID) REFERENCES endpoints (id)
 );
 

@@ -12,6 +12,8 @@ public interface MarsRepoInt {
     Set<ShortEndpoint> getEndpoints();
     void addEndpoint(String endpoint);
     Endpoint getEndpoint(int id);
+    void favoriteEndpoint_Users(UserAccount user, int id);
+    void favoriteEndpoint_Businesses(BusinessAccount business, int id);
 
     // User
     void addUser(UserAccount user);

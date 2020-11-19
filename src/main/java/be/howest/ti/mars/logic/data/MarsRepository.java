@@ -73,6 +73,37 @@ public class MarsRepository implements MarsRepoInt {
     }
 
     @Override
+    public void favoriteEndpoint_Users(UserAccount user, int id) {
+        String SQL_INSERT_FAVORITE = "insert into favorite_trips_users(userName, endpointID) values(?,?)";
+
+        try(Connection con = MarsConnection.getConnection();
+            PreparedStatement stmt = con.prepareStatement(SQL_INSERT_FAVORITE)){
+            stmt.setString(1,user.getUsername());
+            stmt.setInt(2, id);
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            throw new DatabaseException("Could not favorite endpoint.");
+        }
+
+    }
+
+    @Override
+    public void favoriteEndpoint_Businesses(BusinessAccount business, int id) {
+        String SQL_INSERT_FAVORITE = "insert into favorite_trips_businesses(businessName, endpointID) values(?,?)";
+
+        try(Connection con = MarsConnection.getConnection();
+            PreparedStatement stmt = con.prepareStatement(SQL_INSERT_FAVORITE)){
+            stmt.setString(1,business.getUsername());
+            stmt.setInt(2, id);
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            throw new DatabaseException("Could not favorite endpoint.");
+        }
+    }
+
+    @Override
     public void addUser(UserAccount user) {
         String SQL_INSERT_USER =
                 "INSERT INTO USERS(homeEndpointID, name, password, homeAddress, sharesLocation, subscriptionID) VALUES(?,?,?,?,?,?)";

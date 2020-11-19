@@ -120,6 +120,24 @@ class MarsOpenApiBridge {
         return "Not sharing location anymore with friends.";
     }
 
+    public Object getEndpoints(RoutingContext routingContext) {
+        return controller.getRepo().getEndpoints();
+    }
+
+    public Object getEndpoint(RoutingContext routingContext) {
+        return controller.getRepo().getEndpoint(Integer.parseInt(routingContext.request().getParam("id")));
+    }
+
+    public Object favoriteEndpoint(RoutingContext ctx) {
+        int endpointID = Integer.parseInt(ctx.request().getParam("id"));
+        if (verifyUserAccountToken(ctx)){
+            controller.favoriteEndpoint_Users(getUserAccount(ctx),endpointID);
+        }else{
+           controller.favoriteEndpoint_Business(getBusinessAccount(ctx),endpointID);
+        }
+        return null;
+    }
+
 
     //------------------------------------------------------------------------------------------------------------------
 
@@ -166,11 +184,6 @@ class MarsOpenApiBridge {
         }
     }
 
-    public Object getEndpoints(RoutingContext routingContext) {
-        return controller.getRepo().getEndpoints();
-    }
 
-    public Object getEndpoint(RoutingContext routingContext) {
-        return controller.getRepo().getEndpoint(Integer.parseInt(routingContext.request().getParam("id")));
-    }
+
 }
