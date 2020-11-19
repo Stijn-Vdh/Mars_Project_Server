@@ -22,6 +22,7 @@ public class MarsRepository implements MarsRepoInt {
     private static final String SQL_GET_ENDPOINT = "SELECT * FROM ENDPOINTS WHERE ID = ?";
     private static final String SQL_GET_REPORT_SECTIONS = "SELECT * FROM REPORT_SECTIONS";
     private static final String SQL_GET_ENDPOINTS = "SELECT * FROM \"ENDPOINTS\"";
+    private static final String SQL_INSERT_REPORTS = "INSERT INTO REPORTS (accountId, reportSection, body) VALUES(?, ?, ?)";
 
     @Override
     public Set<ShortEndpoint> getEndpoints() { //will be short for the meantime
@@ -458,15 +459,23 @@ public class MarsRepository implements MarsRepoInt {
             }
         } catch (SQLException throwable) {
             throwable.printStackTrace();
-            throw new DatabaseException("Cannot retrieve endpoints");
+            throw new DatabaseException("Cannot retrieve report sections");
         }
         return sections;
     }
 
     @Override
     public void addReport(BaseAccount baseAccount, String section, String body) {
+        try (Connection con = MarsConnection.getConnection();
+             PreparedStatement stmt = con.prepareStatement(SQL_INSERT_REPORTS)) {
 
+            stmt.setString(1, baseAccount.getUsername());
+            stmt.setString(2,section);
+            stmt.setString(3, body);
+            stmt.execute();
+        } catch (SQLException throwable) {
+            throwable.printStackTrace();
+            throw new DatabaseException("Can't add report");
+        }
     }
-
-
 }

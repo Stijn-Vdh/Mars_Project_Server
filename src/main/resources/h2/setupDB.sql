@@ -111,8 +111,8 @@ CREATE TABLE `reports`
 (
     `id`            INT           NOT NULL AUTO_INCREMENT,
     `reportSection` VARCHAR(90)   NOT NULL,
-    `Body`          VARCHAR(2000) NULL,
-    `accountId`     INT           NOT NULL,
+    `body`          VARCHAR(2000) NULL,
+    `accountId`     varchar(50)   NOT NULL,
     PRIMARY KEY (`id`),
     CONSTRAINT `fk_report_section` FOREIGN KEY (`reportSection`) REFERENCES `report_sections` (`Name`)
 );
