@@ -106,10 +106,11 @@ public class MarsRepository implements MarsRepoInt {
     @Override
     public void favoriteEndpoint_Businesses(BusinessAccount business, int id) {
         if (endpointExists(id)){
-            String SQL_DELETE_FAVORITE = "delete from favorite_trips_businesses where businessName=? and endpointID=?";
+            String SQL_INSERT_FAVORITE = "insert into favorite_trips_businesses(businessName, endpointID) values(?,?)";
+
 
             try (Connection con = MarsConnection.getConnection();
-                 PreparedStatement stmt = con.prepareStatement(SQL_DELETE_FAVORITE)) {
+                 PreparedStatement stmt = con.prepareStatement(SQL_INSERT_FAVORITE)) {
                 stmt.setString(1, business.getUsername());
                 stmt.setInt(2, id);
                 stmt.executeUpdate();
@@ -146,9 +147,14 @@ public class MarsRepository implements MarsRepoInt {
     }
 
     @Override
-    public List<JsonObject> getFavoriteTrips(UserAccount acc){
-        String SQL_GET_FAVORITES = "select * from favorite_trips_users f join endpoints e on f.endpointID = e.id where userName=?";
+    public List<JsonObject> getFavoriteTrips(BaseAccount acc, boolean userAcc){
+        String SQL_GET_FAVORITES = "select * from ";
         List<JsonObject> favoTrips = new LinkedList<>();
+        if (userAcc){
+            SQL_GET_FAVORITES += "favorite_trips_users f join endpoints e on f.endpointID = e.id where userName=?";
+        }else {
+            SQL_GET_FAVORITES += "favorite_trips_businesses f join endpoints e on f.endpointID = e.id where businessName=?";
+        }
 
         try(Connection con = MarsConnection.getConnection();
             PreparedStatement stmt = con.prepareStatement(SQL_GET_FAVORITES)){
@@ -196,10 +202,10 @@ public class MarsRepository implements MarsRepoInt {
     @Override
     public void unFavoriteEndpoint_Businesses(BusinessAccount business, int id) {
         if (isFavored(false,id)){
-            String SQL_INSERT_FAVORITE = "insert into favorite_trips_businesses(businessName, endpointID) values(?,?)";
+            String SQL_DELETE_FAVORITE = "delete from favorite_trips_businesses where businessName=? and endpointID=?";
 
             try (Connection con = MarsConnection.getConnection();
-                 PreparedStatement stmt = con.prepareStatement(SQL_INSERT_FAVORITE)) {
+                 PreparedStatement stmt = con.prepareStatement(SQL_DELETE_FAVORITE)) {
                 stmt.setString(1, business.getUsername());
                 stmt.setInt(2, id);
                 stmt.executeUpdate();
@@ -425,30 +431,6 @@ public class MarsRepository implements MarsRepoInt {
     }
 
     @Override
-    public Subscription getSubscriptionInfo(String businessName) {
-        String SQL_SELECT_SUBSCRIPTION_INFO = "select * from businesses_subscriptions where businessname=?";
-        try (Connection con = MarsConnection.getConnection();
-             PreparedStatement stmt = con.prepareStatement(SQL_SELECT_SUBSCRIPTION_INFO)
-        ) {
-            stmt.setString(1, businessName);
-            ResultSet rs = stmt.executeQuery();
-            rs.next();
-
-            int subID = rs.getInt("subscriptionID");
-            String name = rs.getString("businessname");
-            int remainingSmallPods_thisDay = rs.getInt("remainingSmallPods_thisDay");
-            int remainingLargePods_thisDay = rs.getInt("remainingLargePods_thisDay");
-            int dedicatedPods = rs.getInt("amountOfDedicatedPods");
-
-            return new Subscription(subID, name, remainingSmallPods_thisDay, remainingLargePods_thisDay, dedicatedPods);
-
-        } catch (SQLException ex) {
-            logger.log(Level.WARNING, ex.getMessage(), ex);
-            throw new DatabaseException("Can't get subscription information.");
-        }
-    }
-
-    @Override
     public Subscription getSubscription(BaseAccount acc, boolean userAcc){
         String SQL_SELECT_SUBSCRIPTION_INFO = "select * from ";
         if (userAcc){
@@ -483,10 +465,7 @@ public class MarsRepository implements MarsRepoInt {
             ex.printStackTrace();
             throw new DatabaseException("Can't get subscription information.");
         }
-
-
     }
-
 
     @Override
     public void buySubscription(UserAccount user, String subscription) {

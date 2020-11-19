@@ -68,9 +68,9 @@ class MarsOpenApiBridge {
 
     public Object getAccountInformation(RoutingContext ctx) {
         if (verifyUserAccountToken(ctx)){
-            return controller.getAccountInformation(getUserAccount(ctx));
+            return controller.getAccountInformation(getAccount(ctx), true);
         }else{
-            return controller.getAccountInformation(getBusinessAccount(ctx));
+            return controller.getAccountInformation(getAccount(ctx), false);
         }
     }
 

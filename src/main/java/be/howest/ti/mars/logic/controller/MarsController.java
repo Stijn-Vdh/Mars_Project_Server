@@ -6,6 +6,7 @@ import be.howest.ti.mars.logic.controller.security.AccountToken;
 import be.howest.ti.mars.logic.data.MarsRepository;
 import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
+import org.h2.engine.User;
 
 import java.util.*;
 import java.text.ParseException;
@@ -127,7 +128,7 @@ public class MarsController {
     }
 
     public Object viewSubscriptionInfo(BusinessAccount businessAccount) {
-        return repo.getSubscriptionInfo(businessAccount.getUsername());
+        return repo.getSubscription(businessAccount, false);
     }
 
     public MarsRepository getRepo() {
@@ -157,29 +158,27 @@ public class MarsController {
         repo.unFavoriteEndpoint_Businesses(businessAccount, id);
     }
 
-    public Object getAccountInformation(UserAccount acc) {
+    public Object getAccountInformation(BaseAccount acc, boolean userAcc){
         JsonObject accInformation = new JsonObject();
-        List<JsonObject> friends =  new LinkedList<>(repo.getFriends(acc));
-        List<JsonObject> favoTrips = new LinkedList<>(repo.getFavoriteTrips(acc));
-        Subscription sub = repo.getSubscription(acc, true);
-
         accInformation.put("name:", acc.getUsername());
         accInformation.put("homeAddr:", acc.getAddress());
         accInformation.put("homeEndpoint:", acc.getHomeAddressEndpoint());
-        accInformation.put("subscription:", sub != null ? sub.getName() : "No subscription");
-        accInformation.put("friends:", friends);
-        accInformation.put("favouriteEndpoints:", favoTrips);
+
+        if (userAcc){
+            List<JsonObject> friends =  new LinkedList<>(repo.getFriends((UserAccount) acc));
+            List<JsonObject> favoTrips = new LinkedList<>(repo.getFavoriteTrips(acc, true));
+            Subscription sub = repo.getSubscription(acc, true);
+
+            accInformation.put("subscription:", sub != null ? sub.getName() : "No subscription");
+            accInformation.put("friends:", friends);
+            accInformation.put("favouriteEndpoints:", favoTrips);
+        }else{
+            Subscription sub = repo.getSubscription(acc, false);
+            List<JsonObject> favoTrips = new LinkedList<>(repo.getFavoriteTrips(acc, false));
+            accInformation.put("subscription:", sub != null ? sub.getName() : "No subscription");
+            accInformation.put("favouriteEndpoints:", favoTrips);
+        }
 
         return accInformation;
-    }
-    public Object getAccountInformation(BusinessAccount acc) {
-        JsonObject accInformation = new JsonObject();
-        Subscription sub = repo.getSubscription(acc, false);
-
-        accInformation.put("name:", acc.getUsername());
-        accInformation.put("homeAddr:", acc.getAddress());
-        accInformation.put("homeEndpoint:", acc.getHomeAddressEndpoint());
-        accInformation.put("subscription:", sub != null ? sub.getName() : "No subscription");
-        return null;
     }
 }
