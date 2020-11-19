@@ -144,7 +144,7 @@ public class MarsController {
     public Object getAccountInformation(BaseAccount acc, boolean userAcc){
         JsonObject accInformation = new JsonObject();
         accInformation.put("name:", acc.getUsername());
-        accInformation.put("homeAddr:", acc.getAddress());
+        accInformation.put("homeAddress:", acc.getAddress());
         accInformation.put("homeEndpoint:", acc.getHomeAddressEndpoint());
 
         if (userAcc){
