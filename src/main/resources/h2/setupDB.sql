@@ -1,4 +1,5 @@
-DROP ALL OBJECTS;
+DROP
+ALL OBJECTS;
 
 create table users
 (
@@ -25,31 +26,31 @@ create table businesses
 
 create table subscriptions
 (
-	subscriptionID int auto_increment,
-	name varchar(50),
+    subscriptionID             int auto_increment,
+    name                       varchar(50),
     remainingSmallPods_thisDay int,
     remainingLargePods_thisDay int,
-    amountOfDedicatedPods int,
-	CONSTRAINT subscriptionID_pk PRIMARY KEY (subscriptionID)
+    amountOfDedicatedPods      int,
+    CONSTRAINT subscriptionID_pk PRIMARY KEY (subscriptionID)
 );
 
 create table users_subscriptions
 (
-	userName varchar(50) not null,
-	subscriptionID int not null,
-	CONSTRAINT userID_fk FOREIGN KEY (userName) REFERENCES users(name),
-	CONSTRAINT u_subscriptionID_fk FOREIGN KEY (subscriptionID) REFERENCES subscriptions(subscriptionID)
+    userName       varchar(50) not null,
+    subscriptionID int         not null,
+    CONSTRAINT userID_fk FOREIGN KEY (userName) REFERENCES users (name),
+    CONSTRAINT u_subscriptionID_fk FOREIGN KEY (subscriptionID) REFERENCES subscriptions (subscriptionID)
 );
 
 create table businesses_subscriptions
 (
-	businessName varchar(50) not null,
-	subscriptionID int not null,
-	remainingSmallPods_thisDay int,
-	remainingLargePods_thisDay int,
-	amountOfDedicatedPods int,
-	CONSTRAINT businessName_fk FOREIGN KEY (businessName) REFERENCES businesses(name),
-	CONSTRAINT b_subscriptionID_fk FOREIGN KEY (subscriptionID) REFERENCES subscriptions(subscriptionID)
+    businessName               varchar(50) not null,
+    subscriptionID             int         not null,
+    remainingSmallPods_thisDay int,
+    remainingLargePods_thisDay int,
+    amountOfDedicatedPods      int,
+    CONSTRAINT businessName_fk FOREIGN KEY (businessName) REFERENCES businesses (name),
+    CONSTRAINT b_subscriptionID_fk FOREIGN KEY (subscriptionID) REFERENCES subscriptions (subscriptionID)
 );
 
 create table trips
@@ -101,5 +102,20 @@ create table friends
     userName   varchar(50) not null,
     CONSTRAINT f_userName_fk FOREIGN KEY (userName) REFERENCES users (name),
     CONSTRAINT friendName_fk FOREIGN KEY (friendName) REFERENCES users (name)
-)
+);
+
+CREATE TABLE `report_sections`
+(
+    `Name` VARCHAR(90) NOT NULL,
+    PRIMARY KEY (`Name`)
+);
+
+CREATE TABLE `reports`
+(
+    `id`            INT           NOT NULL AUTO_INCREMENT,
+    `reportSection` VARCHAR(90)   NOT NULL,
+    `Body`          VARCHAR(2000) NULL,
+    PRIMARY KEY (`id`),
+    CONSTRAINT `fk_report_section` FOREIGN KEY (`reportSection`) REFERENCES `report_sections` (`Name`)
+);
 
