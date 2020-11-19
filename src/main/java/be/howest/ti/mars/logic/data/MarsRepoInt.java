@@ -1,8 +1,10 @@
 package be.howest.ti.mars.logic.data;
 
 import be.howest.ti.mars.logic.controller.*;
-import io.vertx.core.json.JsonObject;
 import be.howest.ti.mars.logic.controller.converters.ShortEndpoint;
+import io.vertx.core.json.JsonObject;
+
+
 import java.util.List;
 import java.util.Set;
 
@@ -63,4 +65,9 @@ public interface MarsRepoInt {
 
     void stopSubscription(BaseAccount acc, boolean userAcc);
 
+
+    // Report
+    Set<String> getReportSections();
+
+    void addReport(BaseAccount baseAccount, String section, String body);
 }

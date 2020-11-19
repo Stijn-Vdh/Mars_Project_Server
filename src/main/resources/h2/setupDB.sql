@@ -2,7 +2,6 @@ DROP ALL OBJECTS;
 
 create table users
 (
-    userID         int auto_increment,
     homeEndpointID int,
     name           varchar(50),
     password       varchar(512),
@@ -14,42 +13,41 @@ create table users
 
 create table businesses
 (
-    businessID     int auto_increment,
     homeEndpointID int,
     name           varchar(50),
     password       varchar(512),
     homeAddress    varchar(125),
     subscriptionID int,
-    CONSTRAINT businessID_pk Primary Key (businessID)
+    CONSTRAINT businessID_pk Primary Key (name)
 );
 
 create table subscriptions
 (
-	subscriptionID int auto_increment,
-	name varchar(50),
+    subscriptionID             int auto_increment,
+    name                       varchar(50),
     remainingSmallPods_thisDay int,
     remainingLargePods_thisDay int,
-    amountOfDedicatedPods int,
-	CONSTRAINT subscriptionID_pk PRIMARY KEY (subscriptionID)
+    amountOfDedicatedPods      int,
+    CONSTRAINT subscriptionID_pk PRIMARY KEY (subscriptionID)
 );
 
 create table users_subscriptions
 (
-	userName varchar(50) not null,
-	subscriptionID int not null,
-	CONSTRAINT userID_fk FOREIGN KEY (userName) REFERENCES users(name),
-	CONSTRAINT u_subscriptionID_fk FOREIGN KEY (subscriptionID) REFERENCES subscriptions(subscriptionID)
+    userName       varchar(50) not null,
+    subscriptionID int         not null,
+    CONSTRAINT userID_fk FOREIGN KEY (userName) REFERENCES users (name),
+    CONSTRAINT u_subscriptionID_fk FOREIGN KEY (subscriptionID) REFERENCES subscriptions (subscriptionID)
 );
 
 create table businesses_subscriptions
 (
-	businessName varchar(50) not null,
-	subscriptionID int not null,
-	remainingSmallPods_thisDay int,
-	remainingLargePods_thisDay int,
-	amountOfDedicatedPods int,
-	CONSTRAINT businessName_fk FOREIGN KEY (businessName) REFERENCES businesses(name),
-	CONSTRAINT b_subscriptionID_fk FOREIGN KEY (subscriptionID) REFERENCES subscriptions(subscriptionID)
+    businessName               varchar(50) not null,
+    subscriptionID             int         not null,
+    remainingSmallPods_thisDay int,
+    remainingLargePods_thisDay int,
+    amountOfDedicatedPods      int,
+    CONSTRAINT businessName_fk FOREIGN KEY (businessName) REFERENCES businesses (name),
+    CONSTRAINT b_subscriptionID_fk FOREIGN KEY (subscriptionID) REFERENCES subscriptions (subscriptionID)
 );
 
 create table trips
@@ -67,7 +65,7 @@ create table trips_users
     tripID int not null,
     userID int not null,
     CONSTRAINT tripID_fk FOREIGN KEY (tripID) REFERENCES trips (tripID),
-    CONSTRAINT t_userID_fk FOREIGN KEY (userID) REFERENCES users (userID)
+    CONSTRAINT t_userID_fk FOREIGN KEY (userID) REFERENCES users (name)
 );
 
 create table deliveries
@@ -83,7 +81,7 @@ create table deliveries_businesses
 (
     deliveryID int not null,
     businessID int not null,
-    CONSTRAINT d_businessID_fk FOREIGN KEY (businessID) REFERENCES businesses (businessID),
+    CONSTRAINT d_businessID_fk FOREIGN KEY (businessID) REFERENCES businesses (name),
     CONSTRAINT deliveryID_fk FOREIGN KEY (deliveryID) REFERENCES deliveries (deliveryID)
 );
 
@@ -119,3 +117,18 @@ create table favorite_trips_businesses
     constraint fb_endpointID_fk FOREIGN KEY (endpointID) REFERENCES endpoints (id)
 );
 
+CREATE TABLE `report_sections`
+(
+    `Name` VARCHAR(90) NOT NULL,
+    PRIMARY KEY (`Name`)
+);
+
+CREATE TABLE `reports`
+(
+    `id`            INT           NOT NULL AUTO_INCREMENT,
+    `reportSection` VARCHAR(90)   NOT NULL,
+    `body`          VARCHAR(2000) NULL,
+    `accountId`     varchar(50)   NOT NULL,
+    PRIMARY KEY (`id`),
+    CONSTRAINT `fk_report_section` FOREIGN KEY (`reportSection`) REFERENCES `report_sections` (`Name`)
+);
