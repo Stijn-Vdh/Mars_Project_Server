@@ -1,9 +1,7 @@
-DROP
-ALL OBJECTS;
+DROP ALL OBJECTS;
 
 create table users
 (
-    userID         int auto_increment,
     homeEndpointID int,
     name           varchar(50),
     password       varchar(512),
@@ -15,13 +13,12 @@ create table users
 
 create table businesses
 (
-    businessID     int auto_increment,
     homeEndpointID int,
     name           varchar(50),
     password       varchar(512),
     homeAddress    varchar(125),
     subscriptionID int,
-    CONSTRAINT businessID_pk Primary Key (businessID)
+    CONSTRAINT businessID_pk Primary Key (name)
 );
 
 create table subscriptions
@@ -68,7 +65,7 @@ create table trips_users
     tripID int not null,
     userID int not null,
     CONSTRAINT tripID_fk FOREIGN KEY (tripID) REFERENCES trips (tripID),
-    CONSTRAINT t_userID_fk FOREIGN KEY (userID) REFERENCES users (userID)
+    CONSTRAINT t_userID_fk FOREIGN KEY (userID) REFERENCES users (name)
 );
 
 create table deliveries
@@ -84,7 +81,7 @@ create table deliveries_businesses
 (
     deliveryID int not null,
     businessID int not null,
-    CONSTRAINT d_businessID_fk FOREIGN KEY (businessID) REFERENCES businesses (businessID),
+    CONSTRAINT d_businessID_fk FOREIGN KEY (businessID) REFERENCES businesses (name),
     CONSTRAINT deliveryID_fk FOREIGN KEY (deliveryID) REFERENCES deliveries (deliveryID)
 );
 
@@ -115,6 +112,7 @@ CREATE TABLE `reports`
     `id`            INT           NOT NULL AUTO_INCREMENT,
     `reportSection` VARCHAR(90)   NOT NULL,
     `Body`          VARCHAR(2000) NULL,
+    `accountId`     INT           NOT NULL,
     PRIMARY KEY (`id`),
     CONSTRAINT `fk_report_section` FOREIGN KEY (`reportSection`) REFERENCES `report_sections` (`Name`)
 );
