@@ -4,6 +4,7 @@ import be.howest.ti.mars.logic.controller.*;
 import be.howest.ti.mars.logic.controller.converters.ShortEndpoint;
 import io.vertx.core.json.JsonObject;
 
+
 import java.util.List;
 import java.util.Set;
 
@@ -14,12 +15,13 @@ public interface MarsRepoInt {
     void addEndpoint(String endpoint);
 
     Endpoint getEndpoint(int id);
-    void favoriteEndpoint_Users(UserAccount user, int id);
-    void favoriteEndpoint_Businesses(BusinessAccount business, int id);
 
-    void unFavoriteEndpoint_Users(UserAccount user, int id);
+    // Favorite
+    List<JsonObject> getFavoriteTrips(BaseAccount acc, boolean userAcc);
 
-    void unFavoriteEndpoint_Businesses(BusinessAccount business, int id);
+    void favoriteEndpoint(BaseAccount acc, int id, boolean userAcc);
+
+    void unFavoriteEndpoint(BaseAccount user, int id, boolean userAcc);
 
     // User
     void addUser(UserAccount user);
@@ -57,15 +59,12 @@ public interface MarsRepoInt {
     // Subscriptions
     List<Subscription> getSubscriptions();
 
-    Subscription getSubscriptionInfo(String businessName);
+    Subscription getSubscription(BaseAccount acc, boolean userAcc);
 
-    void buySubscription(UserAccount user, String subscription);
+    void buySubscription(BaseAccount acc, String subscription, boolean userAcc);
 
-    void buySubscription(BusinessAccount business, String subscription);
+    void stopSubscription(BaseAccount acc, boolean userAcc);
 
-    void stopSubscription(UserAccount user);
-
-    void stopSubscription(BusinessAccount business);
 
     // Report
     Set<String> getReportSections();

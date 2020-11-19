@@ -4,6 +4,10 @@ import be.howest.ti.mars.logic.controller.exceptions.AuthenticationException;
 import be.howest.ti.mars.logic.controller.exceptions.UsernameException;
 import be.howest.ti.mars.logic.controller.security.AccountToken;
 import be.howest.ti.mars.logic.data.MarsRepository;
+import io.vertx.core.json.Json;
+import io.vertx.core.json.JsonObject;
+import org.h2.engine.User;
+
 import java.util.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -102,29 +106,19 @@ public class MarsController {
         return "You just removed a friend called:" + user.removeFriend(friendAccount).getUsername();
     }
 
-
-    public Object buyBusinessSubscription(BusinessAccount businessAccount, String subscriptionName) {
-        repo.buySubscription(businessAccount, subscriptionName);
+    public Object buySubscription(BaseAccount acc, String subscriptionName, boolean userAcc) {
+        repo.buySubscription(acc, subscriptionName, userAcc);
         return "Thank you for buying a subscription.";
     }
 
-    public Object buyUserSubscription(UserAccount userAccount, String subscriptionName) {
-        repo.buySubscription(userAccount, subscriptionName);
-        return "Thank you for buying a subscription.";
-    }
-
-    public Object stopSubscription(UserAccount userAccount) {
-        repo.stopSubscription(userAccount);
+    public Object stopSubscription(BaseAccount acc, boolean userAcc) {
+        repo.stopSubscription(acc, userAcc);
         return "We are sorry for you to stop you current subscription.";
     }
 
-    public Object stopSubscription(BusinessAccount businessAccount) {
-        repo.stopSubscription(businessAccount);
-        return "We are sorry that you have discontinued your current subscription.";
-    }
 
     public Object viewSubscriptionInfo(BusinessAccount businessAccount) {
-        return repo.getSubscriptionInfo(businessAccount.getUsername());
+        return repo.getSubscription(businessAccount, false);
     }
 
     public MarsRepository getRepo() {
@@ -139,19 +133,35 @@ public class MarsController {
         repo.stopSharingLocation(userAccount);
     }
 
-    public void favoriteEndpoint_Users(UserAccount userAccount, int id) {
-        repo.favoriteEndpoint_Users(userAccount, id);
-    }
-    public void favoriteEndpoint_Business(BusinessAccount businessAccount, int id) {
-        repo.favoriteEndpoint_Businesses(businessAccount, id);
+    public void favoriteEndpoint(BaseAccount acc, int id, boolean userAcc) {
+        repo.favoriteEndpoint(acc, id, userAcc);
     }
 
-    public void unFavoriteEndpoint_Users(UserAccount userAccount, int id) {
-        repo.unFavoriteEndpoint_Users(userAccount, id);
+    public void unFavoriteEndpoint(BaseAccount acc, int id, boolean userAcc) {
+        repo.unFavoriteEndpoint(acc, id, userAcc);
     }
 
-    public void unFavoriteEndpoint_Business(BusinessAccount businessAccount, int id) {
-        repo.unFavoriteEndpoint_Businesses(businessAccount, id);
-    }
+    public Object getAccountInformation(BaseAccount acc, boolean userAcc){
+        JsonObject accInformation = new JsonObject();
+        accInformation.put("name:", acc.getUsername());
+        accInformation.put("homeAddr:", acc.getAddress());
+        accInformation.put("homeEndpoint:", acc.getHomeAddressEndpoint());
 
+        if (userAcc){
+            List<JsonObject> friends =  new LinkedList<>(repo.getFriends((UserAccount) acc));
+            List<JsonObject> favoTrips = new LinkedList<>(repo.getFavoriteTrips(acc, true));
+            Subscription sub = repo.getSubscription(acc, true);
+
+            accInformation.put("subscription:", sub != null ? sub.getName() : "No subscription");
+            accInformation.put("friends:", friends);
+            accInformation.put("favouriteEndpoints:", favoTrips);
+        }else{
+            Subscription sub = repo.getSubscription(acc, false);
+            List<JsonObject> favoTrips = new LinkedList<>(repo.getFavoriteTrips(acc, false));
+            accInformation.put("subscription:", sub != null ? sub.getName() : "No subscription");
+            accInformation.put("favouriteEndpoints:", favoTrips);
+        }
+
+        return accInformation;
+    }
 }
