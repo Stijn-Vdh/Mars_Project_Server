@@ -452,7 +452,48 @@ paths:
           description: There is no endpoint matching that id.
         '500':
           description: Unexpected error.
-
+  /api/endpoints/favorite/{id}:
+    summary: add / remove endpoint to favorites
+    post:
+      tags:
+        - endpoint
+      operationId: favoriteEndpoint
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: give the id of the endpoint
+      responses:
+        '200':
+          description: Ok
+        '402':
+          description: There is no endpoint matching that id.
+        '500':
+          description: Unexpected error.
+      security:
+        - Token: [ ]
+    delete:
+      tags:
+        - endpoint
+      operationId: unfavoriteEndpoint
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: give the id of the endpoint
+      responses:
+        '200':
+          description: Ok
+        '402':
+          description: The endpoint you try to un favorite is not favoured.
+        '500':
+          description: Unexpected error.
+      security:
+        - Token: [ ]
   /api/delivery/{id}: #Get delivery information
     description: get delivery information
     get:
@@ -610,6 +651,7 @@ paths:
           description: Unexpected error.
       security:
         - Token: [ User ]
+
 
   /api/ping:
     get:
