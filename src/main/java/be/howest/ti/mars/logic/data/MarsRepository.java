@@ -27,7 +27,7 @@ public class MarsRepository implements MarsRepoInt {
 
         try (
                 Connection con = MarsConnection.getConnection();
-                PreparedStatement stmt = con.prepareStatement(SQL_GET_ENDPOINTS);
+                PreparedStatement stmt = con.prepareStatement(SQL_GET_ENDPOINTS)
         ) {
 
             try (ResultSet rs = stmt.executeQuery()) {
@@ -56,7 +56,7 @@ public class MarsRepository implements MarsRepoInt {
     @Override
     public Endpoint getEndpoint(int id) {
         try (Connection con = MarsConnection.getConnection();
-             PreparedStatement stmt = con.prepareStatement(SQL_GET_ENDPOINT);
+             PreparedStatement stmt = con.prepareStatement(SQL_GET_ENDPOINT)
         ) {
             stmt.setInt(1, id);
             try (ResultSet rs = stmt.executeQuery()) {
@@ -158,6 +158,8 @@ public class MarsRepository implements MarsRepoInt {
                 ex.printStackTrace();
                 throw new DatabaseException("Could not unfavorite endpoint.");
             }
+        }else{
+            throw new EndpointException("This endpoint is not favoured");
         }
     }
 
@@ -175,6 +177,8 @@ public class MarsRepository implements MarsRepoInt {
                 ex.printStackTrace();
                 throw new DatabaseException("Could not favorite endpoint.");
             }
+        }else{
+            throw new EndpointException("This endpoint is not favoured");
         }
     }
 
