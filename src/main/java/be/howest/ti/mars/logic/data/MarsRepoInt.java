@@ -59,11 +59,8 @@ public interface MarsRepoInt {
 
     Subscription getSubscription(BaseAccount acc, boolean userAcc);
 
-    void buySubscription(UserAccount user, String subscription);
+    void buySubscription(BaseAccount acc, String subscription, boolean userAcc);
 
-    void buySubscription(BusinessAccount business, String subscription);
+    void stopSubscription(BaseAccount acc, boolean userAcc);
 
-    void stopSubscription(UserAccount user);
-
-    void stopSubscription(BusinessAccount business);
 }

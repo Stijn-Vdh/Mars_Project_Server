@@ -101,17 +101,17 @@ class MarsOpenApiBridge {
         String subscriptionName = json.getString("subscriptionName");
 
         if (verifyUserAccountToken(ctx)) {
-            return controller.buyUserSubscription(getUserAccount(ctx), subscriptionName);
+            return controller.buySubscription(getAccount(ctx), subscriptionName, true);
         } else {
-            return controller.buyBusinessSubscription(getBusinessAccount(ctx), subscriptionName);
+            return controller.buySubscription(getAccount(ctx), subscriptionName, false);
         }
     }
 
     public Object stopSubscription(RoutingContext ctx) {
         if (verifyUserAccountToken(ctx)) {
-            return controller.stopSubscription(getUserAccount(ctx));
+            return controller.stopSubscription(getAccount(ctx), true);
         } else {
-            return controller.stopSubscription(getBusinessAccount(ctx));
+            return controller.stopSubscription(getAccount(ctx), false);
         }
     }
 

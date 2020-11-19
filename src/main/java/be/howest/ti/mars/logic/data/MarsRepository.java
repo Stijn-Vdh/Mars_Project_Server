@@ -331,7 +331,6 @@ public class MarsRepository implements MarsRepoInt {
         return null;
     }
 
-
     @Override
     public Set<String> getTrips() {
         return null;
@@ -443,28 +442,63 @@ public class MarsRepository implements MarsRepoInt {
     }
 
     @Override
-    public void buySubscription(UserAccount user, String subscription) {
+    public void buySubscription(BaseAccount acc, String subscription, boolean userAcc) {
         int id = getSubscriptions().stream()
                 .filter(sub -> sub.getName().equals(subscription))
                 .mapToInt(Subscription::getId).sum();
 
-        String SQL_UPDATE_USER = "UPDATE USERS SET subscriptionID=? where name=?";
-        String SQL_INSERT_USER_SUB = "INSERT INTO USERS_SUBSCRIPTIONS(userName,subscriptionID) values(?,?)";
+        String SQL_UPDATE_ACC = "UPDATE ";
+        String SQL_INSERT_ACC_SUB = "INSERT INTO ";
+        int remainingSmallPods_thisDay = 0;
+        int remainingLargePods_thisDay = 0;
+        int dedicatedPods = 0;
+        // init variables for different type of accounts
+        if (userAcc){
+            SQL_UPDATE_ACC += "USERS SET subscriptionID=? where name=?";
+            SQL_INSERT_ACC_SUB += "USERS_SUBSCRIPTIONS(userName,subscriptionID) values(?,?)";
+        }else {
+            SQL_UPDATE_ACC += "BUSINESSES SET subscriptionID=? where name=?";
+            SQL_INSERT_ACC_SUB += "BUSINESSES_SUBSCRIPTIONS(businessName,subscriptionID, remainingSmallPods_thisDay," +
+                                    "remainingLargePods_thisDay, amountOfDedicatedPods) values(?,?,?,?,?)";
 
+            remainingSmallPods_thisDay = getSubscriptions().stream()
+                    .filter(sub -> sub.getName().equals(subscription))
+                    .mapToInt(Subscription::getRemainingSmallPods_thisDay)
+                    .findAny()
+                    .orElse(0);
+
+            remainingLargePods_thisDay = getSubscriptions().stream()
+                    .filter(sub -> sub.getName().equals(subscription))
+                    .mapToInt(Subscription::getRemainingLargePods_thisDay)
+                    .findAny()
+                    .orElse(0);;
+
+            dedicatedPods = getSubscriptions().stream()
+                    .filter(sub -> sub.getName().equals(subscription))
+                    .mapToInt(Subscription::getAmountOfDedicatedPods)
+                    .findAny()
+                    .orElse(0);;
+        }
+        // update acc table
         try (Connection con = MarsConnection.getConnection();
-             PreparedStatement stmt = con.prepareStatement(SQL_UPDATE_USER)) {
+             PreparedStatement stmt = con.prepareStatement(SQL_UPDATE_ACC)) {
             stmt.setInt(1, id);
-            stmt.setString(2, user.getUsername());
+            stmt.setString(2, acc.getUsername());
             stmt.executeUpdate();
         } catch (SQLException ex) {
             logger.log(Level.WARNING, ex.getMessage(), ex);
             throw new DatabaseException("Can't buy a subscription.");
         }
-
+        // update link table (user_subscription | business_subscriptions)
         try (Connection con = MarsConnection.getConnection();
-             PreparedStatement stmt = con.prepareStatement(SQL_INSERT_USER_SUB)) {
-            stmt.setString(1, user.getUsername());
+             PreparedStatement stmt = con.prepareStatement(SQL_INSERT_ACC_SUB)) {
+            stmt.setString(1, acc.getUsername());
             stmt.setInt(2, id);
+            if (!userAcc){
+                stmt.setInt(3, remainingSmallPods_thisDay);
+                stmt.setInt(4, remainingLargePods_thisDay);
+                stmt.setInt(5, dedicatedPods);
+            }
             stmt.executeUpdate();
         } catch (SQLException ex) {
             logger.log(Level.WARNING, ex.getMessage(), ex);
@@ -473,66 +507,23 @@ public class MarsRepository implements MarsRepoInt {
     }
 
     @Override
-    public void buySubscription(BusinessAccount business, String subscription) {
-        int id = getSubscriptions().stream()
-                .filter(sub -> sub.getName().equals(subscription))
-                .mapToInt(Subscription::getId).sum();
-
-        int remainingSmallPods_thisDay = getSubscriptions().stream()
-                .filter(sub -> sub.getName().equals(subscription))
-                .mapToInt(Subscription::getRemainingSmallPods_thisDay).sum();
-
-        int remainingLargePods_thisDay = getSubscriptions().stream()
-                .filter(sub -> sub.getName().equals(subscription))
-                .mapToInt(Subscription::getRemainingLargePods_thisDay).sum();
-
-        int dedicatedPods = getSubscriptions().stream()
-                .filter(sub -> sub.getName().equals(subscription))
-                .mapToInt(Subscription::getAmountOfDedicatedPods).sum();
-
-        String SQL_UPDATE_BUSINESS = "UPDATE BUSINESSES SET subscriptionID=? where name=?";
-        String SQL_INSERT_BUSINESS_SUB = "INSERT INTO BUSINESSES_SUBSCRIPTIONS" +
-                "(businessName,subscriptionID, " +
-                "remainingSmallPods_thisDay,remainingLargePods_thisDay," +
-                "amountOfDedicatedPods) " +
-                "values(?,?,?,?,?)";
-
-        try (Connection con = MarsConnection.getConnection();
-             PreparedStatement stmt = con.prepareStatement(SQL_UPDATE_BUSINESS)) {
-            stmt.setInt(1, id);
-            stmt.setString(2, business.getUsername());
-
-            stmt.executeUpdate();
-        } catch (SQLException ex) {
-            logger.log(Level.WARNING, ex.getMessage(), ex);
-            throw new DatabaseException("Can't buy a subscription.");
-        }
-
-        try (Connection con = MarsConnection.getConnection();
-             PreparedStatement stmt = con.prepareStatement(SQL_INSERT_BUSINESS_SUB)) {
-            stmt.setString(1, business.getUsername());
-            stmt.setInt(2, id);
-            stmt.setInt(3, remainingSmallPods_thisDay);
-            stmt.setInt(4, remainingLargePods_thisDay);
-            stmt.setInt(5, dedicatedPods);
-
-            stmt.executeUpdate();
-        } catch (SQLException ex) {
-            logger.log(Level.WARNING, ex.getMessage(), ex);
-            throw new DatabaseException("Can't buy a subscription.");
-        }
-    }
-
-    @Override
-    public void stopSubscription(UserAccount user) {
+    public void stopSubscription(BaseAccount acc, boolean userAcc) {
         int idNoDescriptionActive = 0;
-        String SQL_UPDATE_BUSINESS = "UPDATE USERS SET subscriptionID=? where name=?";
-        String SQL_DELETE_BUSINESS_SUB = "DELETE FROM USERS_SUBSCRIPTIONS where userName=?";
+        String SQL_UPDATE_BUSINESS = "UPDATE ";
+        String SQL_DELETE_BUSINESS_SUB = "DELETE FROM ";
+
+        if (userAcc){
+            SQL_UPDATE_BUSINESS += "USERS SET subscriptionID=? where name=?";
+            SQL_DELETE_BUSINESS_SUB += "USERS_SUBSCRIPTIONS where userName=?";
+        }else{
+            SQL_UPDATE_BUSINESS += "BUSINESSES SET subscriptionID=? where name=?";
+            SQL_DELETE_BUSINESS_SUB += "BUSINESSES_SUBSCRIPTIONS where businessName=?";
+        }
 
         try (Connection con = MarsConnection.getConnection();
              PreparedStatement stmt = con.prepareStatement(SQL_UPDATE_BUSINESS)) {
             stmt.setInt(1, idNoDescriptionActive);
-            stmt.setString(2, user.getUsername());
+            stmt.setString(2, acc.getUsername());
             stmt.executeUpdate();
         } catch (SQLException ex) {
             logger.log(Level.WARNING, ex.getMessage(), ex);
@@ -541,39 +532,11 @@ public class MarsRepository implements MarsRepoInt {
 
         try (Connection con = MarsConnection.getConnection();
              PreparedStatement stmt = con.prepareStatement(SQL_DELETE_BUSINESS_SUB)) {
-            stmt.setString(1, user.getUsername());
+            stmt.setString(1, acc.getUsername());
             stmt.executeUpdate();
         } catch (SQLException ex) {
             logger.log(Level.WARNING, ex.getMessage(), ex);
             throw new DatabaseException("Can't stop a subscription.");
         }
     }
-
-    @Override
-    public void stopSubscription(BusinessAccount business) {
-        int idNoDescriptionActive = 0;
-        String SQL_UPDATE_BUSINESS = "UPDATE BUSINESSES SET subscriptionID=? where name=?";
-        String SQL_DELETE_BUSINESS_SUB = "DELETE FROM BUSINESSES_SUBSCRIPTIONS where businessName=?";
-
-        try (Connection con = MarsConnection.getConnection();
-             PreparedStatement stmt = con.prepareStatement(SQL_UPDATE_BUSINESS)) {
-            stmt.setInt(1, idNoDescriptionActive);
-            stmt.setString(2, business.getUsername());
-            stmt.executeUpdate();
-        } catch (SQLException ex) {
-            logger.log(Level.WARNING, ex.getMessage(), ex);
-            throw new DatabaseException("Can't stop a subscription.");
-        }
-
-        try (Connection con = MarsConnection.getConnection();
-             PreparedStatement stmt = con.prepareStatement(SQL_DELETE_BUSINESS_SUB)) {
-            stmt.setString(1, business.getUsername());
-            stmt.executeUpdate();
-        } catch (SQLException ex) {
-            logger.log(Level.WARNING, ex.getMessage(), ex);
-            throw new DatabaseException("Can't stop a subscription.");
-        }
-    }
-
-
 }

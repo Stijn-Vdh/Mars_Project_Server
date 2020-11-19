@@ -106,26 +106,16 @@ public class MarsController {
         return "You just removed a friend called:" + user.removeFriend(friendAccount).getUsername();
     }
 
-
-    public Object buyBusinessSubscription(BusinessAccount businessAccount, String subscriptionName) {
-        repo.buySubscription(businessAccount, subscriptionName);
+    public Object buySubscription(BaseAccount acc, String subscriptionName, boolean userAcc) {
+        repo.buySubscription(acc, subscriptionName, userAcc);
         return "Thank you for buying a subscription.";
     }
 
-    public Object buyUserSubscription(UserAccount userAccount, String subscriptionName) {
-        repo.buySubscription(userAccount, subscriptionName);
-        return "Thank you for buying a subscription.";
-    }
-
-    public Object stopSubscription(UserAccount userAccount) {
-        repo.stopSubscription(userAccount);
+    public Object stopSubscription(BaseAccount acc, boolean userAcc) {
+        repo.stopSubscription(acc, userAcc);
         return "We are sorry for you to stop you current subscription.";
     }
 
-    public Object stopSubscription(BusinessAccount businessAccount) {
-        repo.stopSubscription(businessAccount);
-        return "We are sorry that you have discontinued your current subscription.";
-    }
 
     public Object viewSubscriptionInfo(BusinessAccount businessAccount) {
         return repo.getSubscription(businessAccount, false);
