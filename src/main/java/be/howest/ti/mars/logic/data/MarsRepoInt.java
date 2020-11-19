@@ -44,7 +44,7 @@ public interface MarsRepoInt {
 
     void travel(UserAccount user, Trip trip);
 
-    void cancelTravel(UserAccount user, Trip trip);
+    void cancelTravel(UserAccount user, int tripID);
 
     // Deliveries
     Set<Delivery> getDeliveries();

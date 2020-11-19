@@ -54,7 +54,7 @@ public class MarsController {
     }
 
     public void createDelivery(String deliveryType, int from, int destination, String date) {
-        Date convertedDate = null;
+        Date convertedDate;
         try {
             convertedDate = new SimpleDateFormat("dd-MM-yyyy").parse(date);
             Delivery delivery = new Delivery(deliveryType, from, destination, convertedDate.toString());
@@ -150,11 +150,13 @@ public class MarsController {
         if (userAcc){
             List<JsonObject> friends =  new LinkedList<>(repo.getFriends((UserAccount) acc));
             List<JsonObject> favoTrips = new LinkedList<>(repo.getFavoriteTrips(acc, true));
+            Set<Trip> trips = new HashSet<>(repo.getTravelHistory((UserAccount) acc));
             Subscription sub = repo.getSubscription(acc, true);
 
             accInformation.put("subscription:", sub != null ? sub.getName() : "No subscription");
             accInformation.put("friends:", friends);
             accInformation.put("favouriteEndpoints:", favoTrips);
+            accInformation.put("travelHistory:", trips);
         }else{
             Subscription sub = repo.getSubscription(acc, false);
             List<JsonObject> favoTrips = new LinkedList<>(repo.getFavoriteTrips(acc, false));
@@ -166,7 +168,7 @@ public class MarsController {
     }
 
     public void travel(UserAccount acc, int from, int destination, String type) {
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd");
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
         LocalDateTime now = LocalDateTime.now();
 
         Trip trip = new Trip(from, destination, type, dtf.format(now));
