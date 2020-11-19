@@ -15,6 +15,10 @@ public interface MarsRepoInt {
     void favoriteEndpoint_Users(UserAccount user, int id);
     void favoriteEndpoint_Businesses(BusinessAccount business, int id);
 
+    void unFavoriteEndpoint_Users(UserAccount user, int id);
+
+    void unFavoriteEndpoint_Businesses(BusinessAccount business, int id);
+
     // User
     void addUser(UserAccount user);
 

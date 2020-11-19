@@ -138,6 +138,16 @@ class MarsOpenApiBridge {
         return null;
     }
 
+    public Object unfavoriteEndpoint(RoutingContext ctx) {
+        int endpointID = Integer.parseInt(ctx.request().getParam("id"));
+        if (verifyUserAccountToken(ctx)){
+            controller.unFavoriteEndpoint_Users(getUserAccount(ctx),endpointID);
+        }else{
+            controller.unFavoriteEndpoint_Business(getBusinessAccount(ctx),endpointID);
+        }
+        return null;
+    }
+
 
     //------------------------------------------------------------------------------------------------------------------
 
