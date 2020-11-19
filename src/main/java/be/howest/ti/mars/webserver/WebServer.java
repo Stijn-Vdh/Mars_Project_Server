@@ -163,8 +163,9 @@ public class WebServer extends AbstractVerticle {
         addRouteWithCtxFunction(factory, "report", bridge::addReport);
         addRouteWithCtxFunction(factory, "reportSections", bridge::getReportSections);
         addRouteWithCtxFunction(factory, "favoriteEndpoint", bridge::favoriteEndpoint);
-        addRouteWithCtxFunction(factory, "unfavoriteEndpoint", bridge::unfavoriteEndpoint);
+        addRouteWithCtxFunction(factory, "unfavoriteEndpoint", bridge::unFavoriteEndpoint);
         addRouteWithCtxFunction(factory, "getAccountInformation", bridge::getAccountInformation);
+        addRouteWithCtxFunction(factory, "travel", bridge::travel);
     }
 
     private void addRouteWithCtxFunction(OpenAPI3RouterFactory factory, String operationId, Function<RoutingContext, Object> bridgeFunction) {

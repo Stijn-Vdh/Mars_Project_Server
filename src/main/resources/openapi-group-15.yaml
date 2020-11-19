@@ -636,6 +636,7 @@ paths:
     description: travel from one point to another.
     post:
       summary: Travel from one point to another.
+      operationId: travel
       tags:
         - travel
       requestBody:
@@ -676,7 +677,6 @@ paths:
       security:
         - Token: [ User ]
 
-
   /api/ping:
     get:
       tags:
@@ -687,6 +687,7 @@ paths:
           description: Server is up and running
         default:
           description: Something is wrong
+
   /api/report:
     description: you can report any problem you  have with the system.
     post:

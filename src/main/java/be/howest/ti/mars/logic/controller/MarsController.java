@@ -6,6 +6,8 @@ import be.howest.ti.mars.logic.controller.security.AccountToken;
 import be.howest.ti.mars.logic.data.MarsRepository;
 import io.vertx.core.json.JsonObject;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -62,7 +64,6 @@ public class MarsController {
         }
     }
 
-
     public byte[] login(String name, String password) {
         BaseAccount account = Stream.concat(
                 userAccounts.stream(),
@@ -116,7 +117,6 @@ public class MarsController {
         return "We are sorry for you to stop you current subscription.";
     }
 
-
     public Object viewSubscriptionInfo(BusinessAccount businessAccount) {
         return repo.getSubscription(businessAccount, false);
     }
@@ -163,5 +163,13 @@ public class MarsController {
         }
 
         return accInformation;
+    }
+
+    public void travel(UserAccount acc, int from, int destination, String type) {
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd");
+        LocalDateTime now = LocalDateTime.now();
+
+        Trip trip = new Trip(from, destination, type, dtf.format(now));
+        repo.travel(acc, trip);
     }
 }

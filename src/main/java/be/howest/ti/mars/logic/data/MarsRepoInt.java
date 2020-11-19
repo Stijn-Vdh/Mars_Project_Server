@@ -40,13 +40,11 @@ public interface MarsRepoInt {
     void addBusiness(BusinessAccount business);
 
     // Travel
-    Set<String> getTrips(); // todo:  String moet trip class worden
+    Set<Trip> getTrips(); // todo:  String moet trip class worden
 
-    void addTrip(String trip);
+    void travel(UserAccount user, Trip trip);
 
-    void travel(UserAccount user, String trip);
-
-    void cancelTravel(UserAccount user, String trip);
+    void cancelTravel(UserAccount user, Trip trip);
 
     // Deliveries
     Set<Delivery> getDeliveries();
