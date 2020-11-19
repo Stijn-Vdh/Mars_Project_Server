@@ -4,6 +4,7 @@ import be.howest.ti.mars.logic.controller.*;
 import be.howest.ti.mars.logic.controller.converters.ShortEndpoint;
 import be.howest.ti.mars.logic.controller.exceptions.DatabaseException;
 import be.howest.ti.mars.logic.controller.exceptions.EndpointException;
+import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
 
 import java.sql.Connection;
@@ -142,6 +143,43 @@ public class MarsRepository implements MarsRepoInt {
             ex.printStackTrace();
             throw new DatabaseException("Cannot get all favorites.");
         }
+    }
+
+    public List<JsonObject> getFavoriteTrips(boolean userAcc, UserAccount acc){
+        String SQL_GET_FAVORITES = "select * from ";
+        String name;
+        List<JsonObject> favoTrips = new LinkedList<>();
+
+        if (userAcc){
+            SQL_GET_FAVORITES += "favorite_trips_users where userName=?";
+            name = "userName";
+        }else{
+            SQL_GET_FAVORITES += "favorite_trips_businesses";
+            name = "businessName";
+        }
+
+        try(Connection con = MarsConnection.getConnection();
+            PreparedStatement stmt = con.prepareStatement(SQL_GET_FAVORITES)){
+
+            stmt.setString(1, acc.getUsername());
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()){
+                String accName = rs.getString(name);
+                int endpointID = rs.getInt("homeEndpointID");
+
+                JsonObject json = new JsonObject();
+
+                json.put("name:", accName);
+                json.put("id", endpointID);
+
+                favoTrips.add(json);
+            }
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            throw new DatabaseException("Cannot get all favorites.");
+        }
+        return favoTrips;
     }
 
     @Override

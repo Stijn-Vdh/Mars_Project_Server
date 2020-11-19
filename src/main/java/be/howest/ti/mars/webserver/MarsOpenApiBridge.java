@@ -66,6 +66,14 @@ class MarsOpenApiBridge {
         return "Bye bye";
     }
 
+    public Object getAccountInformation(RoutingContext ctx) {
+        if (verifyUserAccountToken(ctx)){
+            return controller.getAccountInformation(getUserAccount(ctx));
+        }else{
+            return controller.getAccountInformation(getBusinessAccount(ctx));
+        }
+    }
+
     public Object viewFriends(RoutingContext ctx) {
         UserAccount user = getUserAccount(ctx);
         return controller.getFriends(user);

@@ -144,6 +144,7 @@ paths:
     description: get your account information
     get:
       summary: get user information.
+      operationId: getAccountInformation
       tags:
         - user
       responses:
@@ -166,13 +167,32 @@ paths:
                     type: string
                   subscriptionID:
                     type: integer
+                  favourite_trips:
+                    type: object
+                    properties:
+                      endpointID:
+                        type: integer
+                      endpointName:
+                        type: string
                 example: {
                   userID: 1,
                   name: "Debby",
                   homeAdress: "Colony 1, residence 15",
                   homeEndpoint: 5,
                   subscription: "Unlimited",
-                  subscriptionID: 5
+                  subscriptionID: 5,
+                  friends: [
+                    {
+                      name: "Frank",
+                      sharesLocation: true,
+                      homeAddress: "residence 107",
+                      homeEndpointID: 1903
+                    }]
+                  favourite_trips: [
+                    {
+                      endpointID: 5,
+                      endpointName: "Work"
+                    }]
                 }
         '401':
           description: Authorization information is missing or invalid.

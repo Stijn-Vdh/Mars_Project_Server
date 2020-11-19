@@ -4,6 +4,9 @@ import be.howest.ti.mars.logic.controller.exceptions.AuthenticationException;
 import be.howest.ti.mars.logic.controller.exceptions.UsernameException;
 import be.howest.ti.mars.logic.controller.security.AccountToken;
 import be.howest.ti.mars.logic.data.MarsRepository;
+import io.vertx.core.json.Json;
+import io.vertx.core.json.JsonObject;
+
 import java.util.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -154,4 +157,14 @@ public class MarsController {
         repo.unFavoriteEndpoint_Businesses(businessAccount, id);
     }
 
+    public Object getAccountInformation(UserAccount acc) {
+        List<JsonObject> friends =  new LinkedList<>(repo.getFriends(acc));
+        List<JsonObject> favoTrips = new LinkedList<>(repo.getFavoriteTrips(true, acc));
+
+        return null;
+    }
+    public Object getAccountInformation(BusinessAccount acc) {
+
+        return null;
+    }
 }
