@@ -4,9 +4,7 @@ import be.howest.ti.mars.logic.controller.exceptions.AuthenticationException;
 import be.howest.ti.mars.logic.controller.exceptions.UsernameException;
 import be.howest.ti.mars.logic.controller.security.AccountToken;
 import be.howest.ti.mars.logic.data.MarsRepository;
-import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
-import org.h2.engine.User;
 
 import java.util.*;
 import java.text.ParseException;
@@ -14,15 +12,19 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 public class MarsController {
+    private static final Logger LOGGER = Logger.getLogger(MarsController.class.getName());
+    private static final String MOTD = "SmellyEllie";
     MarsRepository repo = new MarsRepository();
     Set<UserAccount> userAccounts = new HashSet<>();
     Set<BusinessAccount> businessAccounts = new HashSet<>();
 
     public String getMessage() {
-        return "SmellyEllie";
+        return MOTD;
     }
 
     public Set<UserAccount> getUserAccounts() {
@@ -47,19 +49,17 @@ public class MarsController {
             }
             repo.addUser(account);
         }
-
-
     }
 
     public void createDelivery(String deliveryType, int from, int destination, String date) {
         Date convertedDate = null;
         try {
             convertedDate = new SimpleDateFormat("dd-MM-yyyy").parse(date);
-        } catch (ParseException e) {
-            e.printStackTrace();
+            Delivery delivery = new Delivery(deliveryType, from, destination, convertedDate.toString());
+            repo.addDelivery(delivery);
+        } catch (ParseException ex) {
+            LOGGER.log(Level.WARNING, ex.getMessage(),ex);
         }
-        Delivery delivery = new Delivery(deliveryType, from, destination, date);
-        repo.addDelivery(delivery);
     }
 
 

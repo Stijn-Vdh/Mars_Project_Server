@@ -5,19 +5,19 @@ import java.util.Objects;
 public class Subscription {
     private final int id;
     private final String name;
-    private final int remainingSmallPods_thisDay;
-    private final int remainingLargePods_thisDay;
+    private final int remainingSmallPodsThisDay;
+    private final int remainingLargePodsThisDay;
     private final int amountOfDedicatedPods;
 
     public Subscription(int id, String name) {
         this(id, name, 0,0, 0);
     }
 
-    public Subscription (int id, String name, int remainingSmallPods_thisDay, int remainingLargePods_thisDay, int amountOfDedicatedPods){
+    public Subscription (int id, String name, int remainingSmallPodsThisDay, int remainingLargePodsThisDay, int amountOfDedicatedPods){
         this.id = id;
         this.name = name;
-        this.remainingSmallPods_thisDay = remainingSmallPods_thisDay;
-        this.remainingLargePods_thisDay = remainingLargePods_thisDay;
+        this.remainingSmallPodsThisDay = remainingSmallPodsThisDay;
+        this.remainingLargePodsThisDay = remainingLargePodsThisDay;
         this.amountOfDedicatedPods = amountOfDedicatedPods;
     }
 
@@ -29,12 +29,12 @@ public class Subscription {
         return name;
     }
 
-    public int getRemainingSmallPods_thisDay() {
-        return remainingSmallPods_thisDay;
+    public int getRemainingSmallPodsThisDay() {
+        return remainingSmallPodsThisDay;
     }
 
-    public int getRemainingLargePods_thisDay() {
-        return remainingLargePods_thisDay;
+    public int getRemainingLargePodsThisDay() {
+        return remainingLargePodsThisDay;
     }
 
     public int getAmountOfDedicatedPods() {

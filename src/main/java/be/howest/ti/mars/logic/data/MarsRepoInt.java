@@ -37,9 +37,6 @@ public interface MarsRepoInt {
 
     void removeFriend(String name, String friendName);
 
-    // Business
-    Set<String> getBusinesses(); // todo:  String moet business class worden
-
     void addBusiness(BusinessAccount business);
 
     // Travel

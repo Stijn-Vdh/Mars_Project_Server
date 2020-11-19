@@ -10,16 +10,14 @@ import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
-
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 class MarsOpenApiBridge {
     private final MarsController controller;
     private static final Logger logger = Logger.getLogger(MarsOpenApiBridge.class.getName());
     public static final String AUTHORIZATION_TOKEN_PREFIX = "Bearer ";
-
+    private static final String TOKEN = "token";
     MarsOpenApiBridge() {
         this.controller = new MarsController();
     }
@@ -68,11 +66,7 @@ class MarsOpenApiBridge {
     }
 
     public Object getAccountInformation(RoutingContext ctx) {
-        if (verifyUserAccountToken(ctx)) {
-            return controller.getAccountInformation(getAccount(ctx), true);
-        } else {
-            return controller.getAccountInformation(getAccount(ctx), false);
-        }
+        return controller.getAccountInformation(getAccount(ctx), verifyUserAccountToken(ctx));
     }
 
     public Object viewFriends(RoutingContext ctx) {
@@ -99,20 +93,11 @@ class MarsOpenApiBridge {
     public Object buySubscription(RoutingContext ctx) {
         JsonObject json = ctx.getBodyAsJson();
         String subscriptionName = json.getString("subscriptionName");
-
-        if (verifyUserAccountToken(ctx)) {
-            return controller.buySubscription(getAccount(ctx), subscriptionName, true);
-        } else {
-            return controller.buySubscription(getAccount(ctx), subscriptionName, false);
-        }
+        return controller.buySubscription(getAccount(ctx), subscriptionName, verifyUserAccountToken(ctx));
     }
 
     public Object stopSubscription(RoutingContext ctx) {
-        if (verifyUserAccountToken(ctx)) {
-            return controller.stopSubscription(getAccount(ctx), true);
-        } else {
-            return controller.stopSubscription(getAccount(ctx), false);
-        }
+        return controller.stopSubscription(getAccount(ctx), verifyUserAccountToken(ctx));
     }
 
     public Object viewSubscriptionInfo(RoutingContext ctx) {
@@ -129,7 +114,7 @@ class MarsOpenApiBridge {
         return "Not sharing location anymore with friends.";
     }
 
-    public Object getEndpoints(RoutingContext routingContext) {
+    public Object getEndpoints(RoutingContext ctx) {
         return controller.getRepo().getEndpoints();
     }
 
@@ -139,21 +124,13 @@ class MarsOpenApiBridge {
 
     public Object favoriteEndpoint(RoutingContext ctx) {
         int endpointID = Integer.parseInt(ctx.request().getParam("id"));
-        if (verifyUserAccountToken(ctx)){
-            controller.favoriteEndpoint(getAccount(ctx), endpointID, true);
-        }else{
-            controller.favoriteEndpoint(getAccount(ctx), endpointID, false);
-        }
+        controller.favoriteEndpoint(getAccount(ctx), endpointID, verifyUserAccountToken(ctx));
         return null;
     }
 
     public Object unfavoriteEndpoint(RoutingContext ctx) {
         int endpointID = Integer.parseInt(ctx.request().getParam("id"));
-        if (verifyUserAccountToken(ctx)) {
-            controller.unFavoriteEndpoint(getAccount(ctx), endpointID, true);
-        } else {
-            controller.unFavoriteEndpoint(getAccount(ctx), endpointID, false);
-        }
+        controller.unFavoriteEndpoint(getAccount(ctx), endpointID, verifyUserAccountToken(ctx));
         return null;
     }
 
@@ -169,7 +146,7 @@ class MarsOpenApiBridge {
     }
 
     private BaseAccount getAccount(RoutingContext ctx) {
-        AccountToken accountToken = Json.decodeValue(new JsonObject().put("token", getBearerToken(ctx)).toString(), AccountToken.class);
+        AccountToken accountToken = Json.decodeValue(new JsonObject().put(TOKEN, getBearerToken(ctx)).toString(), AccountToken.class);
         return Stream.concat(
                 controller.getUserAccounts().stream(),
                 controller.getBusinessAccounts().stream())
@@ -179,7 +156,7 @@ class MarsOpenApiBridge {
     }
 
     private UserAccount getUserAccount(RoutingContext ctx) {
-        AccountToken accountToken = Json.decodeValue(new JsonObject().put("token", getBearerToken(ctx)).toString(), AccountToken.class);
+        AccountToken accountToken = Json.decodeValue(new JsonObject().put(TOKEN, getBearerToken(ctx)).toString(), AccountToken.class);
         return controller.getUserAccounts().stream()
                 .filter(acc -> accountToken.equals(acc.getUserToken()))
                 .findAny()
@@ -187,7 +164,7 @@ class MarsOpenApiBridge {
     }
 
     private BusinessAccount getBusinessAccount(RoutingContext ctx) {
-        AccountToken accountToken = Json.decodeValue(new JsonObject().put("token", getBearerToken(ctx)).toString(), AccountToken.class);
+        AccountToken accountToken = Json.decodeValue(new JsonObject().put(TOKEN, getBearerToken(ctx)).toString(), AccountToken.class);
         return controller.getBusinessAccounts().stream()
                 .filter(acc -> accountToken.equals(acc.getUserToken()))
                 .findAny()

@@ -55,7 +55,7 @@ create table trips
     tripID      int auto_increment,
     `from`      varchar(125),
     destination varchar(125),
-    `when`      date,
+    `date`      date,
     podType     varchar(20),
     CONSTRAINT tripID_pk PRIMARY KEY (tripID)
 );

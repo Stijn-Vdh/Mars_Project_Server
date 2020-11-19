@@ -13,12 +13,12 @@ public class SecureHash {    //according to internet PBKDF2 is more secure than 
     private SecureHash() {
     }
 
-    public static byte[] getUniqueHash(String UID) {
+    public static byte[] getUniqueHash(String uid) {
 
         SecureRandom random = new SecureRandom(); // prevents collisions, if UID isn't unique
         byte[] salt = new byte[64];
         random.nextBytes(salt);
-        KeySpec spec = new PBEKeySpec(UID.toCharArray(), salt, 65536, 512);
+        KeySpec spec = new PBEKeySpec(uid.toCharArray(), salt, 65536, 512);
 
         try {
             SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
