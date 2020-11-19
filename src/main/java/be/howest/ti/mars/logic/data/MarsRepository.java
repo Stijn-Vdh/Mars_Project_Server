@@ -4,6 +4,7 @@ import be.howest.ti.mars.logic.controller.*;
 import be.howest.ti.mars.logic.controller.converters.ShortEndpoint;
 import be.howest.ti.mars.logic.controller.exceptions.DatabaseException;
 import be.howest.ti.mars.logic.controller.exceptions.EndpointException;
+import be.howest.ti.mars.logic.controller.exceptions.EntityNotFoundException;
 import io.vertx.core.json.JsonObject;
 
 import java.sql.Connection;
@@ -18,11 +19,14 @@ import java.util.logging.Logger;
 
 public class MarsRepository implements MarsRepoInt {
     private static final Logger logger = Logger.getLogger(MarsRepository.class.getName());
+    //SQL queries
     private static final String SQL_GET_ENDPOINT = "SELECT * FROM ENDPOINTS WHERE ID = ?";
+    private static final String SQL_GET_REPORT_SECTIONS = "SELECT * FROM REPORT_SECTIONS";
+    private static final String SQL_GET_ENDPOINTS = "SELECT * FROM \"ENDPOINTS\"";
+    private static final String SQL_INSERT_REPORTS = "INSERT INTO REPORTS (accountId, reportSection, body) VALUES(?, ?, ?)";
 
     @Override
     public Set<ShortEndpoint> getEndpoints() { //will be short for the meantime
-        String SQL_GET_ENDPOINTS = "SELECT * FROM ENDPOINTS";
         Set<ShortEndpoint> endpoints = new HashSet<>();
 
         try (
@@ -348,7 +352,7 @@ public class MarsRepository implements MarsRepoInt {
 
     @Override
     public void addDelivery(Delivery delivery) {
-        String SQL_ADD_DELIVERY = "INSERT INTO DELIVERIES(deliveryType, `from`, destination, `date`) VALUES(?,?,?,?)";
+        String SQL_ADD_DELIVERY = "INSERT INTO DELIVERIES(deliveryType, \"FROM\", destination, \"DATE\") VALUES(?,?,?,?)"; //fixed show up as error in intellij
         try (Connection con = MarsConnection.getConnection();
              PreparedStatement stmt = con.prepareStatement(SQL_ADD_DELIVERY)) {
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
@@ -551,5 +555,40 @@ public class MarsRepository implements MarsRepoInt {
         }
     }
 
+    @Override
+    public Set<String> getReportSections() {
+        Set<String> sections = new HashSet<>();
 
+        try (
+                Connection con = MarsConnection.getConnection();
+                PreparedStatement stmt = con.prepareStatement(SQL_GET_REPORT_SECTIONS)
+        ) {
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    sections.add(rs.getString("name"));
+                }
+            }
+        } catch (SQLException throwable) {
+            throwable.printStackTrace();
+            throw new DatabaseException("Cannot retrieve report sections");
+        }
+        return sections;
+    }
+
+    @Override
+    public void addReport(BaseAccount baseAccount, String section, String body) {
+        if (!getReportSections().contains(section)) throw new EntityNotFoundException("Section (" + section + ") does not currently exist");
+
+        try (Connection con = MarsConnection.getConnection();
+             PreparedStatement stmt = con.prepareStatement(SQL_INSERT_REPORTS)) {
+
+            stmt.setString(1, baseAccount.getUsername());
+            stmt.setString(2, section);
+            stmt.setString(3, body);
+            stmt.execute();
+        } catch (SQLException throwable) {
+            throwable.printStackTrace();
+            throw new DatabaseException("Can't add report");
+        }
+    }
 }

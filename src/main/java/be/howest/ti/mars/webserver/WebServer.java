@@ -2,6 +2,7 @@ package be.howest.ti.mars.webserver;
 
 import be.howest.ti.mars.logic.controller.exceptions.AuthenticationException;
 import be.howest.ti.mars.logic.controller.exceptions.EndpointException;
+import be.howest.ti.mars.logic.controller.exceptions.EntityNotFoundException;
 import be.howest.ti.mars.logic.controller.exceptions.UsernameException;
 import be.howest.ti.mars.logic.data.MarsConnection;
 import io.vertx.config.ConfigRetriever;
@@ -158,6 +159,8 @@ public class WebServer extends AbstractVerticle {
         addRouteWithCtxFunction(factory, "shareLocation", bridge::shareLocation);
         addRouteWithCtxFunction(factory, "stopSharingLocation", bridge::stopSharingLocation);
         addRouteWithCtxFunction(factory, "getEndpoint", bridge::getEndpoint);
+        addRouteWithCtxFunction(factory, "report", bridge::addReport);
+        addRouteWithCtxFunction(factory, "reportSections", bridge::getReportSections);
         addRouteWithCtxFunction(factory, "favoriteEndpoint", bridge::favoriteEndpoint);
         addRouteWithCtxFunction(factory, "unfavoriteEndpoint", bridge::unfavoriteEndpoint);
     }
@@ -220,7 +223,8 @@ public class WebServer extends AbstractVerticle {
             throw ctx.failure();
         } catch (UsernameException | AuthenticationException | EndpointException ex) {
             replyWithFailure(ctx, 402, ex.getMessage(), ex.getMessage());
-
+        } catch (EntityNotFoundException ex) {
+            replyWithFailure(ctx, 422, "Entity couldn't not be found", ex.getMessage());
         } catch (Throwable throwable) {
             LOGGER.log(Level.SEVERE, () -> String.format("onInternalServerError at %s", ctx.request().absoluteURI()));
             throwable.printStackTrace();

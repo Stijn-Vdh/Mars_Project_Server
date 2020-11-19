@@ -1,8 +1,7 @@
 openapi: 3.0.0
 info:
   title: 'MTTS'
-  description: 'Through an easily accessible network of travel tubes we want to  allow goods
-                    and people to travel more efficiently than ever.'
+  description: 'Through an easily accessible network of travel tubes we want to  allow goods and people to travel more efficiently than ever.'
   version: 0.1.0 # semantic versioning, in develop starts at 0.1.0, when in production move to 1.0.0
 servers:
   - url: http://localhost:8080/
@@ -28,9 +27,21 @@ components:
           type: integer
       example:
         id: 10
-        name: Jerry Park
-
-
+        name: "Jerry Park"
+    report:
+      description: a report object contains the section name and the description
+      type: object
+      properties:
+        section:
+          type: string
+        description:
+          type: string
+      required:
+        - section
+        - description
+      example:
+        section: "Other"
+        description: "My pod doesnt arrive"
 paths:
   /api/message:
     get:
@@ -45,7 +56,6 @@ paths:
                 type: string
       tags:
         - test
-
   /api/login: #login or logout
     summary: login/logout
     description: login/logout
@@ -653,3 +663,46 @@ paths:
           description: Server is up and running
         default:
           description: Something is wrong
+  /api/report:
+    description: you can report any problem you  have with the system.
+    post:
+      operationId: report
+      tags:
+        - report
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/report'
+      responses:
+        '200':
+          description: Report has been received.
+        '401':
+          description: Authorization information is missing or invalid.
+        '403':
+          description: Forbidden!
+        '422':
+          description: Section doesn't exist!
+        '500':
+          description: Unexpected error.
+      security:
+        - Token: [ ]
+  /api/report/sections:
+    description: receive the sections that you can report problems for
+    get:
+      operationId: reportSections
+      tags:
+        - report
+      responses:
+        '200':
+          description: returns the sections name in an array
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                example: [ "Other", "Account information" ]
+        '500':
+          description: Unexpected error.

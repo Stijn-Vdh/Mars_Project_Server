@@ -59,11 +59,11 @@ public class MarsConnection {
         try {
             addSubscriptionsToDb();
             addEndpointsDB();
+            addReportSectionsDB();
         } catch (SQLException | IOException ex) {
             logger.log(Level.WARNING, ex.getMessage(), ex);
 
         }
-
     }
 
 
@@ -96,5 +96,9 @@ public class MarsConnection {
 
     private static void addEndpointsDB() throws IOException, SQLException {
         executeScript("src/main/resources/h2/initEndpointsDB.sql");
+    }
+
+    private static void addReportSectionsDB() throws IOException, SQLException {
+        executeScript("src/main/resources/h2/initReportSectionsDB.sql");
     }
 }
