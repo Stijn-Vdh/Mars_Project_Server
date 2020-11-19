@@ -27,7 +27,7 @@ public class MarsRepository implements MarsRepoInt {
 
         try (
                 Connection con = MarsConnection.getConnection();
-                PreparedStatement stmt = con.prepareStatement(SQL_GET_ENDPOINTS);
+                PreparedStatement stmt = con.prepareStatement(SQL_GET_ENDPOINTS)
         ) {
 
             try (ResultSet rs = stmt.executeQuery()) {
@@ -56,7 +56,7 @@ public class MarsRepository implements MarsRepoInt {
     @Override
     public Endpoint getEndpoint(int id) {
         try (Connection con = MarsConnection.getConnection();
-             PreparedStatement stmt = con.prepareStatement(SQL_GET_ENDPOINT);
+             PreparedStatement stmt = con.prepareStatement(SQL_GET_ENDPOINT)
         ) {
             stmt.setInt(1, id);
             try (ResultSet rs = stmt.executeQuery()) {
@@ -69,6 +69,116 @@ public class MarsRepository implements MarsRepoInt {
         } catch (SQLException throwables) {
             throwables.printStackTrace();
             throw new DatabaseException("Cannot retrieve endpoint with id: " + id + "!");
+        }
+    }
+
+    private boolean endpointExists(int id) {
+        Set<ShortEndpoint> endpoints = new HashSet<>(getEndpoints());
+        for (ShortEndpoint endpoint: endpoints) {
+            if (endpoint.getId() == id){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public void favoriteEndpoint_Users(UserAccount user, int id) {
+
+        if (endpointExists(id)){
+            String SQL_INSERT_FAVORITE = "insert into favorite_trips_users(userName, endpointID) values(?,?)";
+
+            try (Connection con = MarsConnection.getConnection();
+                 PreparedStatement stmt = con.prepareStatement(SQL_INSERT_FAVORITE)) {
+                stmt.setString(1, user.getUsername());
+                stmt.setInt(2, id);
+                stmt.executeUpdate();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+                throw new DatabaseException("Could not favorite endpoint.");
+            }
+        }else{
+            throw new EndpointException("Endpoint does not exist");
+        }
+    }
+
+    @Override
+    public void favoriteEndpoint_Businesses(BusinessAccount business, int id) {
+        if (endpointExists(id)){
+            String SQL_DELETE_FAVORITE = "delete from favorite_trips_businesses where businessName=? and endpointID=?";
+
+            try (Connection con = MarsConnection.getConnection();
+                 PreparedStatement stmt = con.prepareStatement(SQL_DELETE_FAVORITE)) {
+                stmt.setString(1, business.getUsername());
+                stmt.setInt(2, id);
+                stmt.executeUpdate();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+                throw new DatabaseException("Could not unfavorite endpoint.");
+            }
+        }
+    }
+
+    private boolean isFavored(boolean userAcc, int id){
+        String SQL_GET_FAVORITES = "select * from ";
+
+        if (userAcc){
+            SQL_GET_FAVORITES += "favorite_trips_users";
+        }else{
+            SQL_GET_FAVORITES += "favorite_trips_businesses";
+        }
+
+        try(Connection con = MarsConnection.getConnection();
+            PreparedStatement stmt = con.prepareStatement(SQL_GET_FAVORITES);
+            ResultSet res = stmt.executeQuery()){
+
+            while (res.next()){
+                if (res.getInt("endpointID") == id){
+                    return true;
+                }
+            }
+            return false;
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            throw new DatabaseException("Cannot get all favorites.");
+        }
+    }
+
+    @Override
+    public void unFavoriteEndpoint_Users(UserAccount user, int id) {
+        if (isFavored(true,id)){
+            String SQL_DELETE_FAVORITE = "Delete from favorite_trips_users where userName=? and endpointID=?";
+
+            try (Connection con = MarsConnection.getConnection();
+                 PreparedStatement stmt = con.prepareStatement(SQL_DELETE_FAVORITE)) {
+                stmt.setString(1, user.getUsername());
+                stmt.setInt(2, id);
+                stmt.executeUpdate();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+                throw new DatabaseException("Could not unfavorite endpoint.");
+            }
+        }else{
+            throw new EndpointException("This endpoint is not favoured");
+        }
+    }
+
+    @Override
+    public void unFavoriteEndpoint_Businesses(BusinessAccount business, int id) {
+        if (isFavored(false,id)){
+            String SQL_INSERT_FAVORITE = "insert into favorite_trips_businesses(businessName, endpointID) values(?,?)";
+
+            try (Connection con = MarsConnection.getConnection();
+                 PreparedStatement stmt = con.prepareStatement(SQL_INSERT_FAVORITE)) {
+                stmt.setString(1, business.getUsername());
+                stmt.setInt(2, id);
+                stmt.executeUpdate();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+                throw new DatabaseException("Could not favorite endpoint.");
+            }
+        }else{
+            throw new EndpointException("This endpoint is not favoured");
         }
     }
 

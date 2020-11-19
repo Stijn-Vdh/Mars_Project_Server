@@ -158,6 +158,8 @@ public class WebServer extends AbstractVerticle {
         addRouteWithCtxFunction(factory, "shareLocation", bridge::shareLocation);
         addRouteWithCtxFunction(factory, "stopSharingLocation", bridge::stopSharingLocation);
         addRouteWithCtxFunction(factory, "getEndpoint", bridge::getEndpoint);
+        addRouteWithCtxFunction(factory, "favoriteEndpoint", bridge::favoriteEndpoint);
+        addRouteWithCtxFunction(factory, "unfavoriteEndpoint", bridge::unfavoriteEndpoint);
     }
 
     private void addRouteWithCtxFunction(OpenAPI3RouterFactory factory, String operationId, Function<RoutingContext, Object> bridgeFunction) {
