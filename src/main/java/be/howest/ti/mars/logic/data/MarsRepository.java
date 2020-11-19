@@ -1,13 +1,9 @@
 package be.howest.ti.mars.logic.data;
 
-import be.howest.ti.mars.logic.controller.BaseAccount;
-import be.howest.ti.mars.logic.controller.BusinessAccount;
-import be.howest.ti.mars.logic.controller.Delivery;
-import be.howest.ti.mars.logic.controller.Subscription;
-import be.howest.ti.mars.logic.controller.UserAccount;
+import be.howest.ti.mars.logic.controller.*;
 import be.howest.ti.mars.logic.controller.converters.ShortEndpoint;
 import be.howest.ti.mars.logic.controller.exceptions.DatabaseException;
-import io.vertx.core.json.Json;
+import be.howest.ti.mars.logic.controller.exceptions.EndpointException;
 import io.vertx.core.json.JsonObject;
 
 import java.sql.Connection;
@@ -22,6 +18,7 @@ import java.util.logging.Logger;
 
 public class MarsRepository implements MarsRepoInt {
     private static final Logger logger = Logger.getLogger(MarsRepository.class.getName());
+    private static final String SQL_GET_ENDPOINT = "SELECT * FROM ENDPOINTS WHERE ID = ?";
 
     @Override
     public Set<ShortEndpoint> getEndpoints() { //will be short for the meantime
@@ -53,6 +50,25 @@ public class MarsRepository implements MarsRepoInt {
             stmt.setString(1, endpoint);
         } catch (SQLException ex) {
             throw new DatabaseException("Can't add endpoint!");
+        }
+    }
+
+    @Override
+    public Endpoint getEndpoint(int id) {
+        try (Connection con = MarsConnection.getConnection();
+             PreparedStatement stmt = con.prepareStatement(SQL_GET_ENDPOINT);
+        ) {
+            stmt.setInt(1, id);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return new Endpoint(id, rs.getString("name"), true, "todo", false);
+                } else {
+                    throw new EndpointException("Endpoint with ID (" + id + ") doesn't exist!");
+                }
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+            throw new DatabaseException("Cannot retrieve endpoint with id: " + id + "!");
         }
     }
 

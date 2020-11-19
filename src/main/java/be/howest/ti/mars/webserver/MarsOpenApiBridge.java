@@ -169,4 +169,8 @@ class MarsOpenApiBridge {
     public Object getEndpoints(RoutingContext routingContext) {
         return controller.getRepo().getEndpoints();
     }
+
+    public Object getEndpoint(RoutingContext routingContext) {
+        return controller.getRepo().getEndpoint(Integer.parseInt(routingContext.request().getParam("id")));
+    }
 }

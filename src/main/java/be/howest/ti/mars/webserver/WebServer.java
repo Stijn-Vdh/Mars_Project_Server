@@ -1,6 +1,7 @@
 package be.howest.ti.mars.webserver;
 
 import be.howest.ti.mars.logic.controller.exceptions.AuthenticationException;
+import be.howest.ti.mars.logic.controller.exceptions.EndpointException;
 import be.howest.ti.mars.logic.controller.exceptions.UsernameException;
 import be.howest.ti.mars.logic.data.MarsConnection;
 import io.vertx.config.ConfigRetriever;
@@ -156,7 +157,7 @@ public class WebServer extends AbstractVerticle {
         addRouteWithCtxFunction(factory, "viewSubscriptionInfo", bridge::viewSubscriptionInfo);
         addRouteWithCtxFunction(factory, "shareLocation", bridge::shareLocation);
         addRouteWithCtxFunction(factory, "stopSharingLocation", bridge::stopSharingLocation);
-
+        addRouteWithCtxFunction(factory, "getEndpoint", bridge::getEndpoint);
     }
 
     private void addRouteWithCtxFunction(OpenAPI3RouterFactory factory, String operationId, Function<RoutingContext, Object> bridgeFunction) {
@@ -215,7 +216,7 @@ public class WebServer extends AbstractVerticle {
     private void onInternalServerError(RoutingContext ctx) {
         try {
             throw ctx.failure();
-        } catch (UsernameException | AuthenticationException ex) {
+        } catch (UsernameException | AuthenticationException | EndpointException ex) {
             replyWithFailure(ctx, 402, ex.getMessage(), ex.getMessage());
 
         } catch (Throwable throwable) {

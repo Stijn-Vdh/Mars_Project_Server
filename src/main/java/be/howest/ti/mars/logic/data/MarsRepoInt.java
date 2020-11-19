@@ -1,10 +1,6 @@
 package be.howest.ti.mars.logic.data;
 
-import be.howest.ti.mars.logic.controller.BaseAccount;
-import be.howest.ti.mars.logic.controller.BusinessAccount;
-import be.howest.ti.mars.logic.controller.Delivery;
-import be.howest.ti.mars.logic.controller.Subscription;
-import be.howest.ti.mars.logic.controller.UserAccount;
+import be.howest.ti.mars.logic.controller.*;
 import io.vertx.core.json.JsonObject;
 import be.howest.ti.mars.logic.controller.converters.ShortEndpoint;
 
@@ -12,8 +8,10 @@ import java.util.List;
 import java.util.Set;
 
 public interface MarsRepoInt {
+    // Endpoint
     Set<ShortEndpoint> getEndpoints();
     void addEndpoint(String endpoint);
+    Endpoint getEndpoint(int id);
 
     // User
     void addUser(UserAccount user);

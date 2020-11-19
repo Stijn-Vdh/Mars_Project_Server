@@ -182,7 +182,7 @@ paths:
           description: Internal error.
       security:
         - Token: [ ]
-  /api/user/shareLocation:
+  /api/shareLocation:
     description: Share your location with your friends.
     post:
       operationId: shareLocation
@@ -412,6 +412,7 @@ paths:
     get:
       tags:
         - endpoint
+      operationId: getEndpoint
       parameters:
         - in: path
           name: id
@@ -437,6 +438,8 @@ paths:
                     type: string
                   privateEndpoint:
                     type: boolean
+        '402':
+          description: There is no endpoint matching that id.
         '500':
           description: Unexpected error.
 
