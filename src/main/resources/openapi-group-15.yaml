@@ -479,7 +479,7 @@ paths:
         '200':
           description: Ok
         '402':
-          description: There is no endpoint matching that id.
+          description: The endpoint you try to un favorite is not favoured.
         '500':
           description: Unexpected error.
       security:
