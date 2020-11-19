@@ -15,6 +15,8 @@ public interface MarsRepoInt {
     void favoriteEndpoint_Users(UserAccount user, int id);
     void favoriteEndpoint_Businesses(BusinessAccount business, int id);
 
+    List<JsonObject> getFavoriteTrips(UserAccount acc);
+
     void unFavoriteEndpoint_Users(UserAccount user, int id);
 
     void unFavoriteEndpoint_Businesses(BusinessAccount business, int id);
@@ -56,6 +58,8 @@ public interface MarsRepoInt {
     List<Subscription> getSubscriptions();
 
     Subscription getSubscriptionInfo(String businessName);
+
+    Subscription getSubscription(BaseAccount acc, boolean userAcc);
 
     void buySubscription(UserAccount user, String subscription);
 

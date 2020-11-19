@@ -145,18 +145,10 @@ public class MarsRepository implements MarsRepoInt {
         }
     }
 
-    public List<JsonObject> getFavoriteTrips(boolean userAcc, UserAccount acc){
-        String SQL_GET_FAVORITES = "select * from ";
-        String name;
+    @Override
+    public List<JsonObject> getFavoriteTrips(UserAccount acc){
+        String SQL_GET_FAVORITES = "select * from favorite_trips_users f join endpoints e on f.endpointID = e.id where userName=?";
         List<JsonObject> favoTrips = new LinkedList<>();
-
-        if (userAcc){
-            SQL_GET_FAVORITES += "favorite_trips_users where userName=?";
-            name = "userName";
-        }else{
-            SQL_GET_FAVORITES += "favorite_trips_businesses";
-            name = "businessName";
-        }
 
         try(Connection con = MarsConnection.getConnection();
             PreparedStatement stmt = con.prepareStatement(SQL_GET_FAVORITES)){
@@ -164,12 +156,12 @@ public class MarsRepository implements MarsRepoInt {
             stmt.setString(1, acc.getUsername());
             ResultSet rs = stmt.executeQuery();
             while (rs.next()){
-                String accName = rs.getString(name);
-                int endpointID = rs.getInt("homeEndpointID");
+                String endpointName = rs.getString("name");
+                int endpointID = rs.getInt("endpointID");
 
                 JsonObject json = new JsonObject();
 
-                json.put("name:", accName);
+                json.put("endpointName:", endpointName);
                 json.put("id", endpointID);
 
                 favoTrips.add(json);
@@ -455,6 +447,46 @@ public class MarsRepository implements MarsRepoInt {
             throw new DatabaseException("Can't get subscription information.");
         }
     }
+
+    @Override
+    public Subscription getSubscription(BaseAccount acc, boolean userAcc){
+        String SQL_SELECT_SUBSCRIPTION_INFO = "select * from ";
+        if (userAcc){
+            SQL_SELECT_SUBSCRIPTION_INFO += "USERS_subscriptions us join subscriptions s on us.subscriptionID = s.subscriptionID" +
+                                            " where userName=?";
+        }else{
+            SQL_SELECT_SUBSCRIPTION_INFO += "BUSINESSES_SUBSCRIPTIONS bs join subscriptions s on bs.subscriptionID = " +
+                                            "s.subscriptionID where businessName=?";
+        }
+
+        try (Connection con = MarsConnection.getConnection();
+             PreparedStatement stmt = con.prepareStatement(SQL_SELECT_SUBSCRIPTION_INFO)
+        ) {
+            stmt.setString(1, acc.getUsername());
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()){
+                int subID = rs.getInt("subscriptionID");
+                String subName = rs.getString("name");
+                if (!userAcc){
+                     int remainingSmallPods = rs.getInt("remainingSmallPods_ThisDay");
+                     int remainingLargePods = rs.getInt("remainingLargePods_ThisDay");
+                     int amountOfDedicatedPods = rs.getInt("amountOfDedicatedPods");
+                    return new Subscription(subID, subName, remainingSmallPods, remainingLargePods, amountOfDedicatedPods);
+                }
+                return new Subscription(subID, subName);
+            }else{
+                return null;
+            }
+
+        } catch (SQLException ex) {
+            logger.log(Level.WARNING, ex.getMessage(), ex);
+            ex.printStackTrace();
+            throw new DatabaseException("Can't get subscription information.");
+        }
+
+
+    }
+
 
     @Override
     public void buySubscription(UserAccount user, String subscription) {

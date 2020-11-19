@@ -158,13 +158,28 @@ public class MarsController {
     }
 
     public Object getAccountInformation(UserAccount acc) {
+        JsonObject accInformation = new JsonObject();
         List<JsonObject> friends =  new LinkedList<>(repo.getFriends(acc));
-        List<JsonObject> favoTrips = new LinkedList<>(repo.getFavoriteTrips(true, acc));
+        List<JsonObject> favoTrips = new LinkedList<>(repo.getFavoriteTrips(acc));
+        Subscription sub = repo.getSubscription(acc, true);
 
-        return null;
+        accInformation.put("name:", acc.getUsername());
+        accInformation.put("homeAddr:", acc.getAddress());
+        accInformation.put("homeEndpoint:", acc.getHomeAddressEndpoint());
+        accInformation.put("subscription:", sub != null ? sub.getName() : "No subscription");
+        accInformation.put("friends:", friends);
+        accInformation.put("favouriteEndpoints:", favoTrips);
+
+        return accInformation;
     }
     public Object getAccountInformation(BusinessAccount acc) {
+        JsonObject accInformation = new JsonObject();
+        Subscription sub = repo.getSubscription(acc, false);
 
+        accInformation.put("name:", acc.getUsername());
+        accInformation.put("homeAddr:", acc.getAddress());
+        accInformation.put("homeEndpoint:", acc.getHomeAddressEndpoint());
+        accInformation.put("subscription:", sub != null ? sub.getName() : "No subscription");
         return null;
     }
 }
