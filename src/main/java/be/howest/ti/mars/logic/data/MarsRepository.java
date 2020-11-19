@@ -7,15 +7,13 @@ import be.howest.ti.mars.logic.controller.exceptions.EndpointException;
 import be.howest.ti.mars.logic.controller.exceptions.EntityNotFoundException;
 import io.vertx.core.json.JsonObject;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -35,7 +33,8 @@ public class MarsRepository implements MarsRepoInt {
     private static final String SQL_ADD_DELIVERY = "INSERT INTO DELIVERIES(deliveryType, \"FROM\", destination, \"DATE\") VALUES(?,?,?,?)";
     private static final String SQL_SELECT_ALL_SUBSCRIPTIONS = "select * from subscriptions";
     private static final String SQL_INSERT_TRAVEL = "INSERT INTO TRIPS(from,destination,date,podType) values(?,?,?,?)";
-    private static final String SQL_SELECT_TRAVEL = "SELECT * FROM TRIPS";
+    private static final String SQL_INSERT_TRAVEL_USERS = "INSERT INTO TRIPS_USERS(tripID,userName) values(?,?)";
+    private static final String SQL_SELECT_TRAVEL_HISTORY = "SELECT * FROM TRIPS_USERS tu join TRIPS t on tu.tripID = t.tripID where userName=?";
 
     // Endpoints
     @Override
@@ -343,16 +342,19 @@ public class MarsRepository implements MarsRepoInt {
 
     // Travel / Delivery (packages)
     @Override
-    public Set<Trip> getTrips() {
+    public Set<Trip> getTravelHistory(UserAccount acc) {
         Set<Trip> trips = new HashSet<>();
         try (Connection conn = MarsConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(SQL_SELECT_TRAVEL);
-             ResultSet rs = stmt.executeQuery()) {
-            int from = rs.getInt("from");
-            int destination = rs.getInt("destination");
-            String podType = rs.getString("podType");
-            String date = rs.getString("date");
-            trips.add(new Trip(from,destination,podType,date));
+             PreparedStatement stmt = conn.prepareStatement(SQL_SELECT_TRAVEL_HISTORY)) {
+            stmt.setString(1, acc.getUsername());
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                int from = rs.getInt("from");
+                int destination = rs.getInt("destination");
+                String podType = rs.getString("podType");
+                String date = rs.getString("date");
+                trips.add(new Trip(from, destination, podType, date));
+            }
         } catch (SQLException ex) {
             LOGGER.log(Level.WARNING, ex.getMessage(), ex);
             throw new DatabaseException("Could not add trip to DB");
@@ -362,17 +364,36 @@ public class MarsRepository implements MarsRepoInt {
 
     @Override
     public void travel(UserAccount user, Trip trip) {
+        int generatedID;
         try (Connection conn = MarsConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(SQL_INSERT_TRAVEL)) {
+             PreparedStatement stmt = conn.prepareStatement(SQL_INSERT_TRAVEL, Statement.RETURN_GENERATED_KEYS)) {
+
             stmt.setInt(1, trip.getFrom());
             stmt.setInt(2, trip.getDestination());
             stmt.setString(3, trip.getDate());
             stmt.setString(4, trip.getPodType());
             stmt.executeUpdate();
+
+            try (ResultSet rs = stmt.getGeneratedKeys()) {
+                rs.next();
+                generatedID = rs.getInt(1);
+            }
+
         } catch (SQLException ex) {
             LOGGER.log(Level.WARNING, ex.getMessage(), ex);
             throw new DatabaseException("Could not add trip to DB");
         }
+
+        try (Connection conn = MarsConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(SQL_INSERT_TRAVEL_USERS)) {
+            stmt.setInt(1, generatedID);
+            stmt.setString(2, user.getUsername());
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
+            throw new DatabaseException("Could not add trip to DB");
+        }
+
     }
 
     @Override

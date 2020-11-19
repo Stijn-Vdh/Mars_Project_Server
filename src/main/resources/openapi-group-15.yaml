@@ -634,6 +634,37 @@ paths:
         - Token: [ ]
   /api/travel:
     description: travel from one point to another.
+    get:
+      summary: Get travel history.
+      operationId: getTravelHistory
+      tags:
+        - travel
+      responses:
+        '200':
+          description: Successfully obtained your travel history.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tripID:
+                    type: integer
+                  from:
+                      type: integer
+                  destination:
+                      type: integer
+                  date:
+                    type: string
+                  podType:
+                    type: string
+        '401':
+          description: Authorization information is missing or invalid.
+        '403':
+            description: Forbidden!
+        '500':
+            description: Unexpected error.
+      security:
+        - Token: [ User ]
     post:
       summary: Travel from one point to another.
       operationId: travel

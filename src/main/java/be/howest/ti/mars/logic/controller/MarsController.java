@@ -172,4 +172,8 @@ public class MarsController {
         Trip trip = new Trip(from, destination, type, dtf.format(now));
         repo.travel(acc, trip);
     }
+
+    public Object getTravelHistory(UserAccount acc) {
+        return repo.getTravelHistory(acc);
+    }
 }

@@ -40,7 +40,7 @@ public interface MarsRepoInt {
     void addBusiness(BusinessAccount business);
 
     // Travel
-    Set<Trip> getTrips(); // todo:  String moet trip class worden
+    Set<Trip> getTravelHistory(UserAccount acc);
 
     void travel(UserAccount user, Trip trip);
 

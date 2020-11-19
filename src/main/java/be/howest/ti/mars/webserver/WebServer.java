@@ -166,6 +166,7 @@ public class WebServer extends AbstractVerticle {
         addRouteWithCtxFunction(factory, "unfavoriteEndpoint", bridge::unFavoriteEndpoint);
         addRouteWithCtxFunction(factory, "getAccountInformation", bridge::getAccountInformation);
         addRouteWithCtxFunction(factory, "travel", bridge::travel);
+        addRouteWithCtxFunction(factory, "getTravelHistory", bridge::getTravelHistory);
     }
 
     private void addRouteWithCtxFunction(OpenAPI3RouterFactory factory, String operationId, Function<RoutingContext, Object> bridgeFunction) {

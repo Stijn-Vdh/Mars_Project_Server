@@ -156,6 +156,9 @@ class MarsOpenApiBridge {
 
         return "Your pod is on route to your location.";
     }
+    public Object getTravelHistory(RoutingContext ctx) {
+        return controller.getTravelHistory(getUserAccount(ctx));
+    }
 
     //------------------------------------------------------------------------------------------------------------------
 
@@ -201,6 +204,7 @@ class MarsOpenApiBridge {
             return header.substring(AUTHORIZATION_TOKEN_PREFIX.length());
         }
     }
+
 
 
 }
