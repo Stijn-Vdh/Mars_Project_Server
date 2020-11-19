@@ -55,7 +55,7 @@ create table trips
     tripID      int auto_increment,
     `from`      varchar(125),
     destination varchar(125),
-    `date`      date,
+    `dateTime`      varchar(50),
     podType     varchar(20),
     CONSTRAINT tripID_pk PRIMARY KEY (tripID)
 );
@@ -63,9 +63,9 @@ create table trips
 create table trips_users
 (
     tripID int not null,
-    userID int not null,
+    userName varchar(50) not null,
     CONSTRAINT tripID_fk FOREIGN KEY (tripID) REFERENCES trips (tripID),
-    CONSTRAINT t_userID_fk FOREIGN KEY (userID) REFERENCES users (name)
+    CONSTRAINT t_userName_fk FOREIGN KEY (username) REFERENCES users (name)
 );
 
 create table deliveries
