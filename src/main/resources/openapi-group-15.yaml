@@ -660,11 +660,5 @@ paths:
                 items:
                   type: string
                 example: [ "Other", "Account information" ]
-        '401':
-          description: Authorization information is missing or invalid.
-        '403':
-          description: Forbidden!
         '500':
           description: Unexpected error.
-      security:
-        - Token: [ ]
