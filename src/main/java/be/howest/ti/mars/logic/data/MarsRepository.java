@@ -4,7 +4,6 @@ import be.howest.ti.mars.logic.controller.*;
 import be.howest.ti.mars.logic.controller.converters.ShortEndpoint;
 import be.howest.ti.mars.logic.controller.exceptions.DatabaseException;
 import be.howest.ti.mars.logic.controller.exceptions.EndpointException;
-import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
 
 import java.sql.Connection;
@@ -21,6 +20,7 @@ public class MarsRepository implements MarsRepoInt {
     private static final Logger logger = Logger.getLogger(MarsRepository.class.getName());
     private static final String SQL_GET_ENDPOINT = "SELECT * FROM ENDPOINTS WHERE ID = ?";
 
+    // Endpoints
     @Override
     public Set<ShortEndpoint> getEndpoints() { //will be short for the meantime
         String SQL_GET_ENDPOINTS = "SELECT * FROM ENDPOINTS";
@@ -67,8 +67,8 @@ public class MarsRepository implements MarsRepoInt {
                     throw new EndpointException("Endpoint with ID (" + id + ") doesn't exist!");
                 }
             }
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
             throw new DatabaseException("Cannot retrieve endpoint with id: " + id + "!");
         }
     }
@@ -111,7 +111,7 @@ public class MarsRepository implements MarsRepoInt {
     @Override
     public List<JsonObject> getFavoriteTrips(BaseAccount acc, boolean userAcc){
         String SQL_GET_FAVORITES = "select * from ";
-        List<JsonObject> favoTrips = new LinkedList<>();
+        List<JsonObject> favouredTrips = new LinkedList<>();
         if (userAcc){
             SQL_GET_FAVORITES += "favorite_trips_users f join endpoints e on f.endpointID = e.id where userName=?";
         }else {
@@ -132,14 +132,14 @@ public class MarsRepository implements MarsRepoInt {
                 json.put("endpointName:", endpointName);
                 json.put("id", endpointID);
 
-                favoTrips.add(json);
+                favouredTrips.add(json);
             }
 
         } catch (SQLException ex) {
             ex.printStackTrace();
             throw new DatabaseException("Cannot get all favorites.");
         }
-        return favoTrips;
+        return favouredTrips;
     }
 
     @Override
@@ -169,13 +169,13 @@ public class MarsRepository implements MarsRepoInt {
 
     @Override
     public void unFavoriteEndpoint(BaseAccount acc, int id, boolean userAcc) {
-        String SQL_DELETE_FAVORITE = "Delete from ";
+        String SQL_DELETE_FAVORITE;
 
         if (userAcc){
-            SQL_DELETE_FAVORITE += "favorite_trips_users where userName=? and endpointID=?";
+            SQL_DELETE_FAVORITE = "Delete from favorite_trips_users where userName=? and endpointID=?";
 
         }else{
-            SQL_DELETE_FAVORITE += "favorite_trips_businesses where businessName=? and endpointID=?";
+            SQL_DELETE_FAVORITE = "Delete from favorite_trips_businesses where businessName=? and endpointID=?";
         }
 
         if (isFavored(userAcc,id)){
@@ -186,13 +186,14 @@ public class MarsRepository implements MarsRepoInt {
                 stmt.executeUpdate();
             } catch (SQLException ex) {
                 ex.printStackTrace();
-                throw new DatabaseException("Could not unfavorite endpoint.");
+                throw new DatabaseException("Could not un favorite endpoint.");
             }
         }else{
             throw new EndpointException("This endpoint is not favoured");
         }
     }
 
+    // System
     @Override
     public void addUser(UserAccount user) {
         String SQL_INSERT_USER =
@@ -228,6 +229,7 @@ public class MarsRepository implements MarsRepoInt {
 
     }
 
+    // User
     @Override
     public void shareLocation(UserAccount user) {
         String SQL_UPDATE_USER = "UPDATE USERS SET sharesLocation=? where name=?";
@@ -262,6 +264,7 @@ public class MarsRepository implements MarsRepoInt {
         }
     }
 
+    // Friends"
     @Override
     public List<JsonObject> getFriends(UserAccount user) {
         List<JsonObject> friends = new LinkedList<>();
@@ -326,11 +329,13 @@ public class MarsRepository implements MarsRepoInt {
 
     }
 
+    // ?
     @Override
     public Set<String> getBusinesses() {
         return null;
     }
 
+    // Travel / Delivery (packages)
     @Override
     public Set<String> getTrips() {
         return null;
@@ -358,7 +363,7 @@ public class MarsRepository implements MarsRepoInt {
 
     @Override
     public void addDelivery(Delivery delivery) {
-        String SQL_ADD_DELIVERY = "INSERT INTO DELIVERIES(deliveryType, `from`, destination, `date`) VALUES(?,?,?,?)";
+        String SQL_ADD_DELIVERY = "INSERT INTO DELIVERIES(deliveryType, \"FROM\", destination, \"DATE\") VALUES(?,?,?,?)";
         try (Connection con = MarsConnection.getConnection();
              PreparedStatement stmt = con.prepareStatement(SQL_ADD_DELIVERY)) {
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
@@ -376,7 +381,7 @@ public class MarsRepository implements MarsRepoInt {
         }
     }
 
-
+    // Subscription
     @Override
     public List<Subscription> getSubscriptions() {
         List<Subscription> subscriptions = new LinkedList<>();
@@ -447,17 +452,17 @@ public class MarsRepository implements MarsRepoInt {
                 .filter(sub -> sub.getName().equals(subscription))
                 .mapToInt(Subscription::getId).sum();
 
-        String SQL_UPDATE_ACC = "UPDATE ";
+        String SQL_UPDATE_ACC;
         String SQL_INSERT_ACC_SUB = "INSERT INTO ";
         int remainingSmallPods_thisDay = 0;
         int remainingLargePods_thisDay = 0;
         int dedicatedPods = 0;
         // init variables for different type of accounts
         if (userAcc){
-            SQL_UPDATE_ACC += "USERS SET subscriptionID=? where name=?";
+            SQL_UPDATE_ACC = "UPDATE USERS SET subscriptionID=? where name=?";
             SQL_INSERT_ACC_SUB += "USERS_SUBSCRIPTIONS(userName,subscriptionID) values(?,?)";
         }else {
-            SQL_UPDATE_ACC += "BUSINESSES SET subscriptionID=? where name=?";
+            SQL_UPDATE_ACC = "UPDATE BUSINESSES SET subscriptionID=? where name=?";
             SQL_INSERT_ACC_SUB += "BUSINESSES_SUBSCRIPTIONS(businessName,subscriptionID, remainingSmallPods_thisDay," +
                                     "remainingLargePods_thisDay, amountOfDedicatedPods) values(?,?,?,?,?)";
 
@@ -471,13 +476,13 @@ public class MarsRepository implements MarsRepoInt {
                     .filter(sub -> sub.getName().equals(subscription))
                     .mapToInt(Subscription::getRemainingLargePods_thisDay)
                     .findAny()
-                    .orElse(0);;
+                    .orElse(0);
 
             dedicatedPods = getSubscriptions().stream()
                     .filter(sub -> sub.getName().equals(subscription))
                     .mapToInt(Subscription::getAmountOfDedicatedPods)
                     .findAny()
-                    .orElse(0);;
+                    .orElse(0);
         }
         // update acc table
         try (Connection con = MarsConnection.getConnection();
@@ -509,15 +514,15 @@ public class MarsRepository implements MarsRepoInt {
     @Override
     public void stopSubscription(BaseAccount acc, boolean userAcc) {
         int idNoDescriptionActive = 0;
-        String SQL_UPDATE_BUSINESS = "UPDATE ";
-        String SQL_DELETE_BUSINESS_SUB = "DELETE FROM ";
+        String SQL_UPDATE_BUSINESS;
+        String SQL_DELETE_BUSINESS_SUB;
 
         if (userAcc){
-            SQL_UPDATE_BUSINESS += "USERS SET subscriptionID=? where name=?";
-            SQL_DELETE_BUSINESS_SUB += "USERS_SUBSCRIPTIONS where userName=?";
+            SQL_UPDATE_BUSINESS = "UPDATE USERS SET subscriptionID=? where name=?";
+            SQL_DELETE_BUSINESS_SUB = "DELETE FROM USERS_SUBSCRIPTIONS where userName=?";
         }else{
-            SQL_UPDATE_BUSINESS += "BUSINESSES SET subscriptionID=? where name=?";
-            SQL_DELETE_BUSINESS_SUB += "BUSINESSES_SUBSCRIPTIONS where businessName=?";
+            SQL_UPDATE_BUSINESS = "UPDATE BUSINESSES SET subscriptionID=? where name=?";
+            SQL_DELETE_BUSINESS_SUB = "DELETE FROM BUSINESSES_SUBSCRIPTIONS where businessName=?";
         }
 
         try (Connection con = MarsConnection.getConnection();
