@@ -108,6 +108,7 @@ public class WebServer extends AbstractVerticle {
     }
 
     private Router createRequestHandler(OpenAPI3RouterFactory factory) {
+        final String token = "Token";
         // Log all incoming requests
         factory.addGlobalHandler(LoggerHandler.create(LoggerFormat.TINY));
 
@@ -121,13 +122,13 @@ public class WebServer extends AbstractVerticle {
         factory.addGlobalHandler(createCorsHandler());
 
         // Verify the user token for all secured operations
-        factory.addSecuritySchemaScopeValidator("Token", "User", this::verifyUserAccountToken);
+        factory.addSecuritySchemaScopeValidator(token, "User", this::verifyUserAccountToken);
 
         // Verify the business token for all secured operations
-        factory.addSecuritySchemaScopeValidator("Token", "Business", this::verifyBusinessAccountToken);
+        factory.addSecuritySchemaScopeValidator(token, "Business", this::verifyBusinessAccountToken);
 
         // Both tokens are allowed
-        factory.addSecurityHandler("Token", this::verifyAccountToken);
+        factory.addSecurityHandler(token, this::verifyAccountToken);
 
         // Add all route handlers
         addRoutes(factory);
@@ -226,9 +227,9 @@ public class WebServer extends AbstractVerticle {
             replyWithFailure(ctx, 402, ex.getMessage(), ex.getMessage());
         } catch (EntityNotFoundException ex) {
             replyWithFailure(ctx, 422, "Entity couldn't not be found", ex.getMessage());
-        } catch (Throwable throwable) {
+        } catch (Throwable ex) {
             LOGGER.log(Level.SEVERE, () -> String.format("onInternalServerError at %s", ctx.request().absoluteURI()));
-            throwable.printStackTrace();
+            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
             replyWithFailure(ctx, 500, "Internal Server Error", null);
         }
     }

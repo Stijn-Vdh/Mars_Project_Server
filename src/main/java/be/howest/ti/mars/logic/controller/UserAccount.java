@@ -2,7 +2,6 @@ package be.howest.ti.mars.logic.controller;
 
 import be.howest.ti.mars.logic.controller.security.AccountToken;
 import be.howest.ti.mars.logic.data.MarsRepository;
-import java.util.List;
 
 public class UserAccount extends BaseAccount {
     MarsRepository repo = new MarsRepository();
@@ -38,4 +37,5 @@ public class UserAccount extends BaseAccount {
     public boolean isSharesLocation(){
         return sharesLocation;
     }
+
 }
