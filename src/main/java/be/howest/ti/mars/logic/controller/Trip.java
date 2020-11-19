@@ -6,13 +6,13 @@ public class Trip {
     private final int from;
     private final int destination;
     private final String podType;
-    private final String date;
+    private final String dateTime;
 
     public Trip(int from, int destination, String podType, String date) {
         this.from = from;
         this.destination = destination;
         this.podType = podType;
-        this.date = date;
+        this.dateTime = date;
     }
 
     public int getFrom() {
@@ -27,8 +27,8 @@ public class Trip {
         return podType;
     }
 
-    public String getDate() {
-        return date;
+    public String getDateTime() {
+        return dateTime;
     }
 
     @Override
@@ -37,6 +37,7 @@ public class Trip {
                 "from=" + from +
                 ", destination=" + destination +
                 ", podType='" + podType + '\'' +
+                ", dateTime='" + dateTime + '\'' +
                 '}';
     }
 

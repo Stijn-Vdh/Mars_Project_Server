@@ -30,7 +30,7 @@ public class MarsRepository implements MarsRepoInt {
     private static final String SQL_DELETE_FRIEND = "DELETE FROM friends WHERE friendName=? AND userName=?";
     private static final String SQL_ADD_DELIVERY = "INSERT INTO DELIVERIES(deliveryType, \"FROM\", destination, \"DATE\") VALUES(?,?,?,?)";
     private static final String SQL_SELECT_ALL_SUBSCRIPTIONS = "select * from subscriptions";
-    private static final String SQL_INSERT_TRAVEL = "INSERT INTO TRIPS(\"FROM\",destination,\"DATE\",podType) values(?,?,?,?)";
+    private static final String SQL_INSERT_TRAVEL = "INSERT INTO TRIPS(\"FROM\",destination,\"DATETIME\",podType) values(?,?,?,?)";
     private static final String SQL_INSERT_TRAVEL_USERS = "INSERT INTO TRIPS_USERS(tripID,userName) values(?,?)";
     private static final String SQL_SELECT_TRAVEL_HISTORY = "SELECT * FROM TRIPS_USERS tu join TRIPS t on tu.tripID = t.tripID where tu.userName=?";
 
@@ -351,7 +351,7 @@ public class MarsRepository implements MarsRepoInt {
                     int from = rs.getInt("from");
                     int destination = rs.getInt("destination");
                     String podType = rs.getString("podType");
-                    String date = rs.getString("date");
+                    String date = rs.getString("dateTime");
                     trips.add(new Trip(from, destination, podType, date));
                 }
 
@@ -371,7 +371,7 @@ public class MarsRepository implements MarsRepoInt {
 
             stmt.setInt(1, trip.getFrom());
             stmt.setInt(2, trip.getDestination());
-            stmt.setString(3, trip.getDate());
+            stmt.setString(3, trip.getDateTime());
             stmt.setString(4, trip.getPodType());
             stmt.executeUpdate();
 
