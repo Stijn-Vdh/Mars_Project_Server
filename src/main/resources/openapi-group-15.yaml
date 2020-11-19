@@ -640,6 +640,8 @@ paths:
           description: Authorization information is missing or invalid.
         '403':
           description: Forbidden!
+        '422':
+          description: Section doesn't exist!
         '500':
           description: Unexpected error.
       security:

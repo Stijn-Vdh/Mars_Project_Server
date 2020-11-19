@@ -4,6 +4,7 @@ import be.howest.ti.mars.logic.controller.*;
 import be.howest.ti.mars.logic.controller.converters.ShortEndpoint;
 import be.howest.ti.mars.logic.controller.exceptions.DatabaseException;
 import be.howest.ti.mars.logic.controller.exceptions.EndpointException;
+import be.howest.ti.mars.logic.controller.exceptions.EntityNotFoundException;
 import io.vertx.core.json.JsonObject;
 
 import java.sql.Connection;
@@ -466,11 +467,13 @@ public class MarsRepository implements MarsRepoInt {
 
     @Override
     public void addReport(BaseAccount baseAccount, String section, String body) {
+        if (!getReportSections().contains(section)) throw new EntityNotFoundException("Section (" + section + ") does not currently exist");
+
         try (Connection con = MarsConnection.getConnection();
              PreparedStatement stmt = con.prepareStatement(SQL_INSERT_REPORTS)) {
 
             stmt.setString(1, baseAccount.getUsername());
-            stmt.setString(2,section);
+            stmt.setString(2, section);
             stmt.setString(3, body);
             stmt.execute();
         } catch (SQLException throwable) {
