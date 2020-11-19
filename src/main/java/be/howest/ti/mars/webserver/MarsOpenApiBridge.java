@@ -124,6 +124,10 @@ class MarsOpenApiBridge {
         return controller.getRepo().getEndpoints();
     }
 
+    public Object getEndpoint(RoutingContext ctx) {
+        return controller.getRepo().getEndpoint(Integer.parseInt(ctx.request().getParam("id")));
+    }
+
     public Object favoriteEndpoint(RoutingContext ctx) {
         int endpointID = Integer.parseInt(ctx.request().getParam("id"));
         if (verifyUserAccountToken(ctx)){
