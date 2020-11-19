@@ -149,7 +149,7 @@ public class MarsRepository implements MarsRepoInt {
         if (userAcc){
             SQL_INSERT_FAVORITE += "favorite_trips_users(userName, endpointID) values(?,?)";
         }else{
-            SQL_INSERT_FAVORITE = "favorite_trips_businesses(businessName, endpointID) values(?,?)";
+            SQL_INSERT_FAVORITE += "favorite_trips_businesses(businessName, endpointID) values(?,?)";
         }
 
         if (endpointExists(id)){
@@ -178,8 +178,7 @@ public class MarsRepository implements MarsRepoInt {
             SQL_DELETE_FAVORITE += "favorite_trips_businesses where businessName=? and endpointID=?";
         }
 
-        if (isFavored(true,id)){
-
+        if (isFavored(userAcc,id)){
             try (Connection con = MarsConnection.getConnection();
                  PreparedStatement stmt = con.prepareStatement(SQL_DELETE_FAVORITE)) {
                 stmt.setString(1, acc.getUsername());

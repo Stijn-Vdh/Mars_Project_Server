@@ -3,18 +3,21 @@ package be.howest.ti.mars.logic.data;
 import be.howest.ti.mars.logic.controller.*;
 import io.vertx.core.json.JsonObject;
 import be.howest.ti.mars.logic.controller.converters.ShortEndpoint;
-
 import java.util.List;
 import java.util.Set;
 
 public interface MarsRepoInt {
     // Endpoint
     Set<ShortEndpoint> getEndpoints();
-    void addEndpoint(String endpoint);
-    Endpoint getEndpoint(int id);
-    void favoriteEndpoint(BaseAccount acc, int id, boolean userAcc);
 
+    void addEndpoint(String endpoint);
+
+    Endpoint getEndpoint(int id);
+
+    // Favorite
     List<JsonObject> getFavoriteTrips(BaseAccount acc, boolean userAcc);
+
+    void favoriteEndpoint(BaseAccount acc, int id, boolean userAcc);
 
     void unFavoriteEndpoint(BaseAccount user, int id, boolean userAcc);
 
