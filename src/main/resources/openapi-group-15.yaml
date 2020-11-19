@@ -625,6 +625,8 @@ paths:
     description: you can report any problem you  have with the system.
     post:
       operationId: report
+      tags:
+        - report
       requestBody:
         required: true
         content:
@@ -646,6 +648,8 @@ paths:
     description: receive the sections that you can report problems for
     get:
       operationId: reportSections
+      tags:
+        - report
       responses:
         '200':
           description: returns the sections name in an array

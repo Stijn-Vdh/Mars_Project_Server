@@ -116,4 +116,3 @@ CREATE TABLE `reports`
     PRIMARY KEY (`id`),
     CONSTRAINT `fk_report_section` FOREIGN KEY (`reportSection`) REFERENCES `report_sections` (`Name`)
 );
-

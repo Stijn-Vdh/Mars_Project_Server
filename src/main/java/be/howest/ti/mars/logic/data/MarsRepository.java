@@ -18,16 +18,18 @@ import java.util.logging.Logger;
 
 public class MarsRepository implements MarsRepoInt {
     private static final Logger logger = Logger.getLogger(MarsRepository.class.getName());
+    //SQL queries
     private static final String SQL_GET_ENDPOINT = "SELECT * FROM ENDPOINTS WHERE ID = ?";
+    private static final String SQL_GET_REPORT_SECTIONS = "SELECT * FROM REPORT_SECTIONS";
+    private static final String SQL_GET_ENDPOINTS = "SELECT * FROM \"ENDPOINTS\"";
 
     @Override
     public Set<ShortEndpoint> getEndpoints() { //will be short for the meantime
-        String SQL_GET_ENDPOINTS = "SELECT * FROM ENDPOINTS";
         Set<ShortEndpoint> endpoints = new HashSet<>();
 
         try (
                 Connection con = MarsConnection.getConnection();
-                PreparedStatement stmt = con.prepareStatement(SQL_GET_ENDPOINTS);
+                PreparedStatement stmt = con.prepareStatement(SQL_GET_ENDPOINTS)
         ) {
 
             try (ResultSet rs = stmt.executeQuery()) {
@@ -56,7 +58,7 @@ public class MarsRepository implements MarsRepoInt {
     @Override
     public Endpoint getEndpoint(int id) {
         try (Connection con = MarsConnection.getConnection();
-             PreparedStatement stmt = con.prepareStatement(SQL_GET_ENDPOINT);
+             PreparedStatement stmt = con.prepareStatement(SQL_GET_ENDPOINT)
         ) {
             stmt.setInt(1, id);
             try (ResultSet rs = stmt.executeQuery()) {
@@ -238,7 +240,7 @@ public class MarsRepository implements MarsRepoInt {
 
     @Override
     public void addDelivery(Delivery delivery) {
-        String SQL_ADD_DELIVERY = "INSERT INTO DELIVERIES(deliveryType, `from`, destination, `date`) VALUES(?,?,?,?)";
+        String SQL_ADD_DELIVERY = "INSERT INTO DELIVERIES(deliveryType, \"FROM\", destination, \"DATE\") VALUES(?,?,?,?)"; //fixed show up as error in intellij
         try (Connection con = MarsConnection.getConnection();
              PreparedStatement stmt = con.prepareStatement(SQL_ADD_DELIVERY)) {
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
@@ -439,6 +441,31 @@ public class MarsRepository implements MarsRepoInt {
             logger.log(Level.WARNING, ex.getMessage(), ex);
             throw new DatabaseException("Can't stop a subscription.");
         }
+    }
+
+    @Override
+    public Set<String> getReportSections() {
+        Set<String> sections = new HashSet<>();
+
+        try (
+                Connection con = MarsConnection.getConnection();
+                PreparedStatement stmt = con.prepareStatement(SQL_GET_REPORT_SECTIONS)
+        ) {
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    sections.add(rs.getString("name"));
+                }
+            }
+        } catch (SQLException throwable) {
+            throwable.printStackTrace();
+            throw new DatabaseException("Cannot retrieve endpoints");
+        }
+        return sections;
+    }
+
+    @Override
+    public void addReport(BaseAccount baseAccount, String section, String body) {
+
     }
 
 
