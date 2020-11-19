@@ -101,5 +101,13 @@ create table friends
     userName   varchar(50) not null,
     CONSTRAINT f_userName_fk FOREIGN KEY (userName) REFERENCES users (name),
     CONSTRAINT friendName_fk FOREIGN KEY (friendName) REFERENCES users (name)
-)
+);
+
+create table favorite_trips
+(
+    userName varchar(50) not null,
+    endpointID int not null,
+    constraint f_userNameF_fk FOREIGN KEY (userName) REFERENCES users (name),
+    constraint endpointID_fk FOREIGN KEY (endpointID) REFERENCES endpoints (id)
+);
 
