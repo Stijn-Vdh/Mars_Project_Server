@@ -2,8 +2,6 @@ package be.howest.ti.mars.logic.data;
 
 import be.howest.ti.mars.logic.controller.*;
 import be.howest.ti.mars.logic.controller.converters.ShortEndpoint;
-import io.vertx.core.json.JsonObject;
-
 
 import java.util.List;
 import java.util.Set;
@@ -33,12 +31,13 @@ public interface MarsRepository {
 
 
     // Friends
-    List<JsonObject> getFriends(UserAccount user);
+    Set<UserAccount> getFriends(UserAccount user, Set<UserAccount> users);
 
     void beFriend(String name, String friendName);
 
     void removeFriend(String name, String friendName);
 
+    // business
     void addBusiness(BusinessAccount business);
 
     // Travel

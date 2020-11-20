@@ -1,6 +1,7 @@
 package be.howest.ti.mars.logic.controller;
 
 import be.howest.ti.mars.logic.controller.security.AccountToken;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.util.Objects;
 
@@ -31,6 +32,7 @@ public abstract class BaseAccount {
         return homeAddressEndpoint;
     }
 
+    @JsonIgnore
     public String getPassword() {
         return password;
     }
@@ -42,7 +44,7 @@ public abstract class BaseAccount {
     public void setAccountToken(AccountToken accountToken) {
         this.accountToken = accountToken;
     }
-
+    @JsonIgnore
     public AccountToken getAccountToken() {
         return accountToken;
     }

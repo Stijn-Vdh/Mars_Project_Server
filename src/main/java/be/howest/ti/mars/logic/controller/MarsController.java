@@ -6,13 +6,13 @@ import be.howest.ti.mars.logic.controller.security.AccountToken;
 import be.howest.ti.mars.logic.data.MarsH2Repository;
 import io.vertx.core.json.JsonObject;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -60,7 +60,7 @@ public class MarsController {
             Delivery delivery = new Delivery(deliveryType, from, destination, convertedDate.toString());
             repo.addDelivery(delivery);
         } catch (ParseException ex) {
-            LOGGER.log(Level.WARNING, ex.getMessage(),ex);
+            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
         }
     }
 
@@ -87,24 +87,22 @@ public class MarsController {
         return repo.getSubscriptions();
     }
 
-    public Object getFriends(UserAccount user) {
-        return repo.getFriends(user);
+    public Object addFriend(UserAccount user, String friendName) { // TODO: 20-11-2020 validation friend exists and not already friended
+        if (userAccounts.contains(new UserAccount(friendName))){
+                user.addFriend(friendName);
+        }else {
+            //throw error
+        }
+        return "You just added a friend called:" + friendName;
     }
 
-    public Object addFriend(UserAccount user, String friendName) {
-        UserAccount friendAccount = userAccounts.stream()
-                .filter(acc -> acc.getUsername().equals(friendName))
-                .findAny().orElse(null);
-        assert friendAccount != null;
-        return "You just added a friend called:" + user.addFriend(friendAccount).getUsername();
-    }
-
-    public Object removeFriend(UserAccount user, String friendName) {
-        UserAccount friendAccount = userAccounts.stream()
-                .filter(acc -> acc.getUsername().equals(friendName))
-                .findAny().orElse(null);
-        assert friendAccount != null;
-        return "You just removed a friend called:" + user.removeFriend(friendAccount).getUsername();
+    public Object removeFriend(UserAccount user, String friendName) { // TODO: 20-11-2020 validation friend exists and not friended
+        if (userAccounts.contains(new UserAccount(friendName))){
+            user.removeFriend(friendName);
+        }else {
+            //throw error
+        }
+        return "You just removed a friend called:" + friendName;
     }
 
     public Object buySubscription(BaseAccount acc, String subscriptionName, boolean userAcc) {
@@ -133,22 +131,21 @@ public class MarsController {
         repo.unFavoriteEndpoint(acc, id);
     }
 
-    public Object getAccountInformation(BaseAccount acc, boolean userAcc){
+    public Object getAccountInformation(BaseAccount acc, boolean userAcc) {
         JsonObject accInformation = new JsonObject();
         accInformation.put("name:", acc.getUsername());
         accInformation.put("homeAddress:", acc.getAddress());
         accInformation.put("homeEndpoint:", acc.getHomeAddressEndpoint());
         accInformation.put("favouriteEndpoints:", repo.getFavoriteEndpoints(acc));
 
-        if (userAcc){
-            List<JsonObject> friends =  new LinkedList<>(repo.getFriends((UserAccount) acc));
+        if (userAcc) {
             Set<Trip> trips = new HashSet<>(repo.getTravelHistory((UserAccount) acc));
             Subscription sub = repo.getSubscription(acc, true);
 
             accInformation.put("subscription:", sub != null ? sub.getName() : "No subscription");
-            accInformation.put("friends:", friends);
+            accInformation.put("friends:", repo.getFriends((UserAccount) acc, userAccounts));
             accInformation.put("travelHistory:", trips);
-        }else{
+        } else {
             Subscription sub = repo.getSubscription(acc, false);
             accInformation.put("subscription:", sub != null ? sub.getName() : "No subscription");
         }

@@ -1,7 +1,7 @@
 package be.howest.ti.mars.logic.controller;
 
-import be.howest.ti.mars.logic.data.MarsRepository;
 import be.howest.ti.mars.logic.data.MarsH2Repository;
+import be.howest.ti.mars.logic.data.MarsRepository;
 
 public class UserAccount extends BaseAccount {
     MarsRepository repo = new MarsH2Repository();
@@ -31,14 +31,12 @@ public class UserAccount extends BaseAccount {
         this.displayName = displayName;
     }
 
-    public UserAccount addFriend(UserAccount friend) {
-        repo.beFriend(getUsername(), friend.getUsername());
-        return friend;
+    public void addFriend(String friendName) {
+        repo.beFriend(getUsername(), friendName);
     }
 
-    public UserAccount removeFriend(UserAccount friend) {
-        repo.removeFriend(getUsername(), friend.getUsername());
-        return friend;
+    public void removeFriend(String friendName) {
+        repo.removeFriend(getUsername(), friendName);
     }
 
     public boolean isSharesLocation() {

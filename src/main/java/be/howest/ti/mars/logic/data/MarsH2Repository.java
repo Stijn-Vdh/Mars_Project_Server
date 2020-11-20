@@ -5,7 +5,6 @@ import be.howest.ti.mars.logic.controller.converters.ShortEndpoint;
 import be.howest.ti.mars.logic.controller.exceptions.DatabaseException;
 import be.howest.ti.mars.logic.controller.exceptions.EndpointException;
 import be.howest.ti.mars.logic.controller.exceptions.EntityNotFoundException;
-import io.vertx.core.json.JsonObject;
 
 import java.sql.*;
 import java.text.ParseException;
@@ -39,8 +38,8 @@ public class MarsH2Repository implements MarsRepository {
     private static final String SQL_SELECT_FAVORITE_ENDPOINT = "SELECT * FROM favorite_endpoints fe JOIN endpoints e ON fe.endpointid = e.id WHERE accountname = ?";
 
     private static final String SQL_INSERT_ACCOUNT = "INSERT INTO accounts VALUES (?, ?, ?, NULL)";
-    private static final String SQL_INSERT_USER = "INSERT INTO users VALUES (?, default, default, default)";
-    private static final String SQL_INSERT_BUSINESS = "INSERT INTO businesses values (?, default, default, default)";
+    private static final String SQL_INSERT_USER = "INSERT INTO users VALUES (?, ?, default, default)";
+    private static final String SQL_INSERT_BUSINESS = "INSERT INTO businesses VALUES (?, default, default, default)";
 
     // Endpoints
     @Override
@@ -198,6 +197,7 @@ public class MarsH2Repository implements MarsRepository {
              PreparedStatement stmt = con.prepareStatement(SQL_INSERT_USER)) {
             addAccount(user);
             stmt.setString(1, user.getUsername());
+            stmt.setString(2, user.getUsername());
             stmt.executeUpdate();
         } catch (SQLException ex) {
             LOGGER.log(Level.WARNING, ex.getMessage(), ex);
@@ -234,9 +234,8 @@ public class MarsH2Repository implements MarsRepository {
 
     // Friends
     @Override
-    public List<JsonObject> getFriends(UserAccount user) {
-        List<JsonObject> friends = new LinkedList<>();
-
+    public Set<UserAccount> getFriends(UserAccount user, Set<UserAccount> users) { // TODO: 20-11-2020 kinda a hack?
+        Set<UserAccount> friends = new HashSet<>();
 
         try (Connection con = MarsConnection.getConnection();
              PreparedStatement stmt = con.prepareStatement(SQL_SELECT_ALL_FRIENDS)) {
@@ -244,18 +243,12 @@ public class MarsH2Repository implements MarsRepository {
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     String name = rs.getString("friendName");
-                    int endpointID = rs.getInt("homeEndpointID");
-                    String addr = rs.getString("homeAddress");
-                    boolean shares = rs.getBoolean("sharesLocation");
-
-                    JsonObject json = new JsonObject();
-
-                    json.put("name:", name);
-                    json.put("sharesLocation:", shares);
-                    json.put("homeAddress:", addr);
-                    json.put("homeEndpointID:", endpointID);
-
-                    friends.add(json);
+                    friends.add(
+                            users.stream()
+                                    .filter(userAccount -> userAccount.getUsername().equals(name))
+                                    .findAny()
+                                    .orElseThrow()
+                    );
                 }
             }
 
@@ -271,9 +264,9 @@ public class MarsH2Repository implements MarsRepository {
 
         try (Connection con = MarsConnection.getConnection();
              PreparedStatement stmt = con.prepareStatement(SQL_INSERT_FRIEND)) {
+
             stmt.setString(1, friendName);
             stmt.setString(2, name);
-
             stmt.executeUpdate();
         } catch (SQLException ex) {
             LOGGER.log(Level.WARNING, ex.getMessage());
@@ -285,9 +278,9 @@ public class MarsH2Repository implements MarsRepository {
     public void removeFriend(String name, String friendName) {
         try (Connection con = MarsConnection.getConnection();
              PreparedStatement stmt = con.prepareStatement(SQL_DELETE_FRIEND)) {
+
             stmt.setString(1, friendName);
             stmt.setString(2, name);
-
             stmt.executeUpdate();
         } catch (SQLException ex) {
             LOGGER.log(Level.WARNING, ex.getMessage());

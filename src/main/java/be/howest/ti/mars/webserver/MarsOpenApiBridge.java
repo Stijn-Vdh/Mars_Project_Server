@@ -12,6 +12,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 class MarsOpenApiBridge {
@@ -72,8 +73,10 @@ class MarsOpenApiBridge {
     }
 
     public Object viewFriends(RoutingContext ctx) {
-        UserAccount user = getUserAccount(ctx);
-        return controller.getFriends(user);
+        return controller.getRepo().getFriends(getUserAccount(ctx), controller.getUserAccounts())
+                .stream()
+                .map(UserAccount::getUsername)
+                .collect(Collectors.toUnmodifiableList());
     }
 
     public Object addFriend(RoutingContext ctx) {
