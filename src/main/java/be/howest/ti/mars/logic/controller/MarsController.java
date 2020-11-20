@@ -6,6 +6,8 @@ import be.howest.ti.mars.logic.controller.security.AccountToken;
 import be.howest.ti.mars.logic.data.MarsRepository;
 import io.vertx.core.json.JsonObject;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -52,7 +54,7 @@ public class MarsController {
     }
 
     public void createDelivery(String deliveryType, int from, int destination, String date) {
-        Date convertedDate = null;
+        Date convertedDate;
         try {
             convertedDate = new SimpleDateFormat("dd-MM-yyyy").parse(date);
             Delivery delivery = new Delivery(deliveryType, from, destination, convertedDate.toString());
@@ -61,7 +63,6 @@ public class MarsController {
             LOGGER.log(Level.WARNING, ex.getMessage(),ex);
         }
     }
-
 
     public byte[] login(String name, String password) {
         BaseAccount account = Stream.concat(
@@ -116,7 +117,6 @@ public class MarsController {
         return "We are sorry for you to stop you current subscription.";
     }
 
-
     public Object viewSubscriptionInfo(BusinessAccount businessAccount) {
         return repo.getSubscription(businessAccount, false);
     }
@@ -144,17 +144,19 @@ public class MarsController {
     public Object getAccountInformation(BaseAccount acc, boolean userAcc){
         JsonObject accInformation = new JsonObject();
         accInformation.put("name:", acc.getUsername());
-        accInformation.put("homeAddr:", acc.getAddress());
+        accInformation.put("homeAddress:", acc.getAddress());
         accInformation.put("homeEndpoint:", acc.getHomeAddressEndpoint());
 
         if (userAcc){
             List<JsonObject> friends =  new LinkedList<>(repo.getFriends((UserAccount) acc));
             List<JsonObject> favoTrips = new LinkedList<>(repo.getFavoriteTrips(acc, true));
+            Set<Trip> trips = new HashSet<>(repo.getTravelHistory((UserAccount) acc));
             Subscription sub = repo.getSubscription(acc, true);
 
             accInformation.put("subscription:", sub != null ? sub.getName() : "No subscription");
             accInformation.put("friends:", friends);
             accInformation.put("favouriteEndpoints:", favoTrips);
+            accInformation.put("travelHistory:", trips);
         }else{
             Subscription sub = repo.getSubscription(acc, false);
             List<JsonObject> favoTrips = new LinkedList<>(repo.getFavoriteTrips(acc, false));
@@ -163,5 +165,17 @@ public class MarsController {
         }
 
         return accInformation;
+    }
+
+    public void travel(UserAccount acc, int from, int destination, String type) {
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+        LocalDateTime now = LocalDateTime.now();
+
+        Trip trip = new Trip(from, destination, type, dtf.format(now));
+        repo.travel(acc, trip);
+    }
+
+    public Object getTravelHistory(UserAccount acc) {
+        return repo.getTravelHistory(acc);
     }
 }

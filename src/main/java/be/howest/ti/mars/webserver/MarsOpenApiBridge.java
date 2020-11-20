@@ -128,12 +128,37 @@ class MarsOpenApiBridge {
         return null;
     }
 
-    public Object unfavoriteEndpoint(RoutingContext ctx) {
+    public Object unFavoriteEndpoint(RoutingContext ctx) {
         int endpointID = Integer.parseInt(ctx.request().getParam("id"));
         controller.unFavoriteEndpoint(getAccount(ctx), endpointID, verifyUserAccountToken(ctx));
-        return null;
+        return "Successfully un favoured this endpoint {" + endpointID + "}.";
     }
 
+    public Object addReport(RoutingContext ctx) {
+        JsonObject json = ctx.getBodyAsJson();
+        controller.getRepo().addReport(
+                getAccount(ctx),
+                json.getString("section"),
+                json.getString("description")
+        );
+        return "Report has been received.";
+    }
+
+    public Object getReportSections(RoutingContext ctx) {
+        return controller.getRepo().getReportSections();
+    }
+
+    public Object travel(RoutingContext ctx) {
+        int from = ctx.getBodyAsJson().getInteger("from");
+        int destination = ctx.getBodyAsJson().getInteger("destination");
+        String podType = ctx.getBodyAsJson().getString("podType");
+        controller.travel(getUserAccount(ctx),from, destination, podType);
+
+        return "Your pod is on route to your location.";
+    }
+    public Object getTravelHistory(RoutingContext ctx) {
+        return controller.getTravelHistory(getUserAccount(ctx));
+    }
 
     //------------------------------------------------------------------------------------------------------------------
 
@@ -180,17 +205,6 @@ class MarsOpenApiBridge {
         }
     }
 
-    public Object addReport(RoutingContext ctx) {
-        JsonObject json = ctx.getBodyAsJson();
-        controller.getRepo().addReport(
-                getAccount(ctx),
-                json.getString("section"),
-                json.getString("description")
-        );
-        return "Report has been received.";
-    }
 
-    public Object getReportSections(RoutingContext ctx) {
-        return controller.getRepo().getReportSections();
-    }
+
 }
