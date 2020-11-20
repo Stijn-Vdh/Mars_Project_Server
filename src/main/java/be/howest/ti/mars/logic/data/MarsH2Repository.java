@@ -6,10 +6,12 @@ import be.howest.ti.mars.logic.controller.exceptions.DatabaseException;
 import be.howest.ti.mars.logic.controller.exceptions.EndpointException;
 import be.howest.ti.mars.logic.controller.exceptions.EntityNotFoundException;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -27,11 +29,13 @@ public class MarsH2Repository implements MarsRepository {
     private static final String SQL_SELECT_ALL_FRIENDS = "SELECT * FROM friends f LEFT JOIN users u ON u.name = f.friendName WHERE f.userName=?";
     private static final String SQL_INSERT_FRIEND = "INSERT INTO friends(friendName, userName) VALUES(?,?)";
     private static final String SQL_DELETE_FRIEND = "DELETE FROM friends WHERE friendName=? AND userName=?";
+
     private static final String SQL_ADD_DELIVERY = "INSERT INTO DELIVERIES(deliveryType, \"FROM\", destination, DATE) VALUES(?,?,?,?)";
+
     private static final String SQL_SELECT_ALL_SUBSCRIPTIONS = "SELECT * FROM subscriptions";
-    private static final String SQL_INSERT_TRAVEL = "INSERT INTO TRIPS(\"FROM\",destination,DATETIME,podType) VALUES(?,?,?,?)";
-    private static final String SQL_INSERT_TRAVEL_USERS = "INSERT INTO TRIPS_USERS(tripID,userName) VALUES(?,?)";
-    private static final String SQL_SELECT_TRAVEL_HISTORY = "SELECT * FROM TRIPS_USERS tu JOIN TRIPS t ON tu.tripID = t.tripID WHERE tu.userName=?";
+
+    private static final String SQL_INSERT_TRAVEL = "INSERT INTO TRAVELS VALUES(default, ?, ?, ?, DEFAULT, ?, NULL)";
+    private static final String SQL_SELECT_TRAVEL_HISTORY = "SELECT * FROM TRAVELS t WHERE userName=? ";
     // new
     private static final String SQL_DELETE_FAVORITE_ENDPOINT = "DELETE FROM favorite_endpoints WHERE ACCOUNTNAME=? AND ENDPOINTID=?;";
     private static final String SQL_INSERT_FAVORITE_ENDPOINT = "INSERT INTO favorite_endpoints VALUES (?, ?)";
@@ -289,10 +293,15 @@ public class MarsH2Repository implements MarsRepository {
 
     }
 
+    public ShortEndpoint getShortEndpoint(int id) {
+        Endpoint endpoint = getEndpoint(id);
+        return new ShortEndpoint(endpoint.getId(), endpoint.getName());
+    }
+
     // Travel / Delivery (packages)
     @Override
-    public Set<Trip> getTravelHistory(UserAccount acc) {
-        Set<Trip> trips = new HashSet<>();
+    public Set<Travel> getTravelHistory(UserAccount acc) {
+        Set<Travel> travels = new HashSet<>();
         try (Connection conn = MarsConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(SQL_SELECT_TRAVEL_HISTORY)) {
             stmt.setString(1, acc.getUsername());
@@ -303,49 +312,30 @@ public class MarsH2Repository implements MarsRepository {
                     int destination = rs.getInt("destination");
                     String podType = rs.getString("podType");
                     String date = rs.getString("dateTime");
-                    trips.add(new Trip(from, destination, podType, date));
+                    travels.add(new Travel(getShortEndpoint(from), getShortEndpoint(destination), PodType.valueOf(podType), date));
                 }
-
             }
         } catch (SQLException ex) {
             LOGGER.log(Level.WARNING, ex.getMessage(), ex);
             throw new DatabaseException("Could not add trip to DB.");
         }
-        return trips;
+        return travels;
     }
 
     @Override
-    public void travel(UserAccount user, Trip trip) {
-        int generatedID;
+    public void travel(UserAccount user, Travel travel) {
         try (Connection conn = MarsConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(SQL_INSERT_TRAVEL, Statement.RETURN_GENERATED_KEYS)) {
+             PreparedStatement stmt = conn.prepareStatement(SQL_INSERT_TRAVEL)) {
 
-            stmt.setInt(1, trip.getFrom());
-            stmt.setInt(2, trip.getDestination());
-            stmt.setString(3, trip.getDateTime());
-            stmt.setString(4, trip.getPodType());
-            stmt.executeUpdate();
-
-            try (ResultSet rs = stmt.getGeneratedKeys()) {
-                rs.next();
-                generatedID = rs.getInt(1);
-            }
-
-        } catch (SQLException ex) {
-            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
-            throw new DatabaseException("Could not add trip to DB");
-        }
-
-        try (Connection conn = MarsConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(SQL_INSERT_TRAVEL_USERS)) {
-            stmt.setInt(1, generatedID);
-            stmt.setString(2, user.getUsername());
+            stmt.setInt(1, travel.getFrom().getId());
+            stmt.setInt(2, travel.getDestination().getId());
+            stmt.setString(3, user.getUsername());
+            stmt.setString(4, travel.getPodType().name());
             stmt.executeUpdate();
         } catch (SQLException ex) {
             LOGGER.log(Level.WARNING, ex.getMessage(), ex);
-            throw new DatabaseException("Could not add trip to DB");
+            throw new DatabaseException("Could not add travel to DB");
         }
-
     }
 
     @Override

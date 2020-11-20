@@ -41,9 +41,9 @@ public interface MarsRepository {
     void addBusiness(BusinessAccount business);
 
     // Travel
-    Set<Trip> getTravelHistory(UserAccount acc);
+    Set<Travel> getTravelHistory(UserAccount acc);
 
-    void travel(UserAccount user, Trip trip);
+    void travel(UserAccount user, Travel travel);
 
     void cancelTravel(UserAccount user, int tripID);
 

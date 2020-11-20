@@ -8,8 +8,6 @@ import io.vertx.core.json.JsonObject;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -88,18 +86,18 @@ public class MarsController {
     }
 
     public Object addFriend(UserAccount user, String friendName) { // TODO: 20-11-2020 validation friend exists and not already friended
-        if (userAccounts.contains(new UserAccount(friendName))){
-                user.addFriend(friendName);
-        }else {
+        if (userAccounts.contains(new UserAccount(friendName))) {
+            user.addFriend(friendName);
+        } else {
             //throw error
         }
         return "You just added a friend called:" + friendName;
     }
 
     public Object removeFriend(UserAccount user, String friendName) { // TODO: 20-11-2020 validation friend exists and not friended
-        if (userAccounts.contains(new UserAccount(friendName))){
+        if (userAccounts.contains(new UserAccount(friendName))) {
             user.removeFriend(friendName);
-        }else {
+        } else {
             //throw error
         }
         return "You just removed a friend called:" + friendName;
@@ -131,7 +129,7 @@ public class MarsController {
         repo.unFavoriteEndpoint(acc, id);
     }
 
-    public Object getAccountInformation(BaseAccount acc, boolean userAcc) {
+    public Object getAccountInformation(BaseAccount acc, boolean userAcc) { // TODO: 20-11-2020 missing shareLocation
         JsonObject accInformation = new JsonObject();
         accInformation.put("name:", acc.getUsername());
         accInformation.put("homeAddress:", acc.getAddress());
@@ -139,26 +137,21 @@ public class MarsController {
         accInformation.put("favouriteEndpoints:", repo.getFavoriteEndpoints(acc));
 
         if (userAcc) {
-            Set<Trip> trips = new HashSet<>(repo.getTravelHistory((UserAccount) acc));
-            Subscription sub = repo.getSubscription(acc, true);
-
-            accInformation.put("subscription:", sub != null ? sub.getName() : "No subscription");
+          //  Subscription sub = repo.getSubscription(acc, true);
+           // accInformation.put("subscription:", sub != null ? sub.getName() : "No subscription");
             accInformation.put("friends:", repo.getFriends((UserAccount) acc, userAccounts));
-            accInformation.put("travelHistory:", trips);
+            accInformation.put("travelHistory:", repo.getTravelHistory((UserAccount) acc));
+
         } else {
-            Subscription sub = repo.getSubscription(acc, false);
-            accInformation.put("subscription:", sub != null ? sub.getName() : "No subscription");
+          //  Subscription sub = repo.getSubscription(acc, false);
+           // accInformation.put("subscription:", sub != null ? sub.getName() : "No subscription");
         }
 
         return accInformation;
     }
 
-    public void travel(UserAccount acc, int from, int destination, String type) {
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
-        LocalDateTime now = LocalDateTime.now();
-
-        Trip trip = new Trip(from, destination, type, dtf.format(now));
-        repo.travel(acc, trip);
+    public void travel(UserAccount acc, int from, int destination, String type) { // getShortEndpoint also validates if endpoint exists
+        repo.travel(acc, new Travel(repo.getShortEndpoint(from), repo.getShortEndpoint(destination), PodType.valueOf(type), ""));
     }
 
     public Object getTravelHistory(UserAccount acc) {
