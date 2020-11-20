@@ -17,11 +17,11 @@ public interface MarsRepoInt {
     Endpoint getEndpoint(int id);
 
     // Favorite
-    List<JsonObject> getFavoriteTrips(BaseAccount acc, boolean userAcc);
+    Set<ShortEndpoint> getFavoriteEndpoints(BaseAccount acc);
 
-    void favoriteEndpoint(BaseAccount acc, int id, boolean userAcc);
+    void favoriteEndpoint(BaseAccount acc, int id);
 
-    void unFavoriteEndpoint(BaseAccount user, int id, boolean userAcc);
+    void unFavoriteEndpoint(BaseAccount user, int id);
 
     // User
     void addUser(UserAccount user);

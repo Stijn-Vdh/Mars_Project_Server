@@ -133,12 +133,12 @@ public class MarsController {
         repo.stopSharingLocation(userAccount);
     }
 
-    public void favoriteEndpoint(BaseAccount acc, int id, boolean userAcc) {
-        repo.favoriteEndpoint(acc, id, userAcc);
+    public void favoriteEndpoint(BaseAccount acc, int id) {
+        repo.favoriteEndpoint(acc, id);
     }
 
-    public void unFavoriteEndpoint(BaseAccount acc, int id, boolean userAcc) {
-        repo.unFavoriteEndpoint(acc, id, userAcc);
+    public void unFavoriteEndpoint(BaseAccount acc, int id) {
+        repo.unFavoriteEndpoint(acc, id);
     }
 
     public Object getAccountInformation(BaseAccount acc, boolean userAcc){
@@ -146,22 +146,19 @@ public class MarsController {
         accInformation.put("name:", acc.getUsername());
         accInformation.put("homeAddress:", acc.getAddress());
         accInformation.put("homeEndpoint:", acc.getHomeAddressEndpoint());
+        accInformation.put("favouriteEndpoints:", repo.getFavoriteEndpoints(acc));
 
         if (userAcc){
             List<JsonObject> friends =  new LinkedList<>(repo.getFriends((UserAccount) acc));
-            List<JsonObject> favoTrips = new LinkedList<>(repo.getFavoriteTrips(acc, true));
             Set<Trip> trips = new HashSet<>(repo.getTravelHistory((UserAccount) acc));
             Subscription sub = repo.getSubscription(acc, true);
 
             accInformation.put("subscription:", sub != null ? sub.getName() : "No subscription");
             accInformation.put("friends:", friends);
-            accInformation.put("favouriteEndpoints:", favoTrips);
             accInformation.put("travelHistory:", trips);
         }else{
             Subscription sub = repo.getSubscription(acc, false);
-            List<JsonObject> favoTrips = new LinkedList<>(repo.getFavoriteTrips(acc, false));
             accInformation.put("subscription:", sub != null ? sub.getName() : "No subscription");
-            accInformation.put("favouriteEndpoints:", favoTrips);
         }
 
         return accInformation;

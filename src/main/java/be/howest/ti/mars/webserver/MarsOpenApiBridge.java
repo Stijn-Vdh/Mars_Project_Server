@@ -10,6 +10,7 @@ import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
+
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 
@@ -18,6 +19,7 @@ class MarsOpenApiBridge {
     private static final Logger logger = Logger.getLogger(MarsOpenApiBridge.class.getName());
     public static final String AUTHORIZATION_TOKEN_PREFIX = "Bearer ";
     private static final String TOKEN = "token";
+
     MarsOpenApiBridge() {
         this.controller = new MarsController();
     }
@@ -124,14 +126,14 @@ class MarsOpenApiBridge {
 
     public Object favoriteEndpoint(RoutingContext ctx) {
         int endpointID = Integer.parseInt(ctx.request().getParam("id"));
-        controller.favoriteEndpoint(getAccount(ctx), endpointID, verifyUserAccountToken(ctx));
-        return null;
+        controller.favoriteEndpoint(getAccount(ctx), endpointID);
+        return "Successfully favored this endpoint.";
     }
 
     public Object unFavoriteEndpoint(RoutingContext ctx) {
         int endpointID = Integer.parseInt(ctx.request().getParam("id"));
-        controller.unFavoriteEndpoint(getAccount(ctx), endpointID, verifyUserAccountToken(ctx));
-        return "Successfully un favoured this endpoint {" + endpointID + "}.";
+        controller.unFavoriteEndpoint(getAccount(ctx), endpointID);
+        return "Successfully unfavored this endpoint.";
     }
 
     public Object addReport(RoutingContext ctx) {
@@ -152,10 +154,11 @@ class MarsOpenApiBridge {
         int from = ctx.getBodyAsJson().getInteger("from");
         int destination = ctx.getBodyAsJson().getInteger("destination");
         String podType = ctx.getBodyAsJson().getString("podType");
-        controller.travel(getUserAccount(ctx),from, destination, podType);
+        controller.travel(getUserAccount(ctx), from, destination, podType);
 
         return "Your pod is on route to your location.";
     }
+
     public Object getTravelHistory(RoutingContext ctx) {
         return controller.getTravelHistory(getUserAccount(ctx));
     }
@@ -204,7 +207,6 @@ class MarsOpenApiBridge {
             return header.substring(AUTHORIZATION_TOKEN_PREFIX.length());
         }
     }
-
 
 
 }
