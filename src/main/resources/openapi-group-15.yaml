@@ -569,12 +569,15 @@ paths:
               properties:
                 deliveryType:
                   type: string
+                  enum: [ small, large ]
                 from:
                   type: integer
                 destination:
                   type: integer
-                date:
-                  type: string
+              required:
+                - deliveryType
+                - from
+                - destination
       responses:
         '200':
           description: package sent

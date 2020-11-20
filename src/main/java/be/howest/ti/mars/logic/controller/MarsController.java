@@ -6,13 +6,9 @@ import be.howest.ti.mars.logic.controller.security.AccountToken;
 import be.howest.ti.mars.logic.data.MarsH2Repository;
 import io.vertx.core.json.JsonObject;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 
@@ -51,15 +47,8 @@ public class MarsController {
         }
     }
 
-    public void createDelivery(String deliveryType, int from, int destination, String date) {
-        Date convertedDate;
-        try {
-            convertedDate = new SimpleDateFormat("dd-MM-yyyy").parse(date);
-            Delivery delivery = new Delivery(deliveryType, from, destination, convertedDate.toString());
-            repo.addDelivery(delivery);
-        } catch (ParseException ex) {
-            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
-        }
+    public void createDelivery(String deliveryType, int from, int destination, String sender) {
+        repo.addDelivery(new Delivery(DeliveryType.valueOf(deliveryType), repo.getShortEndpoint(from), repo.getShortEndpoint(destination), "", sender));
     }
 
     public byte[] login(String name, String password) {
@@ -137,14 +126,14 @@ public class MarsController {
         accInformation.put("favouriteEndpoints:", repo.getFavoriteEndpoints(acc));
 
         if (userAcc) {
-          //  Subscription sub = repo.getSubscription(acc, true);
-           // accInformation.put("subscription:", sub != null ? sub.getName() : "No subscription");
+            //  Subscription sub = repo.getSubscription(acc, true);
+            // accInformation.put("subscription:", sub != null ? sub.getName() : "No subscription");
             accInformation.put("friends:", repo.getFriends((UserAccount) acc, userAccounts));
             accInformation.put("travelHistory:", repo.getTravelHistory((UserAccount) acc));
 
         } else {
-          //  Subscription sub = repo.getSubscription(acc, false);
-           // accInformation.put("subscription:", sub != null ? sub.getName() : "No subscription");
+            //  Subscription sub = repo.getSubscription(acc, false);
+            // accInformation.put("subscription:", sub != null ? sub.getName() : "No subscription");
         }
 
         return accInformation;

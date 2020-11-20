@@ -10,8 +10,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -30,7 +28,7 @@ public class MarsH2Repository implements MarsRepository {
     private static final String SQL_INSERT_FRIEND = "INSERT INTO friends(friendName, userName) VALUES(?,?)";
     private static final String SQL_DELETE_FRIEND = "DELETE FROM friends WHERE friendName=? AND userName=?";
 
-    private static final String SQL_ADD_DELIVERY = "INSERT INTO DELIVERIES(deliveryType, \"FROM\", destination, DATE) VALUES(?,?,?,?)";
+    private static final String SQL_ADD_DELIVERY = "INSERT INTO DELIVERIES VALUES(DEFAULT, ?, ?, ?, DEFAULT, ?)";
 
     private static final String SQL_SELECT_ALL_SUBSCRIPTIONS = "SELECT * FROM subscriptions";
 
@@ -350,19 +348,15 @@ public class MarsH2Repository implements MarsRepository {
 
     @Override
     public void addDelivery(Delivery delivery) {
-
         try (Connection con = MarsConnection.getConnection();
              PreparedStatement stmt = con.prepareStatement(SQL_ADD_DELIVERY)) {
-            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-            Date parsed = format.parse(delivery.getDate());
-            java.sql.Date sqlDate = new java.sql.Date(parsed.getTime());
 
-            stmt.setString(1, delivery.getDeliveryType());
-            stmt.setInt(2, delivery.getSourceID());
-            stmt.setInt(3, delivery.getDestinationID());
-            stmt.setDate(4, sqlDate);
+            stmt.setString(1, delivery.getDeliveryType().name());
+            stmt.setInt(2, delivery.getSource().getId());
+            stmt.setInt(3, delivery.getDestination().getId());
+            stmt.setString(4, delivery.getSender());
             stmt.executeUpdate();
-        } catch (SQLException | ParseException ex) {
+        } catch (SQLException ex) {
             LOGGER.log(Level.WARNING, ex.getMessage(), ex);
             throw new DatabaseException("Can't add delivery!");
         }

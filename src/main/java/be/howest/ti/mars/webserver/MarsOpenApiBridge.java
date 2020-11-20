@@ -51,9 +51,9 @@ class MarsOpenApiBridge {
         controller.createDelivery(json.getString("deliveryType"),
                 json.getInteger("from"),
                 json.getInteger("destination"),
-                json.getString("date")
+                getAccount(ctx).getUsername()
         );
-        return null;
+        return "Your pod is on route to your location.";
     }
 
     public Object login(RoutingContext ctx) {

@@ -1,49 +1,40 @@
 package be.howest.ti.mars.logic.controller;
-import java.util.Objects;
+
+import be.howest.ti.mars.logic.controller.converters.ShortEndpoint;
 
 public class Delivery {
 
-    private final String deliveryType;
-    private final int sourceID;
-    private final int destinationID;
-    private final String date;
+    private final DeliveryType deliveryType;
+    private final ShortEndpoint source;
+    private final ShortEndpoint destination;
+    private final String dateTime;
+    private final String sender;
 
-    public Delivery(String deliveryType, int source, int destination, String date) {
+    public Delivery(DeliveryType deliveryType, ShortEndpoint source, ShortEndpoint destination, String dateTime, String sender) {
         this.deliveryType = deliveryType;
-        this.sourceID = source;
-        this.destinationID = destination;
-        this.date = date;
+        this.source = source;
+        this.destination = destination;
+        this.dateTime = dateTime;
+        this.sender = sender;
     }
 
-    public String getDeliveryType() {
+    public DeliveryType getDeliveryType() {
         return deliveryType;
     }
 
-    public int getSourceID() {
-        return sourceID;
+    public ShortEndpoint getSource() {
+        return source;
     }
 
-    public int getDestinationID() {
-        return destinationID;
+    public ShortEndpoint getDestination() {
+        return destination;
     }
 
-    public String getDate() {
-        return date;
+    public String getDateTime() {
+        return dateTime;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Delivery delivery = (Delivery) o;
-        return Objects.equals(deliveryType, delivery.deliveryType) &&
-                Objects.equals(sourceID, delivery.sourceID) &&
-                Objects.equals(destinationID, delivery.destinationID) &&
-                Objects.equals(date, delivery.date);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(deliveryType, sourceID, destinationID, date);
+    public String getSender() {
+        return sender;
     }
 }
