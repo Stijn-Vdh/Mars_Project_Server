@@ -50,7 +50,7 @@ CREATE TABLE accounts
 CREATE TABLE users
 (
 	name           varchar(50) PRIMARY KEY,
-	displayName    varchar(100) NOT NULL,
+	displayName    varchar(100) NOT NULL DEFAULT name,
 	sharesLocation boolean DEFAULT FALSE,
 	subscriptionId int     DEFAULT 0, -- different subscription type compared to business!
 	FOREIGN KEY (name) REFERENCES accounts (name),

@@ -9,6 +9,9 @@ import java.util.List;
 import java.util.Set;
 
 public interface MarsRepoInt {
+    // account
+    void addAccount(BaseAccount account);
+
     // Endpoint
     Set<ShortEndpoint> getEndpoints();
 

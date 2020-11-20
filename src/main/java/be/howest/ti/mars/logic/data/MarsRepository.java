@@ -22,7 +22,7 @@ public class MarsRepository implements MarsRepoInt {
     private static final String SQL_GET_ENDPOINT = "SELECT * FROM ENDPOINTS WHERE ID = ?";
     private static final String SQL_GET_REPORT_SECTIONS = "SELECT * FROM REPORT_SECTIONS";
     private static final String SQL_GET_ENDPOINTS = "SELECT * FROM ENDPOINTS";
-    private static final String SQL_INSERT_REPORTS = "INSERT INTO REPORTS (ACCOUNTNAME, reportSection, body) VALUES(?, ?, ?)";
+    private static final String SQL_INSERT_REPORTS = "INSERT INTO REPORTS VALUES(DEFAULT, ?, ?, ?)";
     private static final String SQL_INSERT_ENDPOINT = "INSERT INTO ENDPOINTS(name) VALUES(?)";
     private static final String SQL_UPDATE_USER = "UPDATE USERS SET sharesLocation=? WHERE name=?";
     private static final String SQL_SELECT_ALL_FRIENDS = "SELECT * FROM friends f LEFT JOIN users u ON u.name = f.friendName WHERE f.userName=?";
@@ -37,6 +37,10 @@ public class MarsRepository implements MarsRepoInt {
     private static final String SQL_DELETE_FAVORITE_ENDPOINT = "DELETE FROM favorite_endpoints WHERE ACCOUNTNAME=? AND ENDPOINTID=?;";
     private static final String SQL_INSERT_FAVORITE_ENDPOINT = "INSERT INTO favorite_endpoints VALUES (?, ?)";
     private static final String SQL_SELECT_FAVORITE_ENDPOINT = "SELECT * FROM favorite_endpoints fe JOIN endpoints e ON fe.endpointid = e.id WHERE accountname = ?";
+
+    private static final String SQL_INSERT_ACCOUNT = "INSERT INTO accounts VALUES (?, ?, ?, NULL)";
+    private static final String SQL_INSERT_USER = "INSERT INTO users VALUES (?, default, default, default)";
+    private static final String SQL_INSERT_BUSINESS = "INSERT INTO businesses values (?, default, default, default)";
 
     // Endpoints
     @Override
@@ -172,40 +176,46 @@ public class MarsRepository implements MarsRepoInt {
         }
     }
 
+    @Override
+    public void addAccount(BaseAccount account) {
+        try (Connection con = MarsConnection.getConnection();
+             PreparedStatement stmt = con.prepareStatement(SQL_INSERT_ACCOUNT)) {
+
+            stmt.setString(1, account.getUsername());
+            stmt.setString(2, account.getPassword());
+            stmt.setString(3, account.getAddress());
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
+            throw new DatabaseException("Cannot add account!");
+        }
+    }
+
     // System
     @Override
     public void addUser(UserAccount user) {
-        String sqlInsertUser =
-                "INSERT INTO USERS(homeEndpointID, name, password, homeAddress, sharesLocation, subscriptionID) VALUES(?,?,?,?,?,?)";
         try (Connection con = MarsConnection.getConnection();
-             PreparedStatement stmt = con.prepareStatement(sqlInsertUser)) {
-            stmt.setInt(1, user.getHomeAddressEndpoint());
-            stmt.setString(2, user.getUsername());
-            stmt.setString(3, user.getPassword());
-            stmt.setString(4, user.getAddress());
-            stmt.setBoolean(5, false);
-            stmt.setInt(6, 0);
+             PreparedStatement stmt = con.prepareStatement(SQL_INSERT_USER)) {
+            addAccount(user);
+            stmt.setString(1, user.getUsername());
             stmt.executeUpdate();
         } catch (SQLException ex) {
+            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
             throw new DatabaseException("Cannot add user!");
         }
     }
 
     @Override
     public void addBusiness(BusinessAccount business) {
-        String sqlInsertBusiness = "INSERT INTO BUSINESSES(homeEndpointID, name, password, homeAddress, subscriptionID) VALUES(?,?,?,?,?)";
         try (Connection con = MarsConnection.getConnection();
-             PreparedStatement stmt = con.prepareStatement(sqlInsertBusiness)) {
-            stmt.setInt(1, business.getHomeAddressEndpoint());
-            stmt.setString(2, business.getUsername());
-            stmt.setString(3, business.getPassword());
-            stmt.setString(4, business.getAddress());
-            stmt.setInt(5, 0);
+             PreparedStatement stmt = con.prepareStatement(SQL_INSERT_BUSINESS)) {
+            addAccount(business);
+            stmt.setString(1, business.getUsername());
             stmt.executeUpdate();
         } catch (SQLException ex) {
+            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
             throw new DatabaseException("Cannot add business!");
         }
-
     }
 
     // User
