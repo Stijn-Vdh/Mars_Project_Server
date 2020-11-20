@@ -39,13 +39,13 @@ public class MarsController {
 
     public void createAccount(String name, String password, String address, int endpoint, boolean isBusiness) {
         if (isBusiness) {
-            BusinessAccount account = new BusinessAccount(name, password, endpoint, address, null);
+            BusinessAccount account = new BusinessAccount(name, password, endpoint, address);
             if (userAccounts.contains(new UserAccount(name)) || !businessAccounts.add(account)) { // username exists already
                 throw new UsernameException("Username (" + name + ") is already taken");
             }
             repo.addBusiness(account);
         } else {
-            UserAccount account = new UserAccount(name, password, endpoint, address, null);
+            UserAccount account = new UserAccount(name, password, endpoint, address);
             if (businessAccounts.contains(new BusinessAccount(name)) || !userAccounts.add(account)) { // username exists already
                 throw new UsernameException("Username (" + name + ") is already taken");
             }
@@ -74,13 +74,13 @@ public class MarsController {
         if (account == null) {   // pw and name doesnt match
             throw new AuthenticationException("Credentials does not match!");
         } else {
-            account.setUserToken(new AccountToken(name)); // sets a new token, invalidates previous set token
-            return account.getUserToken().getToken();
+            account.setAccountToken(new AccountToken(name)); // sets a new token, invalidates previous set token
+            return account.getAccountToken().getToken();
         }
     }
 
     public void logout(BaseAccount account) {
-        account.setUserToken(null);
+        account.setAccountToken(null);
     }
 
     public List<Subscription> getSubscriptions() {
