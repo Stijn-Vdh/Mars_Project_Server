@@ -107,12 +107,12 @@ class MarsOpenApiBridge {
     }
 
     public Object shareLocation(RoutingContext ctx) {
-        controller.shareLocation(getUserAccount(ctx));
+        getUserAccount(ctx).setSharesLocation(true);
         return "Now sharing location with friends.";
     }
 
     public Object stopSharingLocation(RoutingContext ctx) {
-        controller.stopSharingLocation(getUserAccount(ctx));
+        getUserAccount(ctx).setSharesLocation(false);
         return "Not sharing location anymore with friends.";
     }
 
@@ -178,7 +178,7 @@ class MarsOpenApiBridge {
         return Stream.concat(
                 controller.getUserAccounts().stream(),
                 controller.getBusinessAccounts().stream())
-                .filter(acc -> accountToken.equals(acc.getUserToken()))
+                .filter(acc -> accountToken.equals(acc.getAccountToken()))
                 .findAny()
                 .orElse(null);
     }
@@ -186,7 +186,7 @@ class MarsOpenApiBridge {
     private UserAccount getUserAccount(RoutingContext ctx) {
         AccountToken accountToken = Json.decodeValue(new JsonObject().put(TOKEN, getBearerToken(ctx)).toString(), AccountToken.class);
         return controller.getUserAccounts().stream()
-                .filter(acc -> accountToken.equals(acc.getUserToken()))
+                .filter(acc -> accountToken.equals(acc.getAccountToken()))
                 .findAny()
                 .orElse(null);
     }
@@ -194,7 +194,7 @@ class MarsOpenApiBridge {
     private BusinessAccount getBusinessAccount(RoutingContext ctx) {
         AccountToken accountToken = Json.decodeValue(new JsonObject().put(TOKEN, getBearerToken(ctx)).toString(), AccountToken.class);
         return controller.getBusinessAccounts().stream()
-                .filter(acc -> accountToken.equals(acc.getUserToken()))
+                .filter(acc -> accountToken.equals(acc.getAccountToken()))
                 .findAny()
                 .orElse(null);
     }

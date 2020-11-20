@@ -1,9 +1,10 @@
 package be.howest.ti.mars.logic.controller;
 
 import be.howest.ti.mars.logic.data.MarsRepository;
+import be.howest.ti.mars.logic.data.MarsH2Repository;
 
 public class UserAccount extends BaseAccount {
-    MarsRepository repo = new MarsRepository();
+    MarsRepository repo = new MarsH2Repository();
     private boolean sharesLocation;
     private String displayName;
 
@@ -22,6 +23,7 @@ public class UserAccount extends BaseAccount {
     }
 
     public void setSharesLocation(boolean sharesLocation) {
+        repo.setShareLocation(this, sharesLocation);
         this.sharesLocation = sharesLocation;
     }
 

@@ -3,7 +3,7 @@ package be.howest.ti.mars.logic.controller;
 import be.howest.ti.mars.logic.controller.exceptions.AuthenticationException;
 import be.howest.ti.mars.logic.controller.exceptions.UsernameException;
 import be.howest.ti.mars.logic.controller.security.AccountToken;
-import be.howest.ti.mars.logic.data.MarsRepository;
+import be.howest.ti.mars.logic.data.MarsH2Repository;
 import io.vertx.core.json.JsonObject;
 
 import java.time.LocalDateTime;
@@ -21,7 +21,7 @@ import java.util.stream.Stream;
 public class MarsController {
     private static final Logger LOGGER = Logger.getLogger(MarsController.class.getName());
     private static final String MOTD = "SmellyEllie";
-    MarsRepository repo = new MarsRepository();
+    MarsH2Repository repo = new MarsH2Repository();
     Set<UserAccount> userAccounts = new HashSet<>();
     Set<BusinessAccount> businessAccounts = new HashSet<>();
 
@@ -121,16 +121,8 @@ public class MarsController {
         return repo.getSubscription(businessAccount, false);
     }
 
-    public MarsRepository getRepo() {
+    public MarsH2Repository getRepo() {
         return repo;
-    }
-
-    public void shareLocation(UserAccount userAccount) {
-        repo.shareLocation(userAccount);
-    }
-
-    public void stopSharingLocation(UserAccount userAccount) {
-        repo.stopSharingLocation(userAccount);
     }
 
     public void favoriteEndpoint(BaseAccount acc, int id) {
