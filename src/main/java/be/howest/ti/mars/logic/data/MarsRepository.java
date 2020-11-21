@@ -2,8 +2,9 @@ package be.howest.ti.mars.logic.data;
 
 import be.howest.ti.mars.logic.controller.*;
 import be.howest.ti.mars.logic.controller.converters.ShortEndpoint;
+import be.howest.ti.mars.logic.controller.subscription.BusinessSubscription;
+import be.howest.ti.mars.logic.controller.subscription.UserSubscription;
 
-import java.util.List;
 import java.util.Set;
 
 public interface MarsRepository {
@@ -53,13 +54,21 @@ public interface MarsRepository {
     void addDelivery(Delivery delivery);
 
     // Subscriptions
-    List<Subscription> getSubscriptions();
+    Set<UserSubscription> getUserSubscriptions(); // TODO: 21-11-2020 add to spec and webserver
 
-    Subscription getSubscription(BaseAccount acc, boolean userAcc);
+    Set<BusinessSubscription> getBusinessSubscriptions(); // TODO: 21-11-2020 add to spec and webserver
 
-    void buySubscription(BaseAccount acc, String subscription, boolean userAcc);
+    UserSubscription getUserSubscription(UserAccount user);
 
-    void stopSubscription(BaseAccount acc, boolean userAcc);
+    BusinessSubscription getBusinessSubscription(BusinessAccount business);
+
+    void buyUserSubscription(UserAccount user, int subscriptionId);
+
+    void buyBusinessSubscription(BusinessAccount business, int subscriptionId);
+
+    void stopUserSubscription(UserAccount user);
+
+    void stopBusinessSubscription(BusinessAccount business);
 
 
     // Report

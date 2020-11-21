@@ -5,18 +5,21 @@ import be.howest.ti.mars.logic.controller.converters.ShortEndpoint;
 import be.howest.ti.mars.logic.controller.exceptions.DatabaseException;
 import be.howest.ti.mars.logic.controller.exceptions.EndpointException;
 import be.howest.ti.mars.logic.controller.exceptions.EntityNotFoundException;
+import be.howest.ti.mars.logic.controller.subscription.BusinessSubscription;
+import be.howest.ti.mars.logic.controller.subscription.UserSubscription;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class MarsH2Repository implements MarsRepository {
     private static final Logger LOGGER = Logger.getLogger(MarsH2Repository.class.getName());
-    private static final String SQL_SELECT_FROM = "select * from ";
     //SQL queries
     private static final String SQL_GET_ENDPOINT = "SELECT * FROM ENDPOINTS WHERE ID = ?";
     private static final String SQL_GET_REPORT_SECTIONS = "SELECT * FROM REPORT_SECTIONS";
@@ -27,21 +30,24 @@ public class MarsH2Repository implements MarsRepository {
     private static final String SQL_SELECT_ALL_FRIENDS = "SELECT * FROM friends f LEFT JOIN users u ON u.name = f.friendName WHERE f.userName=?";
     private static final String SQL_INSERT_FRIEND = "INSERT INTO friends(friendName, userName) VALUES(?,?)";
     private static final String SQL_DELETE_FRIEND = "DELETE FROM friends WHERE friendName=? AND userName=?";
-
     private static final String SQL_ADD_DELIVERY = "INSERT INTO DELIVERIES VALUES(DEFAULT, ?, ?, ?, DEFAULT, ?)";
-
-    private static final String SQL_SELECT_ALL_SUBSCRIPTIONS = "SELECT * FROM subscriptions";
-
     private static final String SQL_INSERT_TRAVEL = "INSERT INTO TRAVELS VALUES(default, ?, ?, ?, DEFAULT, ?, NULL)";
     private static final String SQL_SELECT_TRAVEL_HISTORY = "SELECT * FROM TRAVELS t WHERE userName=? ";
-    // new
+    // favorites
     private static final String SQL_DELETE_FAVORITE_ENDPOINT = "DELETE FROM favorite_endpoints WHERE ACCOUNTNAME=? AND ENDPOINTID=?;";
     private static final String SQL_INSERT_FAVORITE_ENDPOINT = "INSERT INTO favorite_endpoints VALUES (?, ?)";
     private static final String SQL_SELECT_FAVORITE_ENDPOINT = "SELECT * FROM favorite_endpoints fe JOIN endpoints e ON fe.endpointid = e.id WHERE accountname = ?";
-
+    // accounts
     private static final String SQL_INSERT_ACCOUNT = "INSERT INTO accounts VALUES (?, ?, ?, NULL)";
     private static final String SQL_INSERT_USER = "INSERT INTO users VALUES (?, ?, default, default)";
     private static final String SQL_INSERT_BUSINESS = "INSERT INTO businesses VALUES (?, default, default, default)";
+    //subscriptions
+    private static final String SQL_SELECT_USER_SUBSCRIPTIONS = "SELECT * FROM user_subscriptions";
+    private static final String SQL_SELECT_BUSINESS_SUBSCRIPTIONS = "SELECT * FROM business_subscriptions";
+    private static final String SQL_SELECT_USER_SUBSCRIPTION = "SELECT * FROM users u JOIN user_subscriptions us ON us.id = u.subscriptionid WHERE u.name = ?";
+    private static final String SQL_SELECT_BUSINESS_SUBSCRIPTION = "SELECT * FROM businesses b JOIN business_subscriptions bs ON bs.id = b.subscriptionid WHERE b.name = ?";
+    private static final String SQL_UPDATE_USER_SUBSCRIPTION = "UPDATE users SET subscriptionid = ? WHERE name = ?";
+    private static final String SQL_UPDATE_BUSINESS_SUBSCRIPTION = "UPDATE businesses SET subscriptionid = ? WHERE name = ?";
 
     // Endpoints
     @Override
@@ -101,31 +107,6 @@ public class MarsH2Repository implements MarsRepository {
             return true;
         } catch (Exception ex) {
             return false;
-        }
-    }
-
-    private boolean isFavored(boolean userAcc, int id) {
-        String sqlGetFavorites = SQL_SELECT_FROM;
-
-        if (userAcc) {
-            sqlGetFavorites += "favorite_trips_users";
-        } else {
-            sqlGetFavorites += "favorite_trips_businesses";
-        }
-
-        try (Connection con = MarsConnection.getConnection();
-             PreparedStatement stmt = con.prepareStatement(sqlGetFavorites);
-             ResultSet res = stmt.executeQuery()) {
-
-            while (res.next()) {
-                if (res.getInt("endpointID") == id) {
-                    return true;
-                }
-            }
-            return false;
-        } catch (SQLException ex) {
-            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
-            throw new DatabaseException("Cannot get all favorites.");
         }
     }
 
@@ -236,7 +217,7 @@ public class MarsH2Repository implements MarsRepository {
 
     // Friends
     @Override
-    public Set<UserAccount> getFriends(UserAccount user, Set<UserAccount> users) { // TODO: 20-11-2020 kinda a hack?
+    public Set<UserAccount> getFriends(UserAccount user, Set<UserAccount> users) { // TODO: 20-11-2020 hacky?
         Set<UserAccount> friends = new HashSet<>();
 
         try (Connection con = MarsConnection.getConnection();
@@ -263,7 +244,6 @@ public class MarsH2Repository implements MarsRepository {
 
     @Override
     public void beFriend(String name, String friendName) {
-
         try (Connection con = MarsConnection.getConnection();
              PreparedStatement stmt = con.prepareStatement(SQL_INSERT_FRIEND)) {
 
@@ -362,168 +342,125 @@ public class MarsH2Repository implements MarsRepository {
         }
     }
 
-    // Subscription
     @Override
-    public List<Subscription> getSubscriptions() {
-        List<Subscription> subscriptions = new LinkedList<>();
-
+    public Set<UserSubscription> getUserSubscriptions() {
+        Set<UserSubscription> subscriptions = new HashSet<>();
 
         try (Connection con = MarsConnection.getConnection();
-             PreparedStatement stmt = con.prepareStatement(SQL_SELECT_ALL_SUBSCRIPTIONS);
+             PreparedStatement stmt = con.prepareStatement(SQL_SELECT_USER_SUBSCRIPTIONS);
              ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
-                int id = rs.getInt("subscriptionID");
-                String name = rs.getString("name");
-                int remainingSmallPodsThisDay = rs.getInt("remainingSmallPods_thisDay");
-                int remainingLargePodsThisDay = rs.getInt("remainingLargePods_thisDay");
-                int dedicatedPods = rs.getInt("amountOfDedicatedPods");
-
-
-                Subscription sub = new Subscription(id, name, remainingSmallPodsThisDay, remainingLargePodsThisDay, dedicatedPods);
-                subscriptions.add(sub);
+                subscriptions.add(getUserSubscription(rs));
             }
         } catch (SQLException ex) {
             LOGGER.log(Level.WARNING, ex.getMessage(), ex);
-            throw new DatabaseException("Can't get subscriptions.");
+            throw new DatabaseException("Can't get userSubscriptions");
         }
         return subscriptions;
     }
 
     @Override
-    public Subscription getSubscription(BaseAccount acc, boolean userAcc) {
-        String sqlSelectSubscriptionInfo = SQL_SELECT_FROM;
-        if (userAcc) {
-            sqlSelectSubscriptionInfo += "USERS_subscriptions us join subscriptions s on us.subscriptionID = s.subscriptionID" +
-                    " where userName=?";
-        } else {
-            sqlSelectSubscriptionInfo += "BUSINESSES_SUBSCRIPTIONS bs join subscriptions s on bs.subscriptionID = " +
-                    "s.subscriptionID where businessName=?";
-        }
+    public Set<BusinessSubscription> getBusinessSubscriptions() {
+        Set<BusinessSubscription> subscriptions = new HashSet<>();
 
         try (Connection con = MarsConnection.getConnection();
-             PreparedStatement stmt = con.prepareStatement(sqlSelectSubscriptionInfo)
-        ) {
-            stmt.setString(1, acc.getUsername());
+             PreparedStatement stmt = con.prepareStatement(SQL_SELECT_BUSINESS_SUBSCRIPTIONS);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                subscriptions.add(getBusinessSubscription(rs));
+            }
+        } catch (SQLException ex) {
+            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
+            throw new DatabaseException("Can't get userSubscriptions");
+        }
+        return subscriptions;
+    }
 
+    @Override
+    public UserSubscription getUserSubscription(UserAccount user) {
+        try (Connection con = MarsConnection.getConnection();
+             PreparedStatement stmt = con.prepareStatement(SQL_SELECT_USER_SUBSCRIPTION)) {
+
+            stmt.setString(1, user.getUsername());
             try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    int subID = rs.getInt("subscriptionID");
-                    String subName = rs.getString("name");
-                    if (!userAcc) {
-                        int remainingSmallPods = rs.getInt("remainingSmallPods_ThisDay");
-                        int remainingLargePods = rs.getInt("remainingLargePods_ThisDay");
-                        int amountOfDedicatedPods = rs.getInt("amountOfDedicatedPods");
-                        return new Subscription(subID, subName, remainingSmallPods, remainingLargePods, amountOfDedicatedPods);
-                    }
-                    return new Subscription(subID, subName);
-                } else {
-                    return null;
-                }
+                return getUserSubscription(rs);
             }
         } catch (SQLException ex) {
             LOGGER.log(Level.WARNING, ex.getMessage(), ex);
-            throw new DatabaseException("Can't get subscription information.");
+            throw new DatabaseException("Can't get user subscription");
+        }
+    }
+
+    private UserSubscription getUserSubscription(ResultSet rs) throws SQLException {
+        int id = rs.getInt("id");
+        String name = rs.getString("name");
+        boolean unlimitedTravels = rs.getBoolean("unlimitedTravels");
+        boolean unlimitedPackages = rs.getBoolean("unlimitedPackages");
+        return new UserSubscription(id, name, unlimitedTravels, unlimitedPackages);
+    }
+
+    private BusinessSubscription getBusinessSubscription(ResultSet rs) throws SQLException {
+        int id = rs.getInt("id");
+        String name = rs.getString("name");
+        int smallPodsDaily = rs.getInt("smallPodsDaily");
+        int largePodsDaily = rs.getInt("largePodsDaily");
+        int dedicatedPods = rs.getInt("dedicatedPods");
+        int priorityLevel = rs.getInt("priorityLevel");
+        return new BusinessSubscription(id, name, smallPodsDaily, largePodsDaily, dedicatedPods, priorityLevel);
+    }
+
+    @Override
+    public BusinessSubscription getBusinessSubscription(BusinessAccount business) {
+        try (Connection con = MarsConnection.getConnection();
+             PreparedStatement stmt = con.prepareStatement(SQL_SELECT_BUSINESS_SUBSCRIPTION)) {
+
+            stmt.setString(1, business.getUsername());
+            try (ResultSet rs = stmt.executeQuery()) {
+                return getBusinessSubscription(rs);
+            }
+        } catch (SQLException ex) {
+            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
+            throw new DatabaseException("Can't get business subscription");
         }
     }
 
     @Override
-    public void buySubscription(BaseAccount acc, String subscription, boolean userAcc) {
-        int id = getSubscriptions().stream()
-                .filter(sub -> sub.getName().equals(subscription))
-                .mapToInt(Subscription::getId).sum();
-
-        String sqlUpdateAcc;
-        String sqlInsertAccSub = "INSERT INTO ";
-        int remainingSmallPodsThisDay = 0;
-        int remainingLargePodsThisDay = 0;
-        int dedicatedPods = 0;
-        // init variables for different type of accounts
-        if (userAcc) {
-            sqlUpdateAcc = "UPDATE USERS SET subscriptionID=? WHERE name=?";
-            sqlInsertAccSub += "USERS_SUBSCRIPTIONS(userName,subscriptionID) values(?,?)";
-        } else {
-            sqlUpdateAcc = "UPDATE BUSINESSES SET subscriptionID=? WHERE name=?";
-            sqlInsertAccSub += "BUSINESSES_SUBSCRIPTIONS(businessName,subscriptionID, remainingSmallPods_thisDay," +
-                    "remainingLargePods_thisDay, amountOfDedicatedPods) values(?,?,?,?,?)";
-
-            remainingSmallPodsThisDay = getSubscriptions().stream()
-                    .filter(sub -> sub.getName().equals(subscription))
-                    .mapToInt(Subscription::getRemainingSmallPodsThisDay)
-                    .findAny()
-                    .orElse(0);
-
-            remainingLargePodsThisDay = getSubscriptions().stream()
-                    .filter(sub -> sub.getName().equals(subscription))
-                    .mapToInt(Subscription::getRemainingLargePodsThisDay)
-                    .findAny()
-                    .orElse(0);
-
-            dedicatedPods = getSubscriptions().stream()
-                    .filter(sub -> sub.getName().equals(subscription))
-                    .mapToInt(Subscription::getAmountOfDedicatedPods)
-                    .findAny()
-                    .orElse(0);
-        }
-        // update acc table
+    public void buyUserSubscription(UserAccount user, int subscriptionId) {
         try (Connection con = MarsConnection.getConnection();
-             PreparedStatement stmt = con.prepareStatement(sqlUpdateAcc)) {
-            stmt.setInt(1, id);
-            stmt.setString(2, acc.getUsername());
-            stmt.executeUpdate();
+             PreparedStatement stmt = con.prepareStatement(SQL_UPDATE_USER_SUBSCRIPTION)) {
+
+            stmt.setInt(1, subscriptionId);
+            stmt.setString(2, user.getUsername());
+            stmt.execute();
         } catch (SQLException ex) {
             LOGGER.log(Level.WARNING, ex.getMessage(), ex);
-            throw new DatabaseException("Can't buy a subscription.");
-        }
-        // update link table (user_subscription | business_subscriptions)
-        try (Connection con = MarsConnection.getConnection();
-             PreparedStatement stmt = con.prepareStatement(sqlInsertAccSub)) {
-            stmt.setString(1, acc.getUsername());
-            stmt.setInt(2, id);
-            if (!userAcc) {
-                stmt.setInt(3, remainingSmallPodsThisDay);
-                stmt.setInt(4, remainingLargePodsThisDay);
-                stmt.setInt(5, dedicatedPods);
-            }
-            stmt.executeUpdate();
-        } catch (SQLException ex) {
-            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
-            throw new DatabaseException("Can't buy a subscription.");
+            throw new DatabaseException("Can't buy user subscription");
         }
     }
 
     @Override
-    public void stopSubscription(BaseAccount acc, boolean userAcc) {
-        int idNoDescriptionActive = 0;
-        String sqlUpdate;
-        String sqlDeleteSub;
-
-        if (userAcc) {
-            sqlUpdate = "UPDATE USERS SET subscriptionID=? WHERE name=?";
-            sqlDeleteSub = "DELETE FROM USERS_SUBSCRIPTIONS WHERE userName=?";
-        } else {
-            sqlUpdate = "UPDATE BUSINESSES SET subscriptionID=? WHERE name=?";
-            sqlDeleteSub = "DELETE FROM BUSINESSES_SUBSCRIPTIONS WHERE businessName=?";
-        }
-
+    public void buyBusinessSubscription(BusinessAccount business, int subscriptionId) {
         try (Connection con = MarsConnection.getConnection();
-             PreparedStatement stmt = con.prepareStatement(sqlUpdate)) {
-            stmt.setInt(1, idNoDescriptionActive);
-            stmt.setString(2, acc.getUsername());
-            stmt.executeUpdate();
+             PreparedStatement stmt = con.prepareStatement(SQL_UPDATE_BUSINESS_SUBSCRIPTION)) {
+
+            stmt.setInt(1, subscriptionId);
+            stmt.setString(2, business.getUsername());
+            stmt.execute();
         } catch (SQLException ex) {
             LOGGER.log(Level.WARNING, ex.getMessage(), ex);
-            throw new DatabaseException("Can't stop a subscription.");
+            throw new DatabaseException("Can't buy business subscription");
         }
+    }
 
-        try (Connection con = MarsConnection.getConnection();
-             PreparedStatement stmt = con.prepareStatement(sqlDeleteSub)) {
-            stmt.setString(1, acc.getUsername());
-            stmt.executeUpdate();
-        } catch (SQLException ex) {
-            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
-            throw new DatabaseException("Can't stop a subscription.");
-        }
+    @Override
+    public void stopUserSubscription(UserAccount user) {
+        buyUserSubscription(user, 0);
+    }
+
+    @Override
+    public void stopBusinessSubscription(BusinessAccount business) {
+        buyBusinessSubscription(business, 0);
     }
 
     @Override

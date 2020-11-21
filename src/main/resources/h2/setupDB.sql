@@ -22,7 +22,7 @@ INSERT INTO user_subscriptions VALUES (default, 'Combined Transport', TRUE, TRUE
 
 CREATE TABLE business_subscriptions
 (
-	id             int AUTO_INCREMENT PRIMARY KEY,
+	id             int AUTO_INCREMENT (0) PRIMARY KEY,
 	name           varchar(50),
 	smallPodsDaily int,
 	largePodsDaily int,
@@ -34,7 +34,7 @@ INSERT INTO business_subscriptions VALUES (DEFAULT, 'No business subscription', 
 INSERT INTO business_subscriptions VALUES (DEFAULT, 'Start-up Business', 300, 3, 0, 0);
 INSERT INTO business_subscriptions VALUES (DEFAULT, 'Professional Business', 500, 10, 2, 1);
 INSERT INTO business_subscriptions VALUES (DEFAULT, 'Enterprise Business', 2500, 50, 5, 2);
-INSERT INTO business_subscriptions VALUES (DEFAULT, 'Custom business', 2500, 50, 5, 2);
+INSERT INTO business_subscriptions VALUES (DEFAULT, 'Custom business', -1, -1, -1, -1);
 
 
 CREATE TABLE accounts
