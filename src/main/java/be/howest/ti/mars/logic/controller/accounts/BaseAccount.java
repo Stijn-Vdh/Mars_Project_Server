@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.Objects;
 
 public abstract class BaseAccount {
-    protected final MarsRepository repo = new MarsH2Repository();
+    protected static final MarsRepository repo = new MarsH2Repository();
     private AccountToken accountToken;
     private Integer homeAddressEndpoint; //replace with endpoint class
     private final String password; // needs to be replaced with Password class which will contain hashed version

@@ -61,10 +61,8 @@ public class MarsH2Repository implements MarsRepository {
     public Set<ShortEndpoint> getEndpoints() { //will be short for the meantime
         Set<ShortEndpoint> endpoints = new HashSet<>();
 
-        try (
-                Connection con = MarsConnection.getConnection();
-                PreparedStatement stmt = con.prepareStatement(SQL_GET_ENDPOINTS)
-        ) {
+        try (Connection con = MarsConnection.getConnection();
+             PreparedStatement stmt = con.prepareStatement(SQL_GET_ENDPOINTS)) {
 
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {

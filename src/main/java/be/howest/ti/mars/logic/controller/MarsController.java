@@ -4,19 +4,17 @@ import be.howest.ti.mars.logic.controller.accounts.BaseAccount;
 import be.howest.ti.mars.logic.controller.accounts.BusinessAccount;
 import be.howest.ti.mars.logic.controller.accounts.UserAccount;
 import be.howest.ti.mars.logic.controller.exceptions.AuthenticationException;
+import be.howest.ti.mars.logic.controller.exceptions.EndpointException;
 import be.howest.ti.mars.logic.controller.exceptions.UsernameException;
 import be.howest.ti.mars.logic.controller.security.AccountToken;
 import be.howest.ti.mars.logic.data.MarsH2Repository;
 import io.vertx.core.json.JsonObject;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
-import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 public class MarsController {
-    private static final Logger LOGGER = Logger.getLogger(MarsController.class.getName());
     private static final String MOTD = "SmellyEllie";
     MarsH2Repository repo = new MarsH2Repository();
     Set<UserAccount> userAccounts = new HashSet<>();
@@ -73,7 +71,7 @@ public class MarsController {
         account.setAccountToken(null);
     }
 
-    public Object addFriend(UserAccount user, String friendName) { // TODO: 20-11-2020 validation friend exists and not already friended
+    public Object addFriend(UserAccount user, String friendName) { // TODO: 20-11-2020 validation friend exists and not already friended and user and friend not same
         if (userAccounts.contains(new UserAccount(friendName))) {
             user.addFriend(friendName);
         } else {
@@ -82,7 +80,7 @@ public class MarsController {
         return "You just added a friend called:" + friendName;
     }
 
-    public Object removeFriend(UserAccount user, String friendName) { // TODO: 20-11-2020 validation friend exists and not friended
+    public Object removeFriend(UserAccount user, String friendName) { // TODO: 20-11-2020 validation friend exists and not friended  and user and friend not same
         if (userAccounts.contains(new UserAccount(friendName))) {
             user.removeFriend(friendName);
         } else {
@@ -103,28 +101,33 @@ public class MarsController {
         repo.unFavoriteEndpoint(acc, id);
     }
 
-    public Object getAccountInformation(BaseAccount acc, boolean userAcc) { // TODO: 20-11-2020 missing shareLocation
+    private JsonObject getAccountInformation(BaseAccount acc) {
         JsonObject accInformation = new JsonObject();
         accInformation.put("name:", acc.getUsername());
         accInformation.put("homeAddress:", acc.getAddress());
         accInformation.put("homeEndpoint:", acc.getHomeAddressEndpoint());
         accInformation.put("favouriteEndpoints:", repo.getFavoriteEndpoints(acc));
+        return accInformation;
+    }
 
-        if (userAcc) {
-            //  Subscription sub = repo.getSubscription(acc, true);
-            // accInformation.put("subscription:", sub != null ? sub.getName() : "No subscription");
-            accInformation.put("friends:", repo.getFriends((UserAccount) acc, userAccounts));
-            accInformation.put("travelHistory:", repo.getTravelHistory((UserAccount) acc));
+    public Object getUserAccountInformation(UserAccount account) {
+        JsonObject accInformation = getAccountInformation(account);
+        accInformation.put("shareLocation", account.isSharesLocation());
+        accInformation.put("subscription:", repo.getUserSubscription(account));
+        accInformation.put("friends:", repo.getFriends(account, userAccounts));
+        accInformation.put("travelHistory:", repo.getTravelHistory(account));
+        return accInformation;
+    }
 
-        } else {
-            //  Subscription sub = repo.getSubscription(acc, false);
-            // accInformation.put("subscription:", sub != null ? sub.getName() : "No subscription");
-        }
-
+    public Object getBusinessAccountInformation(BusinessAccount business) {
+        JsonObject accInformation = getAccountInformation(business);
+        accInformation.put("subscription:", repo.getBusinessSubscription(business));
+        accInformation.put("Current usage subscription", repo.getBusinessSubscription(business));
         return accInformation;
     }
 
     public void travel(UserAccount acc, int from, int destination, String type) { // getShortEndpoint also validates if endpoint exists
+        if (from == destination) throw new EndpointException("Destination and from are the same endpoint");
         repo.travel(acc, new Travel(repo.getShortEndpoint(from), repo.getShortEndpoint(destination), PodType.valueOf(type), ""));
     }
 

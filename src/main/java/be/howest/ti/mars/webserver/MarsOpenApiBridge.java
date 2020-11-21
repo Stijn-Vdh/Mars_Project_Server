@@ -65,17 +65,24 @@ class MarsOpenApiBridge {
 
     public Object logout(RoutingContext ctx) {
         logger.info("logout");
+
         controller.logout(getAccount(ctx));
         return "Bye bye";
     }
 
     public Object getAccountInformation(RoutingContext ctx) {
         logger.info("accountInformation");
-        return controller.getAccountInformation(getAccount(ctx), isUserAccountToken(ctx));
+
+        if (isUserAccountToken(ctx)) {
+            return controller.getUserAccountInformation(getUserAccount(ctx));
+        } else {
+            return controller.getBusinessAccountInformation(getBusinessAccount(ctx));
+        }
     }
 
     public Object viewFriends(RoutingContext ctx) {
         logger.info("viewFriends");
+
         return controller.getRepo().getFriends(getUserAccount(ctx), controller.getUserAccounts())
                 .stream()
                 .map(UserAccount::getUsername)
@@ -84,6 +91,7 @@ class MarsOpenApiBridge {
 
     public Object addFriend(RoutingContext ctx) {
         logger.info("addFriend");
+
         UserAccount user = getUserAccount(ctx);
         String friendName = ctx.request().getParam("fName");
         return controller.addFriend(user, friendName);
@@ -91,6 +99,7 @@ class MarsOpenApiBridge {
 
     public Object removeFriend(RoutingContext ctx) {
         logger.info("removeFriend");
+
         UserAccount user = getUserAccount(ctx);
         String friendName = ctx.request().getParam("fName");
         return controller.removeFriend(user, friendName);
@@ -98,6 +107,7 @@ class MarsOpenApiBridge {
 
     public Object viewSubscriptions(RoutingContext ctx) {
         logger.info("viewSubscriptions");
+
         if (isUserAccountToken(ctx)) {
             return controller.getRepo().getUserSubscriptions();
         } else {
@@ -107,6 +117,7 @@ class MarsOpenApiBridge {
 
     public Object buySubscription(RoutingContext ctx) {
         logger.info("buySubscriptions");
+
         int subscriptionId = ctx.getBodyAsJson().getInteger("subscriptionId");
         if (isUserAccountToken(ctx)) {
             getUserAccount(ctx).setSubscriptionId(subscriptionId);
