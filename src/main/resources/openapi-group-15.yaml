@@ -313,7 +313,7 @@ paths:
       security:
         - Token: [ User ]
 
-  /api/subscription:
+  /api/subscription: # todo needs rework to portray current state: it returns either user_subscription or business_subscription (any of), price is currently not worked into our system
     description: subscription.
     get:
       operationId: viewSubscriptions
@@ -355,8 +355,10 @@ paths:
             schema:
               type: object
               properties:
-                subscriptionName:
-                  type: string
+                subscriptionId:
+                  type: int
+              required:
+                - subscriptionId
       responses:
         '200':
           description: Succesfuly bought a subscription
@@ -653,9 +655,9 @@ paths:
                   tripID:
                     type: integer
                   from:
-                      type: integer
+                    type: integer
                   destination:
-                      type: integer
+                    type: integer
                   date:
                     type: string
                   podType:
@@ -663,9 +665,9 @@ paths:
         '401':
           description: Authorization information is missing or invalid.
         '403':
-            description: Forbidden!
+          description: Forbidden!
         '500':
-            description: Unexpected error.
+          description: Unexpected error.
       security:
         - Token: [ User ]
     post:
@@ -713,6 +715,7 @@ paths:
 
   /api/ping:
     get:
+      operationId: ping
       tags:
         - server
       summary: Checks if the server is running

@@ -1,10 +1,6 @@
-package be.howest.ti.mars.logic.controller;
-
-import be.howest.ti.mars.logic.data.MarsH2Repository;
-import be.howest.ti.mars.logic.data.MarsRepository;
+package be.howest.ti.mars.logic.controller.accounts;
 
 public class UserAccount extends BaseAccount {
-    MarsRepository repo = new MarsH2Repository();
     private boolean sharesLocation;
     private String displayName;
 
@@ -12,6 +8,7 @@ public class UserAccount extends BaseAccount {
         super(homeAddressEndpoint, password, username, address);
         sharesLocation = false;
         displayName = username;
+        subscriptionId = 0;
     }
 
     public UserAccount(String name) {
@@ -25,6 +22,15 @@ public class UserAccount extends BaseAccount {
     public void setSharesLocation(boolean sharesLocation) {
         repo.setShareLocation(this, sharesLocation);
         this.sharesLocation = sharesLocation;
+    }
+
+    public int getSubscriptionId() {
+        return subscriptionId;
+    }
+
+    public void setSubscriptionId(int subscriptionId) {
+        repo.setUserSubscription(this, subscriptionId);
+        this.subscriptionId = subscriptionId;
     }
 
     public void setDisplayName(String displayName) {

@@ -1,6 +1,9 @@
 package be.howest.ti.mars.logic.data;
 
 import be.howest.ti.mars.logic.controller.*;
+import be.howest.ti.mars.logic.controller.accounts.BaseAccount;
+import be.howest.ti.mars.logic.controller.accounts.BusinessAccount;
+import be.howest.ti.mars.logic.controller.accounts.UserAccount;
 import be.howest.ti.mars.logic.controller.converters.ShortEndpoint;
 import be.howest.ti.mars.logic.controller.exceptions.DatabaseException;
 import be.howest.ti.mars.logic.controller.exceptions.EndpointException;
@@ -426,7 +429,12 @@ public class MarsH2Repository implements MarsRepository {
     }
 
     @Override
-    public void buyUserSubscription(UserAccount user, int subscriptionId) {
+    public BusinessSubscription getBusinessSubscriptionInfo(BusinessAccount business) {
+        return null;
+    }
+
+    @Override
+    public void setUserSubscription(UserAccount user, int subscriptionId) {
         try (Connection con = MarsConnection.getConnection();
              PreparedStatement stmt = con.prepareStatement(SQL_UPDATE_USER_SUBSCRIPTION)) {
 
@@ -440,7 +448,7 @@ public class MarsH2Repository implements MarsRepository {
     }
 
     @Override
-    public void buyBusinessSubscription(BusinessAccount business, int subscriptionId) {
+    public void setBusinessSubscription(BusinessAccount business, int subscriptionId) {
         try (Connection con = MarsConnection.getConnection();
              PreparedStatement stmt = con.prepareStatement(SQL_UPDATE_BUSINESS_SUBSCRIPTION)) {
 
@@ -451,16 +459,6 @@ public class MarsH2Repository implements MarsRepository {
             LOGGER.log(Level.WARNING, ex.getMessage(), ex);
             throw new DatabaseException("Can't buy business subscription");
         }
-    }
-
-    @Override
-    public void stopUserSubscription(UserAccount user) {
-        buyUserSubscription(user, 0);
-    }
-
-    @Override
-    public void stopBusinessSubscription(BusinessAccount business) {
-        buyBusinessSubscription(business, 0);
     }
 
     @Override

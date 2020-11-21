@@ -167,6 +167,7 @@ public class WebServer extends AbstractVerticle {
         addRouteWithCtxFunction(factory, "getAccountInformation", bridge::getAccountInformation);
         addRouteWithCtxFunction(factory, "travel", bridge::travel);
         addRouteWithCtxFunction(factory, "getTravelHistory", bridge::getTravelHistory);
+        addRouteWithCtxFunction(factory, "ping", bridge::ping);
     }
 
     private void addRouteWithCtxFunction(OpenAPI3RouterFactory factory, String operationId, Function<RoutingContext, Object> bridgeFunction) {
@@ -258,7 +259,7 @@ public class WebServer extends AbstractVerticle {
     }
 
     private void verifyUserAccountToken(RoutingContext ctx) {
-        verifyToken(ctx, bridge::verifyUserAccountToken);
+        verifyToken(ctx, bridge::isUserAccountToken);
     }
 
     private void verifyBusinessAccountToken(RoutingContext ctx) {
@@ -280,7 +281,7 @@ public class WebServer extends AbstractVerticle {
 
         if (bridge.getBearerToken(ctx) == null) {
             ctx.fail(401); // Unauthorized  due to wrong or absent header format
-        } else if (bridge.verifyUserAccountToken(ctx) || bridge.verifyBusinessAccountToken(ctx)) {
+        } else if (bridge.isUserAccountToken(ctx) || bridge.verifyBusinessAccountToken(ctx)) {
             ctx.next();
         } else {
             ctx.fail(403); // forbidden

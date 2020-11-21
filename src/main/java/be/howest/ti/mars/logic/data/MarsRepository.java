@@ -1,6 +1,11 @@
 package be.howest.ti.mars.logic.data;
 
-import be.howest.ti.mars.logic.controller.*;
+import be.howest.ti.mars.logic.controller.Delivery;
+import be.howest.ti.mars.logic.controller.Endpoint;
+import be.howest.ti.mars.logic.controller.Travel;
+import be.howest.ti.mars.logic.controller.accounts.BaseAccount;
+import be.howest.ti.mars.logic.controller.accounts.BusinessAccount;
+import be.howest.ti.mars.logic.controller.accounts.UserAccount;
 import be.howest.ti.mars.logic.controller.converters.ShortEndpoint;
 import be.howest.ti.mars.logic.controller.subscription.BusinessSubscription;
 import be.howest.ti.mars.logic.controller.subscription.UserSubscription;
@@ -62,14 +67,11 @@ public interface MarsRepository {
 
     BusinessSubscription getBusinessSubscription(BusinessAccount business);
 
-    void buyUserSubscription(UserAccount user, int subscriptionId);
+    BusinessSubscription getBusinessSubscriptionInfo(BusinessAccount business); // this returns the used amount of pods by that business that day
 
-    void buyBusinessSubscription(BusinessAccount business, int subscriptionId);
+    void setUserSubscription(UserAccount user, int subscriptionId);
 
-    void stopUserSubscription(UserAccount user);
-
-    void stopBusinessSubscription(BusinessAccount business);
-
+    void setBusinessSubscription(BusinessAccount business, int subscriptionId);
 
     // Report
     Set<String> getReportSections();

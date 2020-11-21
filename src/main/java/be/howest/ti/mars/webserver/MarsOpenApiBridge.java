@@ -1,9 +1,9 @@
 package be.howest.ti.mars.webserver;
 
-import be.howest.ti.mars.logic.controller.BaseAccount;
-import be.howest.ti.mars.logic.controller.BusinessAccount;
 import be.howest.ti.mars.logic.controller.MarsController;
-import be.howest.ti.mars.logic.controller.UserAccount;
+import be.howest.ti.mars.logic.controller.accounts.BaseAccount;
+import be.howest.ti.mars.logic.controller.accounts.BusinessAccount;
+import be.howest.ti.mars.logic.controller.accounts.UserAccount;
 import be.howest.ti.mars.logic.controller.security.AccountToken;
 import be.howest.ti.mars.logic.controller.security.SecureHash;
 import io.vertx.core.http.HttpHeaders;
@@ -64,15 +64,18 @@ class MarsOpenApiBridge {
     }
 
     public Object logout(RoutingContext ctx) {
+        logger.info("logout");
         controller.logout(getAccount(ctx));
         return "Bye bye";
     }
 
     public Object getAccountInformation(RoutingContext ctx) {
-        return controller.getAccountInformation(getAccount(ctx), verifyUserAccountToken(ctx));
+        logger.info("accountInformation");
+        return controller.getAccountInformation(getAccount(ctx), isUserAccountToken(ctx));
     }
 
     public Object viewFriends(RoutingContext ctx) {
+        logger.info("viewFriends");
         return controller.getRepo().getFriends(getUserAccount(ctx), controller.getUserAccounts())
                 .stream()
                 .map(UserAccount::getUsername)
@@ -80,41 +83,62 @@ class MarsOpenApiBridge {
     }
 
     public Object addFriend(RoutingContext ctx) {
+        logger.info("addFriend");
         UserAccount user = getUserAccount(ctx);
         String friendName = ctx.request().getParam("fName");
         return controller.addFriend(user, friendName);
     }
 
     public Object removeFriend(RoutingContext ctx) {
+        logger.info("removeFriend");
         UserAccount user = getUserAccount(ctx);
         String friendName = ctx.request().getParam("fName");
         return controller.removeFriend(user, friendName);
     }
 
     public Object viewSubscriptions(RoutingContext ctx) {
-        return controller.getSubscriptions();
+        logger.info("viewSubscriptions");
+        if (isUserAccountToken(ctx)) {
+            return controller.getRepo().getUserSubscriptions();
+        } else {
+            return controller.getRepo().getBusinessSubscriptions();
+        }
     }
 
     public Object buySubscription(RoutingContext ctx) {
-        JsonObject json = ctx.getBodyAsJson();
-        String subscriptionName = json.getString("subscriptionName");
-        return controller.buySubscription(getAccount(ctx), subscriptionName, verifyUserAccountToken(ctx));
+        logger.info("buySubscriptions");
+        int subscriptionId = ctx.getBodyAsJson().getInteger("subscriptionId");
+        if (isUserAccountToken(ctx)) {
+            getUserAccount(ctx).setSubscriptionId(subscriptionId);
+        } else {
+            getBusinessAccount(ctx).setSubscriptionId(subscriptionId);
+        }
+        return "Thank you for buying a subscription.";
     }
 
     public Object stopSubscription(RoutingContext ctx) {
-        return controller.stopSubscription(getAccount(ctx), verifyUserAccountToken(ctx));
+        logger.info("stopSubscriptions");
+        if (isUserAccountToken(ctx)) {
+            getUserAccount(ctx).setSubscriptionId(0);
+        } else {
+            getBusinessAccount(ctx).setSubscriptionId(0);
+        }
+        return "We are sorry that you have discontinued your current subscription.";
     }
 
     public Object viewSubscriptionInfo(RoutingContext ctx) {
-        return controller.viewSubscriptionInfo(getBusinessAccount(ctx));
+        logger.info("viewSubscription");
+        return controller.getRepo().getBusinessSubscriptionInfo(getBusinessAccount(ctx));
     }
 
     public Object shareLocation(RoutingContext ctx) {
+        logger.info("shareLocation");
         getUserAccount(ctx).setSharesLocation(true);
         return "Now sharing location with friends.";
     }
 
-    public Object stopSharingLocation(RoutingContext ctx) {
+    public Object stopSharingLocation(RoutingContext ctx) { // TODO: 21-11-2020 should we care if someone tries stopping his location sharing when it is already stopped ?
+        logger.info("stop shareLocation");
         getUserAccount(ctx).setSharesLocation(false);
         return "Not sharing location anymore with friends.";
     }
@@ -168,7 +192,7 @@ class MarsOpenApiBridge {
 
     //------------------------------------------------------------------------------------------------------------------
 
-    public boolean verifyUserAccountToken(RoutingContext ctx) {
+    public boolean isUserAccountToken(RoutingContext ctx) {
         return getUserAccount(ctx) != null;
     }
 
@@ -211,5 +235,8 @@ class MarsOpenApiBridge {
         }
     }
 
-
+    public Object ping(RoutingContext ctx) {
+        logger.info("ping");
+        return "pong";
+    }
 }

@@ -1,5 +1,8 @@
 package be.howest.ti.mars.logic.controller;
 
+import be.howest.ti.mars.logic.controller.accounts.BaseAccount;
+import be.howest.ti.mars.logic.controller.accounts.BusinessAccount;
+import be.howest.ti.mars.logic.controller.accounts.UserAccount;
 import be.howest.ti.mars.logic.controller.exceptions.AuthenticationException;
 import be.howest.ti.mars.logic.controller.exceptions.UsernameException;
 import be.howest.ti.mars.logic.controller.security.AccountToken;
@@ -70,10 +73,6 @@ public class MarsController {
         account.setAccountToken(null);
     }
 
-    public List<Subscription> getSubscriptions() {
-        return repo.getSubscriptions();
-    }
-
     public Object addFriend(UserAccount user, String friendName) { // TODO: 20-11-2020 validation friend exists and not already friended
         if (userAccounts.contains(new UserAccount(friendName))) {
             user.addFriend(friendName);
@@ -90,20 +89,6 @@ public class MarsController {
             //throw error
         }
         return "You just removed a friend called:" + friendName;
-    }
-
-    public Object buySubscription(BaseAccount acc, String subscriptionName, boolean userAcc) {
-        repo.buySubscription(acc, subscriptionName, userAcc);
-        return "Thank you for buying a subscription.";
-    }
-
-    public Object stopSubscription(BaseAccount acc, boolean userAcc) {
-        repo.stopSubscription(acc, userAcc);
-        return "We are sorry for you to stop you current subscription.";
-    }
-
-    public Object viewSubscriptionInfo(BusinessAccount businessAccount) {
-        return repo.getSubscription(businessAccount, false);
     }
 
     public MarsH2Repository getRepo() {
