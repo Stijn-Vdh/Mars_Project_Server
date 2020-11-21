@@ -55,7 +55,7 @@ public interface MarsRepository {
     void cancelTravel(UserAccount user, int tripID);
 
     // Deliveries
-    Set<Delivery> getDeliveries();
+    Set<Delivery> getDeliveries(); // TODO: 21-11-2020 also not available in spec
 
     void addDelivery(Delivery delivery);
 

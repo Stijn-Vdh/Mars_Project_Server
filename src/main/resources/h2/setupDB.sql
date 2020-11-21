@@ -72,18 +72,18 @@ CREATE TABLE `report_sections`
 	`Name` VARCHAR(90) PRIMARY KEY
 );
 
-INSERT INTO report_sections (name) VALUES ('Menu usage');
-INSERT INTO report_sections (name) VALUES ('Account information');
-INSERT INTO report_sections (name) VALUES ('Billing');
-INSERT INTO report_sections (name) VALUES ('Other');
+INSERT INTO report_sections VALUES ('Menu usage');
+INSERT INTO report_sections VALUES ('Account information');
+INSERT INTO report_sections VALUES ('Billing');
+INSERT INTO report_sections VALUES ('Other');
 
 
 CREATE TABLE `reports`
 (
 	`id`            INT AUTO_INCREMENT PRIMARY KEY,
+	`accountName`   varchar(50)   NOT NULL,
 	`reportSection` VARCHAR(90)   NOT NULL,
 	`body`          VARCHAR(2000) NULL,
-	`accountName`   varchar(50)   NOT NULL,
 	FOREIGN KEY (`reportSection`) REFERENCES `report_sections` (`Name`),
 	FOREIGN KEY (`accountName`) REFERENCES accounts (name)
 );
@@ -155,28 +155,6 @@ CREATE TABLE travels -- can be used as travel history, not sure why we needed a 
 	FOREIGN KEY (userName) REFERENCES users (name),
 	FOREIGN KEY (podType) REFERENCES podTypes (type),
 	CHECK (`from` <> destination)
-);
-
-
--- was not used and dont understand for what it is, but kept since I could ve missed its purpose
-
-CREATE TABLE trips -- travels ?? also why not keep the a name of who sent this delivery, also shouldn't we keep an name of who we are sending to it ?
-(
-	tripID      int AUTO_INCREMENT,
-	`from`      varchar(125), --also why is this a varchar ?? and not an int ??
-	destination varchar(125),
-	`date`      date,
-	podType     varchar(20),
-	CONSTRAINT tripID_pk PRIMARY KEY (tripID)
-);
-
-
-CREATE TABLE trips_users -- is this the trip history ??
-(
-	tripID int NOT NULL,
-	userID int NOT NULL,
-	CONSTRAINT tripID_fk FOREIGN KEY (tripID) REFERENCES trips (tripID),
-	CONSTRAINT t_userID_fk FOREIGN KEY (userID) REFERENCES users (name)
 );
 
 -- (∩｀-´)⊃━☆ﾟ.*･｡ﾟ*\~=+_changelog_+=-/*

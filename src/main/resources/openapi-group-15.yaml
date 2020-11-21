@@ -313,7 +313,7 @@ paths:
       security:
         - Token: [ User ]
 
-  /api/subscription: # todo needs rework to portray current state: it returns either user_subscription or business_subscription (any of), price is currently not worked into our system
+  /api/subscription: # todo needs rework to portray current state: it returns either user_subscription or business_subscription (any of), price is currently not worked into our system also post could be better as in path parameters instead of just one body request
     description: subscription.
     get:
       operationId: viewSubscriptions
@@ -356,7 +356,7 @@ paths:
               type: object
               properties:
                 subscriptionId:
-                  type: int
+                  type: integer
               required:
                 - subscriptionId
       responses:

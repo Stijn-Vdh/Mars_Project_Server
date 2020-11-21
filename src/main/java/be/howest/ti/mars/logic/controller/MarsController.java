@@ -12,6 +12,7 @@ import io.vertx.core.json.JsonObject;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class MarsController {
@@ -114,7 +115,7 @@ public class MarsController {
         JsonObject accInformation = getAccountInformation(account);
         accInformation.put("shareLocation", account.isSharesLocation());
         accInformation.put("subscription:", repo.getUserSubscription(account));
-        accInformation.put("friends:", repo.getFriends(account, userAccounts));
+        accInformation.put("friends:", repo.getFriends(account, userAccounts).stream().map(UserAccount::getUsername).collect(Collectors.toList()));
         accInformation.put("travelHistory:", repo.getTravelHistory(account));
         return accInformation;
     }
@@ -122,7 +123,7 @@ public class MarsController {
     public Object getBusinessAccountInformation(BusinessAccount business) {
         JsonObject accInformation = getAccountInformation(business);
         accInformation.put("subscription:", repo.getBusinessSubscription(business));
-        accInformation.put("Current usage subscription", repo.getBusinessSubscription(business));
+        accInformation.put("Current usage subscription", repo.getBusinessSubscriptionInfo(business));
         return accInformation;
     }
 

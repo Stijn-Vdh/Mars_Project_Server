@@ -51,13 +51,14 @@ public class MarsH2Repository implements MarsRepository {
     //subscriptions
     private static final String SQL_SELECT_USER_SUBSCRIPTIONS = "SELECT * FROM user_subscriptions";
     private static final String SQL_SELECT_BUSINESS_SUBSCRIPTIONS = "SELECT * FROM business_subscriptions";
-    private static final String SQL_SELECT_USER_SUBSCRIPTION = "SELECT * FROM users u JOIN user_subscriptions us ON us.id = u.subscriptionid WHERE u.name = ?";
-    private static final String SQL_SELECT_BUSINESS_SUBSCRIPTION = "SELECT * FROM businesses b JOIN business_subscriptions bs ON bs.id = b.subscriptionid WHERE b.name = ?";
+    private static final String SQL_SELECT_USER_SUBSCRIPTION = "SELECT us.* FROM users u JOIN user_subscriptions us ON us.id = u.subscriptionid WHERE u.name = ?";
+    private static final String SQL_SELECT_BUSINESS_SUBSCRIPTION = "SELECT bs.* FROM businesses b JOIN business_subscriptions bs ON bs.id = b.subscriptionid WHERE b.name = ?";
+    private static final String SQL_SELECT_BUSINESS_SUBSCRIPTION_INFO = "SELECT bs.ID, bs.NAME, b.LARGEPODSUSED, b.SMALLPODSUSED FROM businesses b JOIN business_subscriptions bs ON bs.id = b.subscriptionid WHERE b.name = ?";
     private static final String SQL_UPDATE_USER_SUBSCRIPTION = "UPDATE users SET subscriptionid = ? WHERE name = ?";
     private static final String SQL_UPDATE_BUSINESS_SUBSCRIPTION = "UPDATE businesses SET subscriptionid = ? WHERE name = ?";
 
     // Endpoints
-    @Override
+    @Override // TODO: 21-11-2020 add endpoint visibility logic: users see only their endpoint and public endpoints and friend home endpoints(if sharing), companies see all endpoints but what if normal person needs to send package to other person ???
     public Set<ShortEndpoint> getEndpoints() { //will be short for the meantime
         Set<ShortEndpoint> endpoints = new HashSet<>();
 
@@ -388,6 +389,7 @@ public class MarsH2Repository implements MarsRepository {
 
             stmt.setString(1, user.getUsername());
             try (ResultSet rs = stmt.executeQuery()) {
+                rs.next();
                 return getUserSubscription(rs);
             }
         } catch (SQLException ex) {
@@ -421,6 +423,7 @@ public class MarsH2Repository implements MarsRepository {
 
             stmt.setString(1, business.getUsername());
             try (ResultSet rs = stmt.executeQuery()) {
+                rs.next();
                 return getBusinessSubscription(rs);
             }
         } catch (SQLException ex) {
@@ -432,9 +435,10 @@ public class MarsH2Repository implements MarsRepository {
     @Override
     public BusinessSubscriptionInfo getBusinessSubscriptionInfo(BusinessAccount business) {
         try (Connection con = MarsConnection.getConnection();
-             PreparedStatement stmt = con.prepareStatement(SQL_SELECT_BUSINESS_SUBSCRIPTION)) {
+             PreparedStatement stmt = con.prepareStatement(SQL_SELECT_BUSINESS_SUBSCRIPTION_INFO)) {
             stmt.setString(1, business.getUsername());
             try (ResultSet rs = stmt.executeQuery()) {
+                rs.next();
                 int id = rs.getInt("id");
                 String name = rs.getString("name");
                 int smallPodsDaily = rs.getInt("smallPodsUsed");

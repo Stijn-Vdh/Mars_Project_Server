@@ -30,8 +30,6 @@ class MarsOpenApiBridge {
     }
 
     public Object createAccount(RoutingContext ctx) {
-        logger.info("createAccount");
-
         JsonObject json = ctx.getBodyAsJson();
         controller.createAccount(
                 json.getString("name"),
@@ -44,9 +42,7 @@ class MarsOpenApiBridge {
         return "Successfully created an account";
     }
 
-    public Object sendPackage(RoutingContext ctx) {
-        logger.info("addDelivery");
-
+    public Object sendPackage(RoutingContext ctx) { // TODO: 21-11-2020 add missing validation: only business can send large packages, etc , from != dest
         JsonObject json = ctx.getBodyAsJson();
         controller.createDelivery(json.getString("deliveryType"),
                 json.getInteger("from"),
@@ -57,22 +53,16 @@ class MarsOpenApiBridge {
     }
 
     public Object login(RoutingContext ctx) {
-        logger.info("login");
-
         JsonObject json = ctx.getBodyAsJson();
         return controller.login(json.getString("name"), SecureHash.getHashEncoded(json.getString("password")));
     }
 
     public Object logout(RoutingContext ctx) {
-        logger.info("logout");
-
         controller.logout(getAccount(ctx));
         return "Bye bye";
     }
 
     public Object getAccountInformation(RoutingContext ctx) {
-        logger.info("accountInformation");
-
         if (isUserAccountToken(ctx)) {
             return controller.getUserAccountInformation(getUserAccount(ctx));
         } else {
@@ -81,33 +71,25 @@ class MarsOpenApiBridge {
     }
 
     public Object viewFriends(RoutingContext ctx) {
-        logger.info("viewFriends");
-
         return controller.getRepo().getFriends(getUserAccount(ctx), controller.getUserAccounts())
                 .stream()
                 .map(UserAccount::getUsername)
                 .collect(Collectors.toUnmodifiableList());
     }
 
-    public Object addFriend(RoutingContext ctx) {
-        logger.info("addFriend");
-
+    public Object addFriend(RoutingContext ctx) { // TODO: 21-11-2020 cant friend businesses
         UserAccount user = getUserAccount(ctx);
         String friendName = ctx.request().getParam("fName");
         return controller.addFriend(user, friendName);
     }
 
     public Object removeFriend(RoutingContext ctx) {
-        logger.info("removeFriend");
-
         UserAccount user = getUserAccount(ctx);
         String friendName = ctx.request().getParam("fName");
         return controller.removeFriend(user, friendName);
     }
 
     public Object viewSubscriptions(RoutingContext ctx) {
-        logger.info("viewSubscriptions");
-
         if (isUserAccountToken(ctx)) {
             return controller.getRepo().getUserSubscriptions();
         } else {
@@ -116,8 +98,6 @@ class MarsOpenApiBridge {
     }
 
     public Object buySubscription(RoutingContext ctx) {
-        logger.info("buySubscriptions");
-
         int subscriptionId = ctx.getBodyAsJson().getInteger("subscriptionId");
         if (isUserAccountToken(ctx)) {
             getUserAccount(ctx).setSubscriptionId(subscriptionId);
@@ -128,7 +108,7 @@ class MarsOpenApiBridge {
     }
 
     public Object stopSubscription(RoutingContext ctx) {
-        logger.info("stopSubscriptions");
+
         if (isUserAccountToken(ctx)) {
             getUserAccount(ctx).setSubscriptionId(0);
         } else {
@@ -138,18 +118,16 @@ class MarsOpenApiBridge {
     }
 
     public Object viewSubscriptionInfo(RoutingContext ctx) {
-        logger.info("viewSubscription");
         return controller.getRepo().getBusinessSubscriptionInfo(getBusinessAccount(ctx));
     }
 
     public Object shareLocation(RoutingContext ctx) {
-        logger.info("shareLocation");
+
         getUserAccount(ctx).setSharesLocation(true);
         return "Now sharing location with friends.";
     }
 
     public Object stopSharingLocation(RoutingContext ctx) { // TODO: 21-11-2020 should we care if someone tries stopping his location sharing when it is already stopped ?
-        logger.info("stop shareLocation");
         getUserAccount(ctx).setSharesLocation(false);
         return "Not sharing location anymore with friends.";
     }
@@ -247,7 +225,6 @@ class MarsOpenApiBridge {
     }
 
     public Object ping(RoutingContext ctx) {
-        logger.info("ping");
         return "pong";
     }
 }
