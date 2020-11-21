@@ -8,6 +8,7 @@ import be.howest.ti.mars.logic.controller.accounts.BusinessAccount;
 import be.howest.ti.mars.logic.controller.accounts.UserAccount;
 import be.howest.ti.mars.logic.controller.converters.ShortEndpoint;
 import be.howest.ti.mars.logic.controller.subscription.BusinessSubscription;
+import be.howest.ti.mars.logic.controller.subscription.BusinessSubscriptionInfo;
 import be.howest.ti.mars.logic.controller.subscription.UserSubscription;
 
 import java.util.Set;
@@ -67,7 +68,7 @@ public interface MarsRepository {
 
     BusinessSubscription getBusinessSubscription(BusinessAccount business);
 
-    BusinessSubscription getBusinessSubscriptionInfo(BusinessAccount business); // this returns the used amount of pods by that business that day
+    BusinessSubscriptionInfo getBusinessSubscriptionInfo(BusinessAccount business); // this returns the used amount of pods by that business that day
 
     void setUserSubscription(UserAccount user, int subscriptionId);
 

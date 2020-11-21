@@ -401,15 +401,13 @@ paths:
               schema:
                 type: object
                 properties:
-                  businessID:
-                    type: integer
+                  subscriptionId:
+                    type: id
                   name:
                     type: string
-                  subscription:
-                    type: string
-                  remainingSmallPods:
+                  smallPodsUsed:
                     type: integer
-                  remainingLargePods:
+                  largePodsUsed:
                     type: integer
         '401':
           description: Authorization information is missing or invalid.

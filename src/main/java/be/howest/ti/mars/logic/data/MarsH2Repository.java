@@ -1,6 +1,9 @@
 package be.howest.ti.mars.logic.data;
 
-import be.howest.ti.mars.logic.controller.*;
+import be.howest.ti.mars.logic.controller.Delivery;
+import be.howest.ti.mars.logic.controller.Endpoint;
+import be.howest.ti.mars.logic.controller.PodType;
+import be.howest.ti.mars.logic.controller.Travel;
 import be.howest.ti.mars.logic.controller.accounts.BaseAccount;
 import be.howest.ti.mars.logic.controller.accounts.BusinessAccount;
 import be.howest.ti.mars.logic.controller.accounts.UserAccount;
@@ -9,6 +12,7 @@ import be.howest.ti.mars.logic.controller.exceptions.DatabaseException;
 import be.howest.ti.mars.logic.controller.exceptions.EndpointException;
 import be.howest.ti.mars.logic.controller.exceptions.EntityNotFoundException;
 import be.howest.ti.mars.logic.controller.subscription.BusinessSubscription;
+import be.howest.ti.mars.logic.controller.subscription.BusinessSubscriptionInfo;
 import be.howest.ti.mars.logic.controller.subscription.UserSubscription;
 
 import java.sql.Connection;
@@ -176,7 +180,6 @@ public class MarsH2Repository implements MarsRepository {
         }
     }
 
-    // System
     @Override
     public void addUser(UserAccount user) {
         try (Connection con = MarsConnection.getConnection();
@@ -429,8 +432,21 @@ public class MarsH2Repository implements MarsRepository {
     }
 
     @Override
-    public BusinessSubscription getBusinessSubscriptionInfo(BusinessAccount business) {
-        return null;
+    public BusinessSubscriptionInfo getBusinessSubscriptionInfo(BusinessAccount business) {
+        try (Connection con = MarsConnection.getConnection();
+             PreparedStatement stmt = con.prepareStatement(SQL_SELECT_BUSINESS_SUBSCRIPTION)) {
+            stmt.setString(1, business.getUsername());
+            try (ResultSet rs = stmt.executeQuery()) {
+                int id = rs.getInt("id");
+                String name = rs.getString("name");
+                int smallPodsDaily = rs.getInt("smallPodsUsed");
+                int largePodsDaily = rs.getInt("largePodsUsed");
+                return new BusinessSubscriptionInfo(id, name, smallPodsDaily, largePodsDaily);
+            }
+        } catch (SQLException ex) {
+            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
+            throw new DatabaseException("Can't get business subscription information");
+        }
     }
 
     @Override
