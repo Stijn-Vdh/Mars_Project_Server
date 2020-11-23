@@ -179,6 +179,19 @@ class MarsOpenApiBridge {
         return controller.getTravelHistory(getUserAccount(ctx));
     }
 
+    public Object cancelTrip(RoutingContext ctx) {
+        int id = Integer.parseInt(ctx.request().getParam("id"));
+        controller.cancelTrip(getUserAccount(ctx) ,id);
+
+        return null;
+    }
+
+    public Object ping(RoutingContext ctx) {
+        return "pong";
+    }
+
+
+
     //------------------------------------------------------------------------------------------------------------------
 
     public boolean isUserAccountToken(RoutingContext ctx) {
@@ -224,7 +237,5 @@ class MarsOpenApiBridge {
         }
     }
 
-    public Object ping(RoutingContext ctx) {
-        return "pong";
-    }
+
 }

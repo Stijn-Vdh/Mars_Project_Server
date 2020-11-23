@@ -27,28 +27,34 @@ import java.util.logging.Logger;
 
 public class MarsH2Repository implements MarsRepository {
     private static final Logger LOGGER = Logger.getLogger(MarsH2Repository.class.getName());
-    //SQL queries
+    // SQL queries
+    // Endpoints
     private static final String SQL_GET_ENDPOINT = "SELECT * FROM ENDPOINTS WHERE ID = ?";
-    private static final String SQL_GET_REPORT_SECTIONS = "SELECT * FROM REPORT_SECTIONS";
     private static final String SQL_GET_ENDPOINTS = "SELECT * FROM ENDPOINTS";
-    private static final String SQL_INSERT_REPORTS = "INSERT INTO REPORTS VALUES(DEFAULT, ?, ?, ?)";
     private static final String SQL_INSERT_ENDPOINT = "INSERT INTO ENDPOINTS(name) VALUES(?)";
-    private static final String SQL_UPDATE_USER = "UPDATE USERS SET sharesLocation=? WHERE name=?";
+    // Reports
+    private static final String SQL_GET_REPORT_SECTIONS = "SELECT * FROM REPORT_SECTIONS";
+    private static final String SQL_INSERT_REPORTS = "INSERT INTO REPORTS VALUES(DEFAULT, ?, ?, ?)";
+    // Friends
     private static final String SQL_SELECT_ALL_FRIENDS = "SELECT * FROM friends f LEFT JOIN users u ON u.name = f.friendName WHERE f.userName=?";
     private static final String SQL_INSERT_FRIEND = "INSERT INTO friends(friendName, userName) VALUES(?,?)";
     private static final String SQL_DELETE_FRIEND = "DELETE FROM friends WHERE friendName=? AND userName=?";
+    // Deliveries
     private static final String SQL_ADD_DELIVERY = "INSERT INTO DELIVERIES VALUES(DEFAULT, ?, ?, ?, DEFAULT, ?)";
+    // Travels
     private static final String SQL_INSERT_TRAVEL = "INSERT INTO TRAVELS VALUES(default, ?, ?, ?, DEFAULT, ?, NULL)";
     private static final String SQL_SELECT_TRAVEL_HISTORY = "SELECT * FROM TRAVELS t WHERE userName=? ";
-    // favorites
+    private static final String SQL_DELETE_TRAVEL = "DELETE FROM TRAVELS WHERE userName=? and ID=?";
+    // Favorites
     private static final String SQL_DELETE_FAVORITE_ENDPOINT = "DELETE FROM favorite_endpoints WHERE ACCOUNTNAME=? AND ENDPOINTID=?;";
     private static final String SQL_INSERT_FAVORITE_ENDPOINT = "INSERT INTO favorite_endpoints VALUES (?, ?)";
     private static final String SQL_SELECT_FAVORITE_ENDPOINT = "SELECT * FROM favorite_endpoints fe JOIN endpoints e ON fe.endpointid = e.id WHERE accountname = ?";
-    // accounts
+    // Accounts
     private static final String SQL_INSERT_ACCOUNT = "INSERT INTO accounts VALUES (?, ?, ?, NULL)";
     private static final String SQL_INSERT_USER = "INSERT INTO users VALUES (?, ?, default, default)";
     private static final String SQL_INSERT_BUSINESS = "INSERT INTO businesses VALUES (?, default, default, default)";
-    //subscriptions
+    private static final String SQL_UPDATE_USER = "UPDATE USERS SET sharesLocation=? WHERE name=?";
+    // Subscriptions
     private static final String SQL_SELECT_USER_SUBSCRIPTIONS = "SELECT * FROM user_subscriptions";
     private static final String SQL_SELECT_BUSINESS_SUBSCRIPTIONS = "SELECT * FROM business_subscriptions";
     private static final String SQL_SELECT_USER_SUBSCRIPTION = "SELECT us.* FROM users u JOIN user_subscriptions us ON us.id = u.subscriptionid WHERE u.name = ?";
@@ -323,7 +329,16 @@ public class MarsH2Repository implements MarsRepository {
 
     @Override
     public void cancelTravel(UserAccount user, int tripID) {
-        // Empty for now
+        try(Connection con = MarsConnection.getConnection();
+            PreparedStatement stmt = con.prepareStatement(SQL_DELETE_TRAVEL)) {
+            stmt.setString(1, user.getUsername());
+            stmt.setInt(2, tripID);
+
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
+            throw new DatabaseException("Could not cancel travel/trip.");
+        }
     }
 
     @Override

@@ -710,7 +710,30 @@ paths:
           description: Unexpected error.
       security:
         - Token: [ User ]
-
+  /api/travel/{id}:
+    summary: Cancel a trip / travel.
+    delete:
+      summary: Cancel a trip / travel.
+      operationId: cancelTrip
+      tags:
+        - travel
+      parameters:
+        - in: path
+          required: true
+          name: id
+          schema:
+            type: integer
+      responses:
+        '202':
+          description: Successfully canceled your trip.
+        '401':
+          description: Authorization information is missing or invalid.
+        '403':
+          description: Forbidden!
+        '500':
+            description: Unexpected error.
+      security:
+          - Token: [ user ]
   /api/ping:
     get:
       operationId: ping
