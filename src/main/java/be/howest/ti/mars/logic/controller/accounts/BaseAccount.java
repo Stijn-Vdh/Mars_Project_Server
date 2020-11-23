@@ -1,21 +1,26 @@
-package be.howest.ti.mars.logic.controller;
+package be.howest.ti.mars.logic.controller.accounts;
 
 import be.howest.ti.mars.logic.controller.security.AccountToken;
+import be.howest.ti.mars.logic.data.MarsH2Repository;
+import be.howest.ti.mars.logic.data.MarsRepository;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.util.Objects;
 
 public abstract class BaseAccount {
+    protected static final MarsRepository repo = new MarsH2Repository();
     private AccountToken accountToken;
-    private final int homeAddressEndpoint; //replace with endpoint class
+    private Integer homeAddressEndpoint; //replace with endpoint class
     private final String password; // needs to be replaced with Password class which will contain hashed version
     private final String username; // needs to be unique
-    private final String address; // just random info
+    private String address; // just random info
+    protected int subscriptionId;
 
     public BaseAccount(int homeAddressEndpoint, String password, String username, String address) {
-        this(new AccountToken(username), homeAddressEndpoint, password, username, address);
+        this(null, homeAddressEndpoint, password, username, address);
     }
 
-    public BaseAccount(AccountToken accountToken, int homeAddressEndpoint, String password, String username, String address) {
+    public BaseAccount(AccountToken accountToken, Integer homeAddressEndpoint, String password, String username, String address) {
         this.accountToken = accountToken;
         this.homeAddressEndpoint = homeAddressEndpoint;
         this.password = password;
@@ -24,17 +29,14 @@ public abstract class BaseAccount {
     }
 
     public BaseAccount(String name) {
-        this(null,0,"",name,"");
-    }
-
-    public AccountToken getUserToken() {
-        return accountToken;
+        this(null, null, "", name, "");
     }
 
     public int getHomeAddressEndpoint() {
         return homeAddressEndpoint;
     }
 
+    @JsonIgnore
     public String getPassword() {
         return password;
     }
@@ -43,12 +45,25 @@ public abstract class BaseAccount {
         return username;
     }
 
-    public String getAddress() {
-        return address;
+    public void setAccountToken(AccountToken accountToken) {
+        this.accountToken = accountToken;
     }
 
-    public void setUserToken(AccountToken accountToken) {
-        this.accountToken = accountToken;
+    @JsonIgnore
+    public AccountToken getAccountToken() {
+        return accountToken;
+    }
+
+    public void setHomeAddressEndpoint(Integer homeAddressEndpoint) {
+        this.homeAddressEndpoint = homeAddressEndpoint;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getAddress() {
+        return address;
     }
 
     @Override
@@ -63,7 +78,6 @@ public abstract class BaseAccount {
     public int hashCode() {
         return Objects.hash(username.toLowerCase());
     }
-
 
 
 }
