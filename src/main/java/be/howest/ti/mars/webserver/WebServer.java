@@ -167,6 +167,7 @@ public class WebServer extends AbstractVerticle {
         addRouteWithCtxFunction(factory, "getAccountInformation", bridge::getAccountInformation);
         addRouteWithCtxFunction(factory, "travel", bridge::travel);
         addRouteWithCtxFunction(factory, "getTravelHistory", bridge::getTravelHistory);
+        addRouteWithCtxFunction(factory, "cancelTrip", bridge::cancelTrip);
         addRouteWithCtxFunction(factory, "ping", bridge::ping);
     }
 

@@ -135,4 +135,8 @@ public class MarsController {
     public Object getTravelHistory(UserAccount acc) {
         return repo.getTravelHistory(acc);
     }
+
+    public void cancelTrip(UserAccount acc, int id) {
+        repo.cancelTravel(acc, id);
+    }
 }
