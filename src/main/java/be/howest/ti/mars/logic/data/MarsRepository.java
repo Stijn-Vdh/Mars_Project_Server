@@ -58,7 +58,7 @@ public interface MarsRepository {
     // Deliveries
     Set<Delivery> getDeliveries(); // TODO: 21-11-2020 also not available in spec
 
-    void addDelivery(Delivery delivery);
+    int addDelivery(Delivery delivery);
 
     // Subscriptions
     Set<UserSubscription> getUserSubscriptions(); // TODO: 21-11-2020 add to spec and webserver

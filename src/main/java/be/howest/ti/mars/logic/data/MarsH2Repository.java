@@ -2,12 +2,12 @@ package be.howest.ti.mars.logic.data;
 
 import be.howest.ti.mars.logic.controller.Delivery;
 import be.howest.ti.mars.logic.controller.Endpoint;
-import be.howest.ti.mars.logic.controller.enums.PodType;
 import be.howest.ti.mars.logic.controller.Travel;
 import be.howest.ti.mars.logic.controller.accounts.BaseAccount;
 import be.howest.ti.mars.logic.controller.accounts.BusinessAccount;
 import be.howest.ti.mars.logic.controller.accounts.UserAccount;
 import be.howest.ti.mars.logic.controller.converters.ShortEndpoint;
+import be.howest.ti.mars.logic.controller.enums.PodType;
 import be.howest.ti.mars.logic.controller.exceptions.DatabaseException;
 import be.howest.ti.mars.logic.controller.exceptions.EndpointException;
 import be.howest.ti.mars.logic.controller.exceptions.EntityNotFoundException;
@@ -15,10 +15,7 @@ import be.howest.ti.mars.logic.controller.subscription.BusinessSubscription;
 import be.howest.ti.mars.logic.controller.subscription.BusinessSubscriptionInfo;
 import be.howest.ti.mars.logic.controller.subscription.UserSubscription;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -364,15 +361,20 @@ public class MarsH2Repository implements MarsRepository {
     }
 
     @Override
-    public void addDelivery(Delivery delivery) {
+    public int addDelivery(Delivery delivery) {
         try (Connection con = MarsConnection.getConnection();
-             PreparedStatement stmt = con.prepareStatement(SQL_ADD_DELIVERY)) {
+             PreparedStatement stmt = con.prepareStatement(SQL_ADD_DELIVERY, Statement.RETURN_GENERATED_KEYS)) {
 
             stmt.setString(1, delivery.getDeliveryType().toString());
             stmt.setInt(2, delivery.getSource().getId());
             stmt.setInt(3, delivery.getDestination().getId());
             stmt.setString(4, delivery.getSender());
             stmt.executeUpdate();
+
+            try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
+                generatedKeys.next();
+                return generatedKeys.getInt(1);
+            }
         } catch (SQLException ex) {
             LOGGER.log(Level.WARNING, ex.getMessage(), ex);
             throw new DatabaseException("Can't add delivery!");

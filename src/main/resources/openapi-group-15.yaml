@@ -614,7 +614,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  deliveryID:
+                  deliveryId:
                     type: integer
         '401':
           description: Authorization information is missing or invalid.

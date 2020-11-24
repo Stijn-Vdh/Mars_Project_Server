@@ -18,8 +18,8 @@ public class MarsController extends AuthController {
         return MOTD;
     }
 
-    public void createDelivery(String deliveryType, int from, int destination, String sender) {
-        repo.addDelivery(new Delivery(DeliveryType.enumOf(deliveryType), repo.getShortEndpoint(from), repo.getShortEndpoint(destination), "", sender));
+    public int createDelivery(String deliveryType, int from, int destination, String sender) {
+       return repo.addDelivery(new Delivery(DeliveryType.enumOf(deliveryType), repo.getShortEndpoint(from), repo.getShortEndpoint(destination), "", sender));
     }
 
     public Object addFriend(UserAccount user, String friendName) { // TODO: 20-11-2020 validation friend exists and not already friended and user and friend not same
