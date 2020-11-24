@@ -139,4 +139,8 @@ public class MarsController {
     public void cancelTrip(UserAccount acc, int id) {
         repo.cancelTravel(acc, id);
     }
+
+    public void changeDisplayName(BaseAccount acc, String newDN) {
+        repo.changeDisplayName(acc, newDN);
+    }
 }

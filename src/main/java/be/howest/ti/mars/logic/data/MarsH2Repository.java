@@ -54,6 +54,7 @@ public class MarsH2Repository implements MarsRepository {
     private static final String SQL_INSERT_USER = "INSERT INTO users VALUES (?, ?, default, default)";
     private static final String SQL_INSERT_BUSINESS = "INSERT INTO businesses VALUES (?, default, default, default)";
     private static final String SQL_UPDATE_USER = "UPDATE USERS SET sharesLocation=? WHERE name=?";
+    private static final String SQL_UPDATE_USER_DN = "UPDATE USERS SET displayName=? where name=?";
     // Subscriptions
     private static final String SQL_SELECT_USER_SUBSCRIPTIONS = "SELECT * FROM user_subscriptions";
     private static final String SQL_SELECT_BUSINESS_SUBSCRIPTIONS = "SELECT * FROM business_subscriptions";
@@ -224,6 +225,11 @@ public class MarsH2Repository implements MarsRepository {
             LOGGER.log(Level.WARNING, ex.getMessage(), ex);
             throw new DatabaseException("Could not share location.");
         }
+    }
+
+    @Override
+    public void changeDisplayName(BaseAccount acc, String newDN) {
+
     }
 
     // Friends

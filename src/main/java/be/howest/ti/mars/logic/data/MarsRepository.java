@@ -36,6 +36,7 @@ public interface MarsRepository {
 
     void setShareLocation(UserAccount user, boolean shareLocation);
 
+    void changeDisplayName(BaseAccount acc, String newDN);
 
     // Friends
     Set<UserAccount> getFriends(UserAccount user, Set<UserAccount> users);
@@ -78,4 +79,6 @@ public interface MarsRepository {
     Set<String> getReportSections();
 
     void addReport(BaseAccount baseAccount, String section, String body);
+
+
 }

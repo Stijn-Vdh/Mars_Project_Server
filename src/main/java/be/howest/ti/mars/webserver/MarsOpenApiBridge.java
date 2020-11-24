@@ -190,7 +190,11 @@ class MarsOpenApiBridge {
         return "pong";
     }
 
-
+    public Object changeDisplayName(RoutingContext ctx) {
+        String newDN = ctx.getBodyAsJson().getString("newDisplayName");
+        controller.changeDisplayName(getAccount(ctx), newDN);
+        return "Successfully changed your display name to " + newDN;
+    }
 
     //------------------------------------------------------------------------------------------------------------------
 
@@ -236,6 +240,7 @@ class MarsOpenApiBridge {
             return header.substring(AUTHORIZATION_TOKEN_PREFIX.length());
         }
     }
+
 
 
 }
