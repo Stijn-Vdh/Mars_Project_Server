@@ -3,6 +3,8 @@ package be.howest.ti.mars.logic.controller;
 import be.howest.ti.mars.logic.controller.accounts.BaseAccount;
 import be.howest.ti.mars.logic.controller.accounts.BusinessAccount;
 import be.howest.ti.mars.logic.controller.accounts.UserAccount;
+import be.howest.ti.mars.logic.controller.enums.DeliveryType;
+import be.howest.ti.mars.logic.controller.enums.PodType;
 import be.howest.ti.mars.logic.controller.exceptions.EndpointException;
 import io.vertx.core.json.JsonObject;
 
@@ -17,7 +19,7 @@ public class MarsController extends AuthController {
     }
 
     public void createDelivery(String deliveryType, int from, int destination, String sender) {
-        repo.addDelivery(new Delivery(DeliveryType.valueOf(deliveryType), repo.getShortEndpoint(from), repo.getShortEndpoint(destination), "", sender));
+        repo.addDelivery(new Delivery(DeliveryType.enumOf(deliveryType), repo.getShortEndpoint(from), repo.getShortEndpoint(destination), "", sender));
     }
 
     public Object addFriend(UserAccount user, String friendName) { // TODO: 20-11-2020 validation friend exists and not already friended and user and friend not same
@@ -74,7 +76,7 @@ public class MarsController extends AuthController {
 
     public void travel(UserAccount acc, int from, int destination, String type) { // getShortEndpoint also validates if endpoint exists
         if (from == destination) throw new EndpointException("Destination and from are the same endpoint");
-        repo.travel(acc, new Travel(repo.getShortEndpoint(from), repo.getShortEndpoint(destination), PodType.valueOf(type), ""));
+        repo.travel(acc, new Travel(repo.getShortEndpoint(from), repo.getShortEndpoint(destination), PodType.enumOf(type), ""));
     }
 
     public Object getTravelHistory(UserAccount acc) {

@@ -2,7 +2,7 @@ package be.howest.ti.mars.logic.data;
 
 import be.howest.ti.mars.logic.controller.Delivery;
 import be.howest.ti.mars.logic.controller.Endpoint;
-import be.howest.ti.mars.logic.controller.PodType;
+import be.howest.ti.mars.logic.controller.enums.PodType;
 import be.howest.ti.mars.logic.controller.Travel;
 import be.howest.ti.mars.logic.controller.accounts.BaseAccount;
 import be.howest.ti.mars.logic.controller.accounts.BusinessAccount;
@@ -44,7 +44,7 @@ public class MarsH2Repository implements MarsRepository {
     // Travels
     private static final String SQL_INSERT_TRAVEL = "INSERT INTO TRAVELS VALUES(default, ?, ?, ?, DEFAULT, ?, NULL)";
     private static final String SQL_SELECT_TRAVEL_HISTORY = "SELECT * FROM TRAVELS t WHERE userName=? ";
-    private static final String SQL_DELETE_TRAVEL = "DELETE FROM TRAVELS WHERE userName=? and ID=?";
+    private static final String SQL_DELETE_TRAVEL = "DELETE FROM TRAVELS WHERE userName=? AND ID=?";
     // Favorites
     private static final String SQL_DELETE_FAVORITE_ENDPOINT = "DELETE FROM favorite_endpoints WHERE ACCOUNTNAME=? AND ENDPOINTID=?;";
     private static final String SQL_INSERT_FAVORITE_ENDPOINT = "INSERT INTO favorite_endpoints VALUES (?, ?)";
@@ -65,7 +65,8 @@ public class MarsH2Repository implements MarsRepository {
     private static final String SQL_UPDATE_BUSINESS_SUBSCRIPTION = "UPDATE businesses SET subscriptionid = ? WHERE name = ?";
 
     // Endpoints
-    @Override // TODO: 21-11-2020 add endpoint visibility logic: users see only their endpoint and public endpoints and friend home endpoints(if sharing), companies see all endpoints but what if normal person needs to send package to other person ???
+    @Override
+    // TODO: 21-11-2020 add endpoint visibility logic: users see only their endpoint and public endpoints and friend home endpoints(if sharing), companies see all endpoints but what if normal person needs to send package to other person ???
     public Set<ShortEndpoint> getEndpoints() { //will be short for the meantime
         Set<ShortEndpoint> endpoints = new HashSet<>();
 
@@ -230,10 +231,10 @@ public class MarsH2Repository implements MarsRepository {
     @Override
     public void setDisplayName(UserAccount acc, String displayName) {
 
-        try(Connection con = MarsConnection.getConnection();
-            PreparedStatement stmt = con.prepareStatement(SQL_UPDATE_USER_DN)){
+        try (Connection con = MarsConnection.getConnection();
+             PreparedStatement stmt = con.prepareStatement(SQL_UPDATE_USER_DN)) {
             stmt.setString(1, displayName);
-            stmt.setString(2,acc.getUsername());
+            stmt.setString(2, acc.getUsername());
             acc.setDisplayName(displayName);
             stmt.executeUpdate();
         } catch (SQLException ex) {
@@ -317,7 +318,7 @@ public class MarsH2Repository implements MarsRepository {
                     int destination = rs.getInt("destination");
                     String podType = rs.getString("podType");
                     String date = rs.getString("dateTime");
-                    travels.add(new Travel(getShortEndpoint(from), getShortEndpoint(destination), PodType.valueOf(podType), date));
+                    travels.add(new Travel(getShortEndpoint(from), getShortEndpoint(destination), PodType.enumOf(podType), date));
                 }
             }
         } catch (SQLException ex) {
@@ -335,7 +336,7 @@ public class MarsH2Repository implements MarsRepository {
             stmt.setInt(1, travel.getFrom().getId());
             stmt.setInt(2, travel.getDestination().getId());
             stmt.setString(3, user.getUsername());
-            stmt.setString(4, travel.getPodType().name());
+            stmt.setString(4, travel.getPodType().toString());
             stmt.executeUpdate();
         } catch (SQLException ex) {
             LOGGER.log(Level.WARNING, ex.getMessage(), ex);
@@ -345,8 +346,8 @@ public class MarsH2Repository implements MarsRepository {
 
     @Override
     public void cancelTravel(UserAccount user, int tripID) {
-        try(Connection con = MarsConnection.getConnection();
-            PreparedStatement stmt = con.prepareStatement(SQL_DELETE_TRAVEL)) {
+        try (Connection con = MarsConnection.getConnection();
+             PreparedStatement stmt = con.prepareStatement(SQL_DELETE_TRAVEL)) {
             stmt.setString(1, user.getUsername());
             stmt.setInt(2, tripID);
 
@@ -367,7 +368,7 @@ public class MarsH2Repository implements MarsRepository {
         try (Connection con = MarsConnection.getConnection();
              PreparedStatement stmt = con.prepareStatement(SQL_ADD_DELIVERY)) {
 
-            stmt.setString(1, delivery.getDeliveryType().name());
+            stmt.setString(1, delivery.getDeliveryType().toString());
             stmt.setInt(2, delivery.getSource().getId());
             stmt.setInt(3, delivery.getDestination().getId());
             stmt.setString(4, delivery.getSender());
