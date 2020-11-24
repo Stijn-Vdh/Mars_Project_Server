@@ -11,9 +11,7 @@ import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 class MarsOpenApiBridge {
     private final MarsController controller;
@@ -34,7 +32,7 @@ class MarsOpenApiBridge {
                 json.getString("name"),
                 SecureHash.getHashEncoded(json.getString("password")),
                 json.getString("homeAddress"),
-                json.getInteger("homeEndpointID"),
+                json.getInteger("homeEndpointId"),
                 json.getBoolean("businessAccount")
         );
 
@@ -43,12 +41,14 @@ class MarsOpenApiBridge {
 
     public Object sendPackage(RoutingContext ctx) { // TODO: 21-11-2020 add missing validation: only business can send large packages, etc , from != dest
         JsonObject json = ctx.getBodyAsJson();
-        controller.createDelivery(json.getString("deliveryType"),
+        int id = controller.createDelivery(json.getString("deliveryType"),
                 json.getInteger("from"),
                 json.getInteger("destination"),
                 getAccount(ctx).getUsername()
         );
-        return "Your pod is on route to your location.";
+        JsonObject delivery = new JsonObject();
+        delivery.put("deliveryId", id);
+        return delivery;
     }
 
     public Object login(RoutingContext ctx) {
@@ -140,14 +140,14 @@ class MarsOpenApiBridge {
     }
 
     public Object favoriteEndpoint(RoutingContext ctx) {
-        int endpointID = Integer.parseInt(ctx.request().getParam("id"));
-        controller.favoriteEndpoint(getAccount(ctx), endpointID);
+        int endpointId = Integer.parseInt(ctx.request().getParam("id"));
+        controller.favoriteEndpoint(getAccount(ctx), endpointId);
         return "Successfully favored this endpoint.";
     }
 
     public Object unFavoriteEndpoint(RoutingContext ctx) {
-        int endpointID = Integer.parseInt(ctx.request().getParam("id"));
-        controller.unFavoriteEndpoint(getAccount(ctx), endpointID);
+        int endpointId = Integer.parseInt(ctx.request().getParam("id"));
+        controller.unFavoriteEndpoint(getAccount(ctx), endpointId);
         return "Successfully unfavored this endpoint.";
     }
 
@@ -180,7 +180,7 @@ class MarsOpenApiBridge {
 
     public Object cancelTrip(RoutingContext ctx) {
         int id = Integer.parseInt(ctx.request().getParam("id"));
-        controller.cancelTrip(getUserAccount(ctx) ,id);
+        controller.cancelTrip(getUserAccount(ctx), id);
 
         return null;
     }
@@ -189,9 +189,9 @@ class MarsOpenApiBridge {
         return "pong";
     }
 
-    public Object changeDisplayName(RoutingContext ctx) {
+    public Object setDisplayName(RoutingContext ctx) {
         String newDN = ctx.getBodyAsJson().getString("newDisplayName");
-        controller.changeDisplayName(getUserAccount(ctx), newDN);
+        getUserAccount(ctx).setDisplayName(newDN);
         return "Successfully changed your display name to " + newDN;
     }
 
@@ -206,13 +206,8 @@ class MarsOpenApiBridge {
     }
 
     private BaseAccount getAccount(RoutingContext ctx) {
-        AccountToken accountToken = Json.decodeValue(new JsonObject().put(TOKEN, getBearerToken(ctx)).toString(), AccountToken.class);
-        return Stream.concat(
-                controller.getUserAccounts().stream(),
-                controller.getBusinessAccounts().stream())
-                .filter(acc -> accountToken.equals(acc.getAccountToken()))
-                .findAny()
-                .orElse(null);
+        UserAccount account = getUserAccount(ctx);
+        return account != null ? account : getBusinessAccount(ctx);
     }
 
     private UserAccount getUserAccount(RoutingContext ctx) {
@@ -239,7 +234,4 @@ class MarsOpenApiBridge {
             return header.substring(AUTHORIZATION_TOKEN_PREFIX.length());
         }
     }
-
-
-
 }

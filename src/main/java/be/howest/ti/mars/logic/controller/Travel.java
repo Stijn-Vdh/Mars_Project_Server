@@ -1,6 +1,7 @@
 package be.howest.ti.mars.logic.controller;
 
 import be.howest.ti.mars.logic.controller.converters.ShortEndpoint;
+import be.howest.ti.mars.logic.controller.enums.PodType;
 
 public class Travel {
     private final ShortEndpoint from;

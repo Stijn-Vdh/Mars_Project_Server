@@ -36,7 +36,7 @@ public interface MarsRepository {
 
     void setShareLocation(UserAccount user, boolean shareLocation);
 
-    void changeDisplayName(UserAccount acc, String newDN);
+    void setDisplayName(UserAccount acc, String displayName);
 
     // Friends
     Set<UserAccount> getFriends(UserAccount user, Set<UserAccount> users);
@@ -58,7 +58,7 @@ public interface MarsRepository {
     // Deliveries
     Set<Delivery> getDeliveries(); // TODO: 21-11-2020 also not available in spec
 
-    void addDelivery(Delivery delivery);
+    int addDelivery(Delivery delivery);
 
     // Subscriptions
     Set<UserSubscription> getUserSubscriptions(); // TODO: 21-11-2020 add to spec and webserver
