@@ -13,9 +13,9 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 public abstract class AuthController {
-    MarsH2Repository repo = new MarsH2Repository();
-    Set<UserAccount> userAccounts = new HashSet<>();
-    Set<BusinessAccount> businessAccounts = new HashSet<>();
+    protected MarsH2Repository repo = new MarsH2Repository();
+    protected Set<UserAccount> userAccounts = new HashSet<>();
+    protected Set<BusinessAccount> businessAccounts = new HashSet<>();
 
     public Set<UserAccount> getUserAccounts() {
         return userAccounts;

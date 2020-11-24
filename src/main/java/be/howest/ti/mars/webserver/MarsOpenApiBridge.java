@@ -12,7 +12,6 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 class MarsOpenApiBridge {
     private final MarsController controller;
@@ -205,13 +204,8 @@ class MarsOpenApiBridge {
     }
 
     private BaseAccount getAccount(RoutingContext ctx) {
-        AccountToken accountToken = Json.decodeValue(new JsonObject().put(TOKEN, getBearerToken(ctx)).toString(), AccountToken.class);
-        return Stream.concat(
-                controller.getUserAccounts().stream(),
-                controller.getBusinessAccounts().stream())
-                .filter(acc -> accountToken.equals(acc.getAccountToken()))
-                .findAny()
-                .orElse(null);
+        UserAccount account = getUserAccount(ctx);
+        return account != null ? account : getBusinessAccount(ctx);
     }
 
     private UserAccount getUserAccount(RoutingContext ctx) {
@@ -238,6 +232,4 @@ class MarsOpenApiBridge {
             return header.substring(AUTHORIZATION_TOKEN_PREFIX.length());
         }
     }
-
-
 }
