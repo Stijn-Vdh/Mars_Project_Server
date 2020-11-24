@@ -17,7 +17,6 @@ import java.util.stream.Stream;
 
 class MarsOpenApiBridge {
     private final MarsController controller;
-    private static final Logger logger = Logger.getLogger(MarsOpenApiBridge.class.getName());
     public static final String AUTHORIZATION_TOKEN_PREFIX = "Bearer ";
     private static final String TOKEN = "token";
 
@@ -190,7 +189,11 @@ class MarsOpenApiBridge {
         return "pong";
     }
 
-
+    public Object changeDisplayName(RoutingContext ctx) {
+        String newDN = ctx.getBodyAsJson().getString("newDisplayName");
+        controller.changeDisplayName(getUserAccount(ctx), newDN);
+        return "Successfully changed your display name to " + newDN;
+    }
 
     //------------------------------------------------------------------------------------------------------------------
 
@@ -236,6 +239,7 @@ class MarsOpenApiBridge {
             return header.substring(AUTHORIZATION_TOKEN_PREFIX.length());
         }
     }
+
 
 
 }

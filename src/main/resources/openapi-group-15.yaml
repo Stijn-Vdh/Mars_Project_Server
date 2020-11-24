@@ -248,6 +248,34 @@ paths:
           description: Unexpected error.
       security:
         - Token: [ User ]
+  /api/changeDisplayName:
+    description: Change your current display name.
+    post:
+      summary: Change your current display name.
+      operationId: changeDisplayName
+      tags:
+        - user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                newDisplayName:
+                  type: string
+      responses:
+        '200':
+          description: Succesfuly changed your display name.
+        '401':
+          description: Authorization information is missing or invalid.
+        '403':
+          description: Forbidden!
+        '500':
+          description: Internal error.
+      security:
+        - Token: [ user ]
+
 
   /api/friend: #Get all our friends
     get:

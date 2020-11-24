@@ -113,7 +113,8 @@ public class MarsController {
 
     public Object getUserAccountInformation(UserAccount account) {
         JsonObject accInformation = getAccountInformation(account);
-        accInformation.put("shareLocation", account.isSharesLocation());
+        accInformation.put("displayName:", account.getDisplayName());
+        accInformation.put("shareLocation:", account.isSharesLocation());
         accInformation.put("subscription:", repo.getUserSubscription(account));
         accInformation.put("friends:", repo.getFriends(account, userAccounts).stream().map(UserAccount::getUsername).collect(Collectors.toList()));
         accInformation.put("travelHistory:", repo.getTravelHistory(account));
@@ -123,7 +124,7 @@ public class MarsController {
     public Object getBusinessAccountInformation(BusinessAccount business) {
         JsonObject accInformation = getAccountInformation(business);
         accInformation.put("subscription:", repo.getBusinessSubscription(business));
-        accInformation.put("Current usage subscription", repo.getBusinessSubscriptionInfo(business));
+        accInformation.put("Current usage subscription:", repo.getBusinessSubscriptionInfo(business));
         return accInformation;
     }
 
@@ -138,5 +139,9 @@ public class MarsController {
 
     public void cancelTrip(UserAccount acc, int id) {
         repo.cancelTravel(acc, id);
+    }
+
+    public void changeDisplayName(UserAccount acc, String newDN) {
+        repo.changeDisplayName(acc, newDN);
     }
 }
