@@ -129,7 +129,7 @@ paths:
                   minLength: 1
                 homeAddress:
                   type: string
-                homeEndpointID:
+                homeEndpointId:
                   type: integer
                 businessAccount:
                   type: boolean
@@ -149,7 +149,7 @@ paths:
           description: username already is taken
         '500':
           description: Internal error.
-  /api/accountInformation: #get your account information
+  /api/accountInformation: #get your account information todo: response is outdated
     summary: get your account information
     get:
       summary: get user information.
@@ -181,12 +181,12 @@ paths:
                         type: boolean
                       homeAddress:
                         type: string
-                      homeEndpointID:
+                      homeEndpointId:
                         type: integer
                   favouriteTrips:
                     type: object
                     properties:
-                      endpointID:
+                      endpointId:
                         type: integer
                       endpointName:
                         type: string
@@ -232,6 +232,8 @@ paths:
           description: Forbidden!
         '5XX':
           description: Unexpected error.
+      security:
+        - Token: [ User ]
     delete:
       operationId: stopSharingLocation
       summary: Stop sharing your location with your friends.
@@ -356,17 +358,17 @@ paths:
               schema:
                 type: object
                 properties:
-                  subscriptionID:
+                  subscriptionId:
                     type: integer
                   subscriptionName:
                     type: string
                   subscriptionPrice:
                     type: integer
                 example: [ {
-                  subscriptionID: 1,
+                  subscriptionId: 1,
                   subscriptionName: 'Start-up'
                 },{
-                  subscriptionID: 2,
+                  subscriptionId: 2,
                   subscriptionName: 'Professional'
                 } ]
         '500':
@@ -566,7 +568,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  deliveryID:
+                  deliveryId:
                     type: integer
                   deliveryType:
                     type: string
@@ -678,7 +680,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  tripID:
+                  tripId:
                     type: integer
                   from:
                     type: integer
@@ -728,7 +730,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  travelID:
+                  travelId:
                     type: integer
         '401':
           description: Authorization information is missing or invalid.

@@ -32,7 +32,7 @@ class MarsOpenApiBridge {
                 json.getString("name"),
                 SecureHash.getHashEncoded(json.getString("password")),
                 json.getString("homeAddress"),
-                json.getInteger("homeEndpointID"),
+                json.getInteger("homeEndpointId"),
                 json.getBoolean("businessAccount")
         );
 
@@ -140,14 +140,14 @@ class MarsOpenApiBridge {
     }
 
     public Object favoriteEndpoint(RoutingContext ctx) {
-        int endpointID = Integer.parseInt(ctx.request().getParam("id"));
-        controller.favoriteEndpoint(getAccount(ctx), endpointID);
+        int endpointId = Integer.parseInt(ctx.request().getParam("id"));
+        controller.favoriteEndpoint(getAccount(ctx), endpointId);
         return "Successfully favored this endpoint.";
     }
 
     public Object unFavoriteEndpoint(RoutingContext ctx) {
-        int endpointID = Integer.parseInt(ctx.request().getParam("id"));
-        controller.unFavoriteEndpoint(getAccount(ctx), endpointID);
+        int endpointId = Integer.parseInt(ctx.request().getParam("id"));
+        controller.unFavoriteEndpoint(getAccount(ctx), endpointId);
         return "Successfully unfavored this endpoint.";
     }
 
