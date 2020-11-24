@@ -36,7 +36,7 @@ public interface MarsRepository {
 
     void setShareLocation(UserAccount user, boolean shareLocation);
 
-    void changeDisplayName(UserAccount acc, String newDN);
+    void setDisplayName(UserAccount acc, String displayName);
 
     // Friends
     Set<UserAccount> getFriends(UserAccount user, Set<UserAccount> users);

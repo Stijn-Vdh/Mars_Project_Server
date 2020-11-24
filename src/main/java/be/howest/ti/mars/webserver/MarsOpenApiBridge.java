@@ -11,7 +11,6 @@ import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -180,7 +179,7 @@ class MarsOpenApiBridge {
 
     public Object cancelTrip(RoutingContext ctx) {
         int id = Integer.parseInt(ctx.request().getParam("id"));
-        controller.cancelTrip(getUserAccount(ctx) ,id);
+        controller.cancelTrip(getUserAccount(ctx), id);
 
         return null;
     }
@@ -189,9 +188,9 @@ class MarsOpenApiBridge {
         return "pong";
     }
 
-    public Object changeDisplayName(RoutingContext ctx) {
+    public Object setDisplayName(RoutingContext ctx) {
         String newDN = ctx.getBodyAsJson().getString("newDisplayName");
-        controller.changeDisplayName(getUserAccount(ctx), newDN);
+        getUserAccount(ctx).setDisplayName(newDN);
         return "Successfully changed your display name to " + newDN;
     }
 
@@ -239,7 +238,6 @@ class MarsOpenApiBridge {
             return header.substring(AUTHORIZATION_TOKEN_PREFIX.length());
         }
     }
-
 
 
 }

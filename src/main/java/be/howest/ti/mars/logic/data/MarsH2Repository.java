@@ -228,13 +228,13 @@ public class MarsH2Repository implements MarsRepository {
     }
 
     @Override
-    public void changeDisplayName(UserAccount acc, String newDN) {
+    public void setDisplayName(UserAccount acc, String displayName) {
 
         try(Connection con = MarsConnection.getConnection();
             PreparedStatement stmt = con.prepareStatement(SQL_UPDATE_USER_DN)){
-            stmt.setString(1,newDN);
+            stmt.setString(1, displayName);
             stmt.setString(2,acc.getUsername());
-            acc.setDisplayName(newDN);
+            acc.setDisplayName(displayName);
             stmt.executeUpdate();
         } catch (SQLException ex) {
             LOGGER.log(Level.WARNING, ex.getMessage(), ex);

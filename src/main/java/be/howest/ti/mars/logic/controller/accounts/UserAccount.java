@@ -34,6 +34,7 @@ public class UserAccount extends BaseAccount {
     }
 
     public void setDisplayName(String displayName) {
+        repo.setDisplayName(this, displayName);
         this.displayName = displayName;
     }
 
