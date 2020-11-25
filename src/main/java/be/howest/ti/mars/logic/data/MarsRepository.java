@@ -34,6 +34,8 @@ public interface MarsRepository {
     // User
     void addUser(UserAccount user);
 
+    void changePassword(BaseAccount acc, String newPW);
+
     void setShareLocation(UserAccount user, boolean shareLocation);
 
     void setDisplayName(UserAccount acc, String displayName);
@@ -79,6 +81,7 @@ public interface MarsRepository {
     Set<String> getReportSections();
 
     void addReport(BaseAccount baseAccount, String section, String body);
+
 
 
 }

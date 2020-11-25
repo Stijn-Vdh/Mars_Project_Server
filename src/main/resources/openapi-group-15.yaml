@@ -277,7 +277,33 @@ paths:
           description: Internal error.
       security:
         - Token: [ user ]
-
+  /api/changePassword:
+    description: Change your password.
+    post:
+      summary: Change your password.
+      operationId: changePassword
+      tags:
+        - user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                newPassword:
+                  type: string
+      responses:
+        '200':
+          description: Succesfuly changed your password.
+        '401':
+          description: Authorization information is missing or invalid.
+        '403':
+          description: Forbidden!
+        '500':
+          description: Internal error.
+      security:
+        - Token: [ ]
 
   /api/friend: #Get all our friends
     get:
@@ -761,9 +787,9 @@ paths:
         '403':
           description: Forbidden!
         '500':
-            description: Unexpected error.
+          description: Unexpected error.
       security:
-          - Token: [ user ]
+        - Token: [ user ]
   /api/ping:
     get:
       operationId: ping

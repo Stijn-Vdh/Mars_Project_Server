@@ -52,6 +52,7 @@ public class MarsH2Repository implements MarsRepository {
     private static final String SQL_INSERT_BUSINESS = "INSERT INTO businesses VALUES (?, default, default, default)";
     private static final String SQL_UPDATE_USER = "UPDATE USERS SET sharesLocation=? WHERE name=?";
     private static final String SQL_UPDATE_USER_DN = "UPDATE USERS SET displayName=? WHERE name=?";
+    private static final String SQL_UPDATE_ACC_PW = "UPDATE ACCOUNTS SET password=? WHERE name=?";
     // Subscriptions
     private static final String SQL_SELECT_USER_SUBSCRIPTIONS = "SELECT * FROM user_subscriptions";
     private static final String SQL_SELECT_BUSINESS_SUBSCRIPTIONS = "SELECT * FROM business_subscriptions";
@@ -195,6 +196,19 @@ public class MarsH2Repository implements MarsRepository {
         } catch (SQLException ex) {
             LOGGER.log(Level.WARNING, ex.getMessage(), ex);
             throw new DatabaseException("Cannot add user!");
+        }
+    }
+
+    @Override
+    public void changePassword(BaseAccount acc, String newPW) {
+        try (Connection con = MarsConnection.getConnection();
+             PreparedStatement stmt = con.prepareStatement(SQL_UPDATE_ACC_PW)) {
+            stmt.setString(1, acc.getUsername());
+            stmt.setString(2, newPW);
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
+            throw new DatabaseException("Could not change password.");
         }
     }
 

@@ -11,7 +11,7 @@ public abstract class BaseAccount {
     protected static final MarsRepository repo = new MarsH2Repository();
     private AccountToken accountToken;
     private Integer homeAddressEndpoint; //replace with endpoint class
-    private final String password; // needs to be replaced with Password class which will contain hashed version
+    private String password; // needs to be replaced with Password class which will contain hashed version
     private final String username; // needs to be unique
     private String address; // just random info
     protected int subscriptionId;
@@ -64,6 +64,10 @@ public abstract class BaseAccount {
 
     public String getAddress() {
         return address;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     @Override
