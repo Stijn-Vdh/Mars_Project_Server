@@ -64,6 +64,7 @@ public class WebServer extends AbstractVerticle {
                 configureOpenApiServer(promise, OPEN_API_SPEC, port);
             }
         });
+        bridge.startDailyResetCompanyPods();
     }
 
     @Override
