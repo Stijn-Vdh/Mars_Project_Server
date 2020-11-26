@@ -71,6 +71,12 @@ public class MarsH2Repository implements MarsRepository {
     private static final String SQL_UPDATE_BUSINESS_SUBSCRIPTION_INFO = "UPDATE businesses SET LARGEPODSUSED = ? AND SMALLPODSUSED = ? WHERE name = ?";
     private static final String SQL_UPDATE_BUSINESS_SUBSCRIPTION_INFO_SMALL = "UPDATE businesses SET SMALLPODSUSED = ? WHERE name = ?";
     private static final String SQL_UPDATE_BUSINESS_SUBSCRIPTION_INFO_LARGE = "UPDATE businesses SET LARGEPODSUSED = ? WHERE name = ?";
+    //sonar (¬_¬)
+    private static final String PASSWORD = "password";
+    public static final String HOME_ADDRESS = "homeAddress";
+    public static final String HOME_ENDPOINT_ID = "homeEndpointId";
+    public static final String DESTINATION = "destination";
+    public static final String DATE_TIME = "dateTime";
 
     // Endpoints
     @Override
@@ -198,9 +204,9 @@ public class MarsH2Repository implements MarsRepository {
 
             while (rs.next()) {
                 String name = rs.getString("name");
-                String password = rs.getString("password");
-                String address = rs.getString("homeaddress");
-                int endpointId = rs.getInt("homeEndpointId");
+                String password = rs.getString(PASSWORD);
+                String address = rs.getString(HOME_ADDRESS);
+                int endpointId = rs.getInt(HOME_ENDPOINT_ID);
                 accounts.add(new BaseAccount(name, password, address, endpointId));
             }
         } catch (SQLException ex) {
@@ -220,11 +226,11 @@ public class MarsH2Repository implements MarsRepository {
 
             while (rs.next()) {
                 String name = rs.getString("name");
-                String password = rs.getString("password");
-                String address = rs.getString("homeAddress");
+                String password = rs.getString(PASSWORD);
+                String address = rs.getString(HOME_ADDRESS);
                 boolean sharesLocation = rs.getBoolean("sharesLocation");
                 String displayName = rs.getString("displayName");
-                int endpointId = rs.getInt("homeEndpointId");
+                int endpointId = rs.getInt(HOME_ENDPOINT_ID);
                 int subscriptionId = rs.getInt("subscriptionId");
                 accounts.add(new UserAccount(name, password, address, endpointId, displayName, sharesLocation, subscriptionId));
             }
@@ -245,9 +251,9 @@ public class MarsH2Repository implements MarsRepository {
 
             while (rs.next()) {
                 String name = rs.getString("name");
-                String password = rs.getString("password");
-                String address = rs.getString("homeAddress");
-                int endpointId = rs.getInt("homeEndpointId");
+                String password = rs.getString(PASSWORD);
+                String address = rs.getString(HOME_ADDRESS);
+                int endpointId = rs.getInt(HOME_ENDPOINT_ID);
                 int subscriptionId = rs.getInt("subscriptionId");
                 int smallPodsUsed = rs.getInt("smallPodsUsed");
                 int largePodsUsed = rs.getInt("largePodsUsed");
@@ -401,9 +407,9 @@ public class MarsH2Repository implements MarsRepository {
                 while (rs.next()) {
                     int id = rs.getInt("id");
                     int from = rs.getInt("from");
-                    int destination = rs.getInt("destination");
+                    int destination = rs.getInt(DESTINATION);
                     String podType = rs.getString("podType");
-                    String date = rs.getString("dateTime");
+                    String date = rs.getString(DATE_TIME);
                     travels.add(new Travel(id, getShortEndpoint(from), getShortEndpoint(destination), PodType.enumOf(podType), date));
                 }
             }
@@ -462,8 +468,8 @@ public class MarsH2Repository implements MarsRepository {
                     int id = rs.getInt("id");
                     String type = rs.getString("deliveryType");
                     int source = rs.getInt("from");
-                    int destination = rs.getInt("destination");
-                    String date = rs.getString("dateTime");
+                    int destination = rs.getInt(DESTINATION);
+                    String date = rs.getString(DATE_TIME);
                     String sender = rs.getString("sender");
 
                     Delivery delivery = new Delivery(id, DeliveryType.enumOf(type), getShortEndpoint(source), getShortEndpoint(destination), date, sender);
@@ -512,8 +518,8 @@ public class MarsH2Repository implements MarsRepository {
                     int deliveryId = rs.getInt("id");
                     String type = rs.getString("deliveryType");
                     int source = rs.getInt("from");
-                    int destination = rs.getInt("destination");
-                    String date = rs.getString("dateTime");
+                    int destination = rs.getInt(DESTINATION);
+                    String date = rs.getString(DATE_TIME);
                     String sender = rs.getString("sender");
 
 
