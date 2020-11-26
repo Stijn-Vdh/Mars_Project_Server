@@ -73,6 +73,8 @@ public interface MarsRepository {
 
     BusinessSubscriptionInfo getBusinessSubscriptionInfo(BusinessAccount business); // this returns the used amount of pods by that business that day
 
+    void updateBusinessSubscription(boolean b, BusinessAccount acc);
+
     void setUserSubscription(UserAccount user, int subscriptionId);
 
     void setBusinessSubscription(BusinessAccount business, int subscriptionId);
