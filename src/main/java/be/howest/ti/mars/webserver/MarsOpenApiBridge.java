@@ -174,7 +174,8 @@ class MarsOpenApiBridge {
         int from = ctx.getBodyAsJson().getInteger("from");
         int destination = ctx.getBodyAsJson().getInteger("destination");
         String podType = ctx.getBodyAsJson().getString("podType");
-        controller.travel(getUserAccount(ctx), from, destination, podType);
+        UserAccount user = getUserAccount(ctx);
+        controller.travel(user, from, destination, podType);
 
         return "Your pod is on route to your location.";
     }
