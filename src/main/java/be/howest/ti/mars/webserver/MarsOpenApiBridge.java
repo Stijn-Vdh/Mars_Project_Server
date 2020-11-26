@@ -228,6 +228,10 @@ class MarsOpenApiBridge {
         return controller.getCurrentRouteInfo(getUserAccount(ctx));
     }
 
+    public Object getDeliveries(RoutingContext ctx) {
+        return controller.getDeliveries(getBusinessAccount(ctx));
+    }
+
     //------------------------------------------------------------------------------------------------------------------
 
     public boolean isUserAccountToken(RoutingContext ctx) {
