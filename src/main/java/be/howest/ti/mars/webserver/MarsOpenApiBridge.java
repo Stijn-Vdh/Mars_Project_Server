@@ -20,20 +20,29 @@ import java.util.TimerTask;
 import java.util.stream.Collectors;
 
 class MarsOpenApiBridge {
-    private final MarsController controller;
     public static final String AUTHORIZATION_TOKEN_PREFIX = "Bearer ";
     private static final String TOKEN = "token";
     private static final Random rand = new Random();
     private static final Timer timer = new Timer();
-    private static Vertx vertx;
     private static final long RESET_PERIOD = 1000L * 60L * 60L * 24L;
+    private static Vertx vertx;
+    private final MarsController controller;
+
+    MarsOpenApiBridge() {
+        this.controller = new MarsController();
+    }
 
     public static void setVertx(Vertx vertx) {
         MarsOpenApiBridge.vertx = vertx;
     }
 
-    MarsOpenApiBridge() {
-        this.controller = new MarsController();
+    private static TimerTask wrap(Runnable r) { // wish this could be cleaner but it isn't a functional interface
+        return new TimerTask() {
+            @Override
+            public void run() {
+                r.run();
+            }
+        };
     }
 
     public Object getMessage(RoutingContext ctx) {
@@ -190,15 +199,6 @@ class MarsOpenApiBridge {
         return controller.getRepo().getReportSections();
     }
 
-    private static TimerTask wrap(Runnable r) { // wish this could be cleaner but it isn't a functional interface
-        return new TimerTask() {
-            @Override
-            public void run() {
-                r.run();
-            }
-        };
-    }
-
     public Object travel(RoutingContext ctx) {
         int from = ctx.getBodyAsJson().getInteger("from");
         int destination = ctx.getBodyAsJson().getInteger("destination");
@@ -221,10 +221,6 @@ class MarsOpenApiBridge {
         controller.cancelTrip(getUserAccount(ctx), id);
 
         return null;
-    }
-
-    public Object ping(RoutingContext ctx) {
-        return "pong";
     }
 
     public Object setDisplayName(RoutingContext ctx) {

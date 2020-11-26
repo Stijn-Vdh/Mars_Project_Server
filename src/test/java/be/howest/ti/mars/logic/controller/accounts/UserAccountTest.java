@@ -13,7 +13,7 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class UserDBAccountTest {
+class UserAccountTest {
 
     private static final MarsRepository repo = new MarsH2Repository();
     private static final UserAccount testDanny = new UserAccount("Danny", "Danny", 5, "MarsStreet 69");
@@ -79,16 +79,16 @@ class UserDBAccountTest {
 
     }
 
-//    @Test
-//    void testDBPassword(){
-//        repo.changePassword(testDanny, "blabla");
-//        getUsers().forEach(userAccount -> {
-//            if (userAccount.getUsername().equals(testDanny.getUsername())){
-//                assertEquals(userAccount.getPassword(), "blabla");
-//            }
-//        });
-//
-//    }
+    @Test
+    void testDBPassword() {
+        repo.changePassword(testDanny, "blabla");
+
+        repo.getUserAccounts().forEach(userAccount -> {
+            if (userAccount.equals(testDanny)) {
+                assertEquals("blabla", userAccount.getPassword());
+            }
+        });
+    }
 
     @Test
     void testDBSetShareLocation() {

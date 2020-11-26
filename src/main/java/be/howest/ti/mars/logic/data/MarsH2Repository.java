@@ -237,7 +237,27 @@ public class MarsH2Repository implements MarsRepository {
 
     @Override
     public Set<BusinessAccount> getBusinessAccounts() {
-        return null;
+        Set<BusinessAccount> accounts = new HashSet<>();
+
+        try (Connection con = MarsConnection.getConnection();
+             PreparedStatement stmt = con.prepareStatement(SQL_SELECT_BUSINESSES);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                String name = rs.getString("name");
+                String password = rs.getString("password");
+                String address = rs.getString("homeAddress");
+                int endpointId = rs.getInt("homeEndpointId");
+                int subscriptionId = rs.getInt("subscriptionId");
+                int smallPodsUsed = rs.getInt("smallPodsUsed");
+                int largePodsUsed = rs.getInt("largePodsUsed");
+                accounts.add(new BusinessAccount(name, password, address, endpointId, subscriptionId, smallPodsUsed, largePodsUsed));
+            }
+        } catch (SQLException ex) {
+            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
+            throw new DatabaseException("Cannot get all businessAccounts");
+        }
+        return accounts;
     }
 
     @Override
@@ -258,8 +278,8 @@ public class MarsH2Repository implements MarsRepository {
     public void changePassword(BaseAccount acc, String newPW) {
         try (Connection con = MarsConnection.getConnection();
              PreparedStatement stmt = con.prepareStatement(SQL_UPDATE_ACC_PW)) {
-            stmt.setString(1, acc.getUsername());
-            stmt.setString(2, newPW);
+            stmt.setString(1, newPW);
+            stmt.setString(2, acc.getUsername());
             stmt.executeUpdate();
         } catch (SQLException ex) {
             LOGGER.log(Level.WARNING, ex.getMessage(), ex);

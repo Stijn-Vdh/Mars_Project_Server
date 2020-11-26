@@ -821,17 +821,6 @@ paths:
           description: Unexpected error.
       security:
         - Token: [ user ]
-  /api/ping:
-    get:
-      operationId: ping
-      tags:
-        - server
-      summary: Checks if the server is running
-      responses:
-        '200':
-          description: Server is up and running
-        default:
-          description: Something is wrong
 
   /api/report:
     description: you can report any problem you  have with the system.
