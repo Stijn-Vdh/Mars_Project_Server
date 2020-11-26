@@ -4,19 +4,33 @@ import be.howest.ti.mars.logic.controller.MarsController;
 import be.howest.ti.mars.logic.controller.accounts.BaseAccount;
 import be.howest.ti.mars.logic.controller.accounts.BusinessAccount;
 import be.howest.ti.mars.logic.controller.accounts.UserAccount;
+import be.howest.ti.mars.logic.controller.enums.DeliveryType;
+import be.howest.ti.mars.logic.controller.enums.NotificationType;
 import be.howest.ti.mars.logic.controller.security.AccountToken;
 import be.howest.ti.mars.logic.controller.security.SecureHash;
+import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 
+import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.stream.Collectors;
 
 class MarsOpenApiBridge {
     private final MarsController controller;
     public static final String AUTHORIZATION_TOKEN_PREFIX = "Bearer ";
     private static final String TOKEN = "token";
+    private static final Random rand = new Random();
+    private static final Timer timer = new Timer();
+    private static Vertx vertx;
+    private static final long RESET_PERIOD = 1000L * 60L * 60L * 24L;
+
+    public static void setVertx(Vertx vertx) {
+        MarsOpenApiBridge.vertx = vertx;
+    }
 
     MarsOpenApiBridge() {
         this.controller = new MarsController();
@@ -39,13 +53,20 @@ class MarsOpenApiBridge {
         return "Successfully created an account";
     }
 
+    private Long getETA() { // randomized delay
+        return rand.nextInt(5) * 1000L;
+    }
+
     public Object sendPackage(RoutingContext ctx) { // TODO: 21-11-2020 add missing validation: only business can send large packages, etc , from != dest
         JsonObject json = ctx.getBodyAsJson();
-        int id = controller.createDelivery(json.getString("deliveryType"),
+        boolean isUser = isUserAccountToken(ctx);
+        int id = controller.sendPackage(DeliveryType.enumOf(json.getString("deliveryType")),
                 json.getInteger("from"),
                 json.getInteger("destination"),
-                getAccount(ctx).getUsername()
+                getAccount(ctx),
+                isUser
         );
+        if (isUser) timer.schedule(wrap(() -> getUserAccount(ctx).sendNotification(vertx, NotificationType.PACKAGE, id)), getETA());
         JsonObject delivery = new JsonObject();
         delivery.put("deliveryId", id);
         return delivery;
@@ -126,7 +147,6 @@ class MarsOpenApiBridge {
     }
 
     public Object shareLocation(RoutingContext ctx) {
-
         getUserAccount(ctx).setSharesLocation(true);
         return "Now sharing location with friends.";
     }
@@ -170,12 +190,23 @@ class MarsOpenApiBridge {
         return controller.getRepo().getReportSections();
     }
 
+    private static TimerTask wrap(Runnable r) { // wish this could be cleaner but it isn't a functional interface
+        return new TimerTask() {
+            @Override
+            public void run() {
+                r.run();
+            }
+        };
+    }
+
     public Object travel(RoutingContext ctx) {
         int from = ctx.getBodyAsJson().getInteger("from");
         int destination = ctx.getBodyAsJson().getInteger("destination");
         String podType = ctx.getBodyAsJson().getString("podType");
-        controller.travel(getUserAccount(ctx), from, destination, podType);
-
+        UserAccount user = getUserAccount(ctx);
+        controller.travel(user, from, destination, podType);
+        int id = 0; // travel should return it
+        timer.schedule(wrap(() -> user.sendNotification(vertx, NotificationType.TRAVEL, id)), getETA());
         return "Your pod is on route to your location.";
     }
 
@@ -198,6 +229,18 @@ class MarsOpenApiBridge {
         String newDN = ctx.getBodyAsJson().getString("newDisplayName");
         getUserAccount(ctx).setDisplayName(newDN);
         return "Successfully changed your display name to " + newDN;
+    }
+
+    public Object getCurrentRouteInfo(RoutingContext ctx) {
+        return controller.getCurrentRouteInfo(getUserAccount(ctx));
+    }
+
+    public Object getDeliveries(RoutingContext ctx) {
+        return controller.getDeliveries(getBusinessAccount(ctx));
+    }
+
+    public Object getDeliveryInformation(RoutingContext ctx) {
+        return controller.getDelivery(getAccount(ctx), Integer.parseInt(ctx.request().getParam("id")));
     }
 
     //------------------------------------------------------------------------------------------------------------------
@@ -238,6 +281,14 @@ class MarsOpenApiBridge {
         } else {
             return header.substring(AUTHORIZATION_TOKEN_PREFIX.length());
         }
+    }
+
+    private void resetBusinessUsedPods() {
+        controller.getBusinessAccounts().forEach(acc -> controller.getRepo().resetPods(acc));
+    }
+
+    public void startDailyResetCompanyPods() {
+        timer.scheduleAtFixedRate(wrap(this::resetBusinessUsedPods), 0, RESET_PERIOD);
     }
 
 

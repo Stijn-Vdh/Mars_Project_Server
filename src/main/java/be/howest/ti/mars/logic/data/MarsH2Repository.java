@@ -7,6 +7,7 @@ import be.howest.ti.mars.logic.controller.accounts.BaseAccount;
 import be.howest.ti.mars.logic.controller.accounts.BusinessAccount;
 import be.howest.ti.mars.logic.controller.accounts.UserAccount;
 import be.howest.ti.mars.logic.controller.converters.ShortEndpoint;
+import be.howest.ti.mars.logic.controller.enums.DeliveryType;
 import be.howest.ti.mars.logic.controller.enums.PodType;
 import be.howest.ti.mars.logic.controller.exceptions.DatabaseException;
 import be.howest.ti.mars.logic.controller.exceptions.EndpointException;
@@ -16,9 +17,7 @@ import be.howest.ti.mars.logic.controller.subscription.BusinessSubscriptionInfo;
 import be.howest.ti.mars.logic.controller.subscription.UserSubscription;
 
 import java.sql.*;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -38,6 +37,8 @@ public class MarsH2Repository implements MarsRepository {
     private static final String SQL_DELETE_FRIEND = "DELETE FROM friends WHERE friendName=? AND userName=?";
     // Deliveries
     private static final String SQL_ADD_DELIVERY = "INSERT INTO DELIVERIES VALUES(DEFAULT, ?, ?, ?, DEFAULT, ?)";
+    private static final String SQL_SELECT_DELIVERIES = "SELECT * FROM DELIVERIES WHERE sender=?";
+    private static final String SQL_SELECT_DELIVERY = "SELECT * FROM DELIVERIES WHERE sender=? and id=?";
     // Travels
     private static final String SQL_INSERT_TRAVEL = "INSERT INTO TRAVELS VALUES(default, ?, ?, ?, DEFAULT, ?, NULL)";
     private static final String SQL_SELECT_TRAVEL_HISTORY = "SELECT * FROM TRAVELS t WHERE userName=? ";
@@ -47,7 +48,7 @@ public class MarsH2Repository implements MarsRepository {
     private static final String SQL_INSERT_FAVORITE_ENDPOINT = "INSERT INTO favorite_endpoints VALUES (?, ?)";
     private static final String SQL_SELECT_FAVORITE_ENDPOINT = "SELECT * FROM favorite_endpoints fe JOIN endpoints e ON fe.endpointid = e.id WHERE accountname = ?";
     // Accounts
-    private static final String SQL_INSERT_ACCOUNT = "INSERT INTO accounts VALUES (?, ?, ?, NULL)";
+    private static final String SQL_INSERT_ACCOUNT = "INSERT INTO accounts VALUES (?, ?, ?, ?)";
     private static final String SQL_INSERT_USER = "INSERT INTO users VALUES (?, ?, default, default)";
     private static final String SQL_INSERT_BUSINESS = "INSERT INTO businesses VALUES (?, default, default, default)";
     private static final String SQL_UPDATE_USER = "UPDATE USERS SET sharesLocation=? WHERE name=?";
@@ -61,6 +62,9 @@ public class MarsH2Repository implements MarsRepository {
     private static final String SQL_SELECT_BUSINESS_SUBSCRIPTION_INFO = "SELECT bs.ID, bs.NAME, b.LARGEPODSUSED, b.SMALLPODSUSED FROM businesses b JOIN business_subscriptions bs ON bs.id = b.subscriptionid WHERE b.name = ?";
     private static final String SQL_UPDATE_USER_SUBSCRIPTION = "UPDATE users SET subscriptionid = ? WHERE name = ?";
     private static final String SQL_UPDATE_BUSINESS_SUBSCRIPTION = "UPDATE businesses SET subscriptionid = ? WHERE name = ?";
+    private static final String SQL_UPDATE_BUSINESS_SUBSCRIPTION_INFO = "UPDATE businesses SET LARGEPODSUSED = ? and SMALLPODSUSED = ? WHERE name = ?";
+    private static final String SQL_UPDATE_BUSINESS_SUBSCRIPTION_INFO_SMALL = "UPDATE businesses SET SMALLPODSUSED = ? WHERE name = ?";
+    private static final String SQL_UPDATE_BUSINESS_SUBSCRIPTION_INFO_LARGE = "UPDATE businesses SET LARGEPODSUSED = ? WHERE name = ?";
 
     // Endpoints
     @Override
@@ -111,15 +115,6 @@ public class MarsH2Repository implements MarsRepository {
         } catch (SQLException ex) {
             LOGGER.log(Level.WARNING, ex.getMessage(), ex);
             throw new DatabaseException("Cannot retrieve endpoint with id: " + id + "!");
-        }
-    }
-
-    private boolean endpointExists(int id) {
-        try {
-            getEndpoint(id);
-            return true;
-        } catch (Exception ex) {
-            return false;
         }
     }
 
@@ -179,6 +174,7 @@ public class MarsH2Repository implements MarsRepository {
             stmt.setString(1, account.getUsername());
             stmt.setString(2, account.getPassword());
             stmt.setString(3, account.getAddress());
+            stmt.setInt(4, account.getHomeAddressEndpoint());
             stmt.executeUpdate();
         } catch (SQLException ex) {
             LOGGER.log(Level.WARNING, ex.getMessage(), ex);
@@ -317,19 +313,20 @@ public class MarsH2Repository implements MarsRepository {
 
     // Travel / Delivery (packages)
     @Override
-    public Set<Travel> getTravelHistory(UserAccount acc) {
-        Set<Travel> travels = new HashSet<>();
+    public List<Travel> getTravelHistory(UserAccount acc) {
+        List<Travel> travels = new LinkedList<>();
         try (Connection conn = MarsConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(SQL_SELECT_TRAVEL_HISTORY)) {
             stmt.setString(1, acc.getUsername());
 
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
+                    int id = rs.getInt("id");
                     int from = rs.getInt("from");
                     int destination = rs.getInt("destination");
                     String podType = rs.getString("podType");
                     String date = rs.getString("dateTime");
-                    travels.add(new Travel(getShortEndpoint(from), getShortEndpoint(destination), PodType.enumOf(podType), date));
+                    travels.add(new Travel(id, getShortEndpoint(from), getShortEndpoint(destination), PodType.enumOf(podType), date));
                 }
             }
         } catch (SQLException ex) {
@@ -370,8 +367,32 @@ public class MarsH2Repository implements MarsRepository {
     }
 
     @Override
-    public Set<Delivery> getDeliveries() {
-        return Collections.emptySet();
+    public List<Delivery> getDeliveries(BusinessAccount acc) {
+        List<Delivery> deliveries = new LinkedList<>();
+
+        try(Connection con = MarsConnection.getConnection();
+            PreparedStatement stmt = con.prepareStatement(SQL_SELECT_DELIVERIES)) {
+            stmt.setString(1,acc.getUsername());
+
+            try(ResultSet rs = stmt.executeQuery()){
+                while (rs.next()){
+                    int id = rs.getInt("id");
+                    String type = rs.getString("deliveryType");
+                    int source = rs.getInt("from");
+                    int destination = rs.getInt("destination");
+                    String date = rs.getString("dateTime");
+                    String sender = rs.getString("sender");
+
+                    Delivery delivery = new Delivery(id,DeliveryType.enumOf(type), getShortEndpoint(source), getShortEndpoint(destination), date, sender);
+                    deliveries.add(delivery);
+                }
+            }
+            return deliveries;
+
+        } catch (SQLException ex) {
+            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
+            throw new DatabaseException("Could not get deliveries from DB");
+        }
     }
 
     @Override
@@ -392,6 +413,35 @@ public class MarsH2Repository implements MarsRepository {
         } catch (SQLException ex) {
             LOGGER.log(Level.WARNING, ex.getMessage(), ex);
             throw new DatabaseException("Can't add delivery!");
+        }
+    }
+
+    @Override
+    public Object getDeliveryInformation(BaseAccount acc, int id) {
+        Delivery delivery = null;
+        try(Connection con = MarsConnection.getConnection();
+            PreparedStatement stmt = con.prepareStatement(SQL_SELECT_DELIVERY)) {
+            stmt.setString(1,acc.getUsername());
+            stmt.setInt(2,id);
+
+            try(ResultSet rs = stmt.executeQuery()){
+                while (rs.next()){
+                    int deliveryId = rs.getInt("id");
+                    String type = rs.getString("deliveryType");
+                    int source = rs.getInt("from");
+                    int destination = rs.getInt("destination");
+                    String date = rs.getString("dateTime");
+                    String sender = rs.getString("sender");
+
+
+                     delivery = new Delivery(deliveryId,DeliveryType.enumOf(type), getShortEndpoint(source), getShortEndpoint(destination), date, sender);
+                }
+            }
+            return delivery;
+
+        } catch (SQLException ex) {
+            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
+            throw new DatabaseException("Could not get deliveries from DB");
         }
     }
 
@@ -425,7 +475,7 @@ public class MarsH2Repository implements MarsRepository {
             }
         } catch (SQLException ex) {
             LOGGER.log(Level.WARNING, ex.getMessage(), ex);
-            throw new DatabaseException("Can't get userSubscriptions");
+            throw new DatabaseException("Can't get businessSubscriptions");
         }
         return subscriptions;
     }
@@ -496,6 +546,43 @@ public class MarsH2Repository implements MarsRepository {
         } catch (SQLException ex) {
             LOGGER.log(Level.WARNING, ex.getMessage(), ex);
             throw new DatabaseException("Can't get business subscription information");
+        }
+    }
+
+    @Override
+    public void updateBusinessSubscription(boolean largePackage, BusinessAccount acc) {
+        BusinessSubscriptionInfo currentInfo = getBusinessSubscriptionInfo(acc);
+        int currentUsedPods;
+        String sqlStatement;
+        if (largePackage){
+            sqlStatement = SQL_UPDATE_BUSINESS_SUBSCRIPTION_INFO_LARGE;
+            currentUsedPods = currentInfo.getLargePodsUsed();
+        }else{
+            sqlStatement = SQL_UPDATE_BUSINESS_SUBSCRIPTION_INFO_SMALL;
+            currentUsedPods = currentInfo.getSmallPodsUsed();
+        }
+
+        try(Connection con = MarsConnection.getConnection();
+            PreparedStatement stmt = con.prepareStatement(sqlStatement)){
+            stmt.setInt(1,currentUsedPods+1);
+            stmt.setString(2, acc.getUsername());
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
+            throw new DatabaseException("Could not update business subscription information");
+        }
+    }
+
+    public void resetPods(BusinessAccount acc) {
+        try(Connection con = MarsConnection.getConnection();
+            PreparedStatement stmt = con.prepareStatement(SQL_UPDATE_BUSINESS_SUBSCRIPTION_INFO)){
+            stmt.setString(1, acc.getUsername());
+            stmt.setInt(2, 0);
+            stmt.setInt(3, 0);
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
+            throw new DatabaseException("Could not reset the daily-pods");
         }
     }
 

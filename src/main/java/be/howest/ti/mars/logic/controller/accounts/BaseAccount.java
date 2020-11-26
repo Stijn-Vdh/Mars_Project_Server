@@ -9,7 +9,7 @@ import java.util.Objects;
 
 public abstract class BaseAccount {
     protected static final MarsRepository repo = new MarsH2Repository();
-    private AccountToken accountToken;
+    protected AccountToken accountToken;
     private Integer homeAddressEndpoint; //replace with endpoint class
     private String password; // needs to be replaced with Password class which will contain hashed version
     private final String username; // needs to be unique

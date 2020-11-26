@@ -6,8 +6,10 @@ import be.howest.ti.mars.logic.controller.accounts.UserAccount;
 import be.howest.ti.mars.logic.controller.enums.DeliveryType;
 import be.howest.ti.mars.logic.controller.enums.PodType;
 import be.howest.ti.mars.logic.controller.exceptions.EndpointException;
+import be.howest.ti.mars.logic.controller.exceptions.UsernameException;
 import io.vertx.core.json.JsonObject;
-
+import java.util.LinkedList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class MarsController extends AuthController {
@@ -18,15 +20,18 @@ public class MarsController extends AuthController {
         return MOTD;
     }
 
-    public int createDelivery(String deliveryType, int from, int destination, String sender) {
-       return repo.addDelivery(new Delivery(DeliveryType.enumOf(deliveryType), repo.getShortEndpoint(from), repo.getShortEndpoint(destination), "", sender));
+    public int sendPackage(DeliveryType deliveryType, int from, int destination, BaseAccount acc, boolean userAcc) {
+        if (!userAcc){
+            repo.updateBusinessSubscription(deliveryType.equals(DeliveryType.LARGE),(BusinessAccount) acc);
+        }
+       return repo.addDelivery(new Delivery(0,deliveryType, repo.getShortEndpoint(from), repo.getShortEndpoint(destination), "", acc.getUsername()));
     }
 
     public Object addFriend(UserAccount user, String friendName) { // TODO: 20-11-2020 validation friend exists and not already friended and user and friend not same
         if (userAccounts.contains(new UserAccount(friendName))) {
             user.addFriend(friendName);
         } else {
-            //throw error
+            throw new UsernameException("Could not add a friend with the given username");
         }
         return "You just added a friend called:" + friendName;
     }
@@ -35,7 +40,7 @@ public class MarsController extends AuthController {
         if (userAccounts.contains(new UserAccount(friendName))) {
             user.removeFriend(friendName);
         } else {
-            //throw error
+            throw new UsernameException("Could not remove a friend with the given username");
         }
         return "You just removed a friend called:" + friendName;
     }
@@ -76,7 +81,7 @@ public class MarsController extends AuthController {
 
     public void travel(UserAccount acc, int from, int destination, String type) { // getShortEndpoint also validates if endpoint exists
         if (from == destination) throw new EndpointException("Destination and from are the same endpoint");
-        repo.travel(acc, new Travel(repo.getShortEndpoint(from), repo.getShortEndpoint(destination), PodType.enumOf(type), ""));
+        repo.travel(acc, new Travel(0,repo.getShortEndpoint(from), repo.getShortEndpoint(destination), PodType.enumOf(type), ""));
     }
 
     public Object getTravelHistory(UserAccount acc) {
@@ -85,5 +90,21 @@ public class MarsController extends AuthController {
 
     public void cancelTrip(UserAccount acc, int id) {
         repo.cancelTravel(acc, id);
+    }
+
+    public Object getCurrentRouteInfo(UserAccount acc) {
+        List<Travel> travelList = new LinkedList<>(repo.getTravelHistory(acc));
+        if (!travelList.isEmpty()){
+            return travelList.get(travelList.size()-1);
+        }
+        return "You have not requested any travel pods recently";
+    }
+
+    public Object getDeliveries(BusinessAccount acc) {
+        return repo.getDeliveries(acc);
+    }
+
+    public Object getDelivery(BaseAccount acc, int id) {
+        return repo.getDeliveryInformation(acc, id);
     }
 }

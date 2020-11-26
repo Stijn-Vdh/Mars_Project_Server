@@ -574,9 +574,41 @@ paths:
           description: Unexpected error.
       security:
         - Token: [ ]
+
+  /api/deliveries:
+    description: Get all deliveries ever made.
+    get:
+      summary: Get all deliveries ever made.
+      operationId: getDeliveries
+      responses:
+        '200':
+          description: list of all deliveries.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  deliveryID:
+                    type: int
+                  deliveryType:
+                    type: string
+                    enum: [ small, large ]
+                  from:
+                    type: integer
+                  destination:
+                    type: integer
+                  date:
+                    type: string
+        '403':
+          description: Forbidden!
+        '500':
+          description: Unexpected error.
+      security:
+        - Token: [ Business ]
   /api/delivery/{id}: #Get delivery information
     description: get delivery information
     get:
+      operationId: getDeliveryInformation
       summary: Get deliver information.
       tags:
         - delivery
@@ -599,8 +631,12 @@ paths:
                   deliveryType:
                     type: string
                     enum: [ small, large ]
-                  business:
-                    type: boolean
+                  from:
+                    type: integer
+                  destination:
+                    type: integer
+                  date:
+                    type: string
         '401':
           description: Authorization information is missing or invalid.
         '403':
@@ -653,21 +689,16 @@ paths:
       security:
         - Token: [ ]
 
-  /api/routeInfo/{id}:
+  /api/routeInfo:
     description: Get route information.
     get:
+      operationId: getCurrentRouteInfo
       summary: Get your current route information.
       tags:
         - travel
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer
       responses:
         '200':
-          description: Succesfully bought a ticket.
+          description: OK
           content:
             application/json:
               schema:
@@ -690,7 +721,7 @@ paths:
         '500':
           description: Unexpected error.
       security:
-        - Token: [ ]
+        - Token: [ user ]
   /api/travel:
     description: travel from one point to another.
     get:

@@ -11,6 +11,7 @@ import be.howest.ti.mars.logic.controller.subscription.BusinessSubscription;
 import be.howest.ti.mars.logic.controller.subscription.BusinessSubscriptionInfo;
 import be.howest.ti.mars.logic.controller.subscription.UserSubscription;
 
+import java.util.List;
 import java.util.Set;
 
 public interface MarsRepository {
@@ -49,18 +50,21 @@ public interface MarsRepository {
 
     // business
     void addBusiness(BusinessAccount business);
+    void resetPods(BusinessAccount acc);
 
     // Travel
-    Set<Travel> getTravelHistory(UserAccount acc);
+    List<Travel> getTravelHistory(UserAccount acc);
 
     void travel(UserAccount user, Travel travel);
 
     void cancelTravel(UserAccount user, int tripID);
 
     // Deliveries
-    Set<Delivery> getDeliveries(); // TODO: 21-11-2020 also not available in spec
+    List<Delivery> getDeliveries(BusinessAccount acc); // TODO: 21-11-2020 also not available in spec
 
     int addDelivery(Delivery delivery);
+
+    Object getDeliveryInformation(BaseAccount acc, int id);
 
     // Subscriptions
     Set<UserSubscription> getUserSubscriptions(); // TODO: 21-11-2020 add to spec and webserver
@@ -73,6 +77,8 @@ public interface MarsRepository {
 
     BusinessSubscriptionInfo getBusinessSubscriptionInfo(BusinessAccount business); // this returns the used amount of pods by that business that day
 
+    void updateBusinessSubscription(boolean b, BusinessAccount acc);
+
     void setUserSubscription(UserAccount user, int subscriptionId);
 
     void setBusinessSubscription(BusinessAccount business, int subscriptionId);
@@ -81,7 +87,4 @@ public interface MarsRepository {
     Set<String> getReportSections();
 
     void addReport(BaseAccount baseAccount, String section, String body);
-
-
-
 }
