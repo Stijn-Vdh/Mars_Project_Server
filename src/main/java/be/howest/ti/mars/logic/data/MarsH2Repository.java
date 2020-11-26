@@ -45,7 +45,7 @@ public class MarsH2Repository implements MarsRepository {
     private static final String SQL_INSERT_FAVORITE_ENDPOINT = "INSERT INTO favorite_endpoints VALUES (?, ?)";
     private static final String SQL_SELECT_FAVORITE_ENDPOINT = "SELECT * FROM favorite_endpoints fe JOIN endpoints e ON fe.endpointid = e.id WHERE accountname = ?";
     // Accounts
-    private static final String SQL_INSERT_ACCOUNT = "INSERT INTO accounts VALUES (?, ?, ?, NULL)";
+    private static final String SQL_INSERT_ACCOUNT = "INSERT INTO accounts VALUES (?, ?, ?, ?)";
     private static final String SQL_INSERT_USER = "INSERT INTO users VALUES (?, ?, default, default)";
     private static final String SQL_INSERT_BUSINESS = "INSERT INTO businesses VALUES (?, default, default, default)";
     private static final String SQL_UPDATE_USER = "UPDATE USERS SET sharesLocation=? WHERE name=?";
@@ -170,6 +170,7 @@ public class MarsH2Repository implements MarsRepository {
             stmt.setString(1, account.getUsername());
             stmt.setString(2, account.getPassword());
             stmt.setString(3, account.getAddress());
+            stmt.setInt(4, account.getHomeAddressEndpoint());
             stmt.executeUpdate();
         } catch (SQLException ex) {
             LOGGER.log(Level.WARNING, ex.getMessage(), ex);

@@ -6,6 +6,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Arrays;
 import java.util.Random;
 
+import static io.vertx.core.json.impl.JsonUtil.BASE64_ENCODER;
+
 public class AccountToken {
     private final byte[] token;
 
@@ -24,6 +26,10 @@ public class AccountToken {
 
     public byte[] getToken() {
         return token;
+    }
+
+    public String getTokenBase64() { // same encoding as Jackson
+        return BASE64_ENCODER.encodeToString(token);
     }
 
     @Override

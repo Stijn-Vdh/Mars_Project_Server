@@ -13,6 +13,7 @@ import io.vertx.core.http.HttpMethod;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
+import io.vertx.ext.bridge.PermittedOptions;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.api.contract.openapi3.OpenAPI3RouterFactory;
@@ -21,6 +22,8 @@ import io.vertx.ext.web.handler.CorsHandler;
 import io.vertx.ext.web.handler.FaviconHandler;
 import io.vertx.ext.web.handler.LoggerFormat;
 import io.vertx.ext.web.handler.LoggerHandler;
+import io.vertx.ext.web.handler.sockjs.SockJSBridgeOptions;
+import io.vertx.ext.web.handler.sockjs.SockJSHandler;
 import org.apache.commons.lang3.StringUtils;
 
 import java.sql.SQLException;
@@ -34,6 +37,7 @@ public class WebServer extends AbstractVerticle {
     private static final Logger LOGGER = Logger.getLogger(WebServer.class.getName());
     private static final Integer DB_WEB_CONSOLE_FALLBACK = 9000;
     private static final String OPEN_API_SPEC = "openapi-group-15.yaml";
+    private static final String CHNL_ROOT_PATH = "/events/*";
     private final MarsOpenApiBridge bridge;
 
     public WebServer(MarsOpenApiBridge bridge) {
@@ -46,6 +50,7 @@ public class WebServer extends AbstractVerticle {
 
     @Override
     public void start(Promise<Void> promise) {
+        MarsOpenApiBridge.setVertx(vertx); // there should be a better way
         ConfigRetriever.create(vertx).getConfig(ar -> {
             if (ar.failed()) {
                 LOGGER.warning("Config not available");
@@ -135,6 +140,7 @@ public class WebServer extends AbstractVerticle {
 
         // Build the router
         Router router = factory.getRouter();
+        router.route(CHNL_ROOT_PATH).handler(createSockJsHandler());
         router.route("/favicon.ico").handler(FaviconHandler.create());
 
         // Install general error handlers
@@ -292,5 +298,14 @@ public class WebServer extends AbstractVerticle {
         }
     }
 
+    private SockJSHandler createSockJsHandler() {
+        final SockJSHandler sockJSHandler = SockJSHandler.create(vertx);
+        final PermittedOptions inbound = new PermittedOptions().setAddressRegex("events\\..+");
+        final SockJSBridgeOptions options = new SockJSBridgeOptions()
+                .addInboundPermitted(inbound)
+                .addOutboundPermitted(inbound);
 
+        sockJSHandler.bridge(options);
+        return sockJSHandler;
+    }
 }

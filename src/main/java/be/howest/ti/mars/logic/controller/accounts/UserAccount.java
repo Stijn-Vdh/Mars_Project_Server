@@ -1,8 +1,13 @@
 package be.howest.ti.mars.logic.controller.accounts;
 
+import be.howest.ti.mars.logic.controller.enums.NotificationType;
+import io.vertx.core.Vertx;
+import io.vertx.core.json.JsonObject;
+
 public class UserAccount extends BaseAccount {
     private boolean sharesLocation;
     private String displayName;
+    private static final String CHNL_TO_CLIENT_NOTIFICATION = "events.client.";
 
     public UserAccount(String username, String password, int homeAddressEndpoint, String address) {
         super(homeAddressEndpoint, password, username, address);
@@ -50,4 +55,12 @@ public class UserAccount extends BaseAccount {
         return sharesLocation;
     }
 
+    public void sendNotification(Vertx vertx, NotificationType type, int id) {
+        if (accountToken != null) {
+            JsonObject message = new JsonObject();
+            message.put("id", id);
+            message.put("type", type);
+            vertx.eventBus().send(CHNL_TO_CLIENT_NOTIFICATION + accountToken.getTokenBase64(), message);
+        }
+    }
 }
