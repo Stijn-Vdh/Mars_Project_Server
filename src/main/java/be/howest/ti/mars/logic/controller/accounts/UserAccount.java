@@ -1,6 +1,5 @@
 package be.howest.ti.mars.logic.controller.accounts;
 
-import be.howest.ti.mars.logic.controller.security.AccountToken;
 import be.howest.ti.mars.logic.controller.enums.NotificationType;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
@@ -11,7 +10,7 @@ public class UserAccount extends BaseAccount {
     private static final String CHNL_TO_CLIENT_NOTIFICATION = "events.client.";
 
     public UserAccount(String username, String password, int homeAddressEndpoint, String address) {
-        super(homeAddressEndpoint, password, username, address);
+        super(username, password, address, homeAddressEndpoint);
         sharesLocation = false;
         displayName = username;
         subscriptionId = 0;

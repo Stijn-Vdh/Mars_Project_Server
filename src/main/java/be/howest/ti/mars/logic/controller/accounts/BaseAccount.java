@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.util.Objects;
 
-public abstract class BaseAccount {
+public class BaseAccount {
     protected static final MarsRepository repo = new MarsH2Repository();
     protected AccountToken accountToken;
     private Integer homeAddressEndpoint; //replace with endpoint class
@@ -16,7 +16,7 @@ public abstract class BaseAccount {
     private String address; // just random info
     protected int subscriptionId;
 
-    public BaseAccount(int homeAddressEndpoint, String password, String username, String address) {
+    public BaseAccount(String username, String password, String address, int homeAddressEndpoint) {
         this(null, homeAddressEndpoint, password, username, address);
     }
 
