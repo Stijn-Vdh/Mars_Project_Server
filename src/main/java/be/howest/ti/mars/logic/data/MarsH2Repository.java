@@ -16,9 +16,7 @@ import be.howest.ti.mars.logic.controller.subscription.BusinessSubscriptionInfo;
 import be.howest.ti.mars.logic.controller.subscription.UserSubscription;
 
 import java.sql.*;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -61,6 +59,7 @@ public class MarsH2Repository implements MarsRepository {
     private static final String SQL_SELECT_BUSINESS_SUBSCRIPTION_INFO = "SELECT bs.ID, bs.NAME, b.LARGEPODSUSED, b.SMALLPODSUSED FROM businesses b JOIN business_subscriptions bs ON bs.id = b.subscriptionid WHERE b.name = ?";
     private static final String SQL_UPDATE_USER_SUBSCRIPTION = "UPDATE users SET subscriptionid = ? WHERE name = ?";
     private static final String SQL_UPDATE_BUSINESS_SUBSCRIPTION = "UPDATE businesses SET subscriptionid = ? WHERE name = ?";
+    private static final String SQL_UPDATE_BUSINESS_SUBSCRIPTION_INFO = "UPDATE businesses SET LARGEPODSUSED = ? and SMALLPODSUSED = ? WHERE name = ?";
 
     // Endpoints
     @Override
@@ -426,7 +425,7 @@ public class MarsH2Repository implements MarsRepository {
             }
         } catch (SQLException ex) {
             LOGGER.log(Level.WARNING, ex.getMessage(), ex);
-            throw new DatabaseException("Can't get userSubscriptions");
+            throw new DatabaseException("Can't get businessSubscriptions");
         }
         return subscriptions;
     }
@@ -483,6 +482,7 @@ public class MarsH2Repository implements MarsRepository {
 
     @Override
     public BusinessSubscriptionInfo getBusinessSubscriptionInfo(BusinessAccount business) {
+        dailyCheck(business);
         try (Connection con = MarsConnection.getConnection();
              PreparedStatement stmt = con.prepareStatement(SQL_SELECT_BUSINESS_SUBSCRIPTION_INFO)) {
             stmt.setString(1, business.getUsername());
@@ -497,6 +497,38 @@ public class MarsH2Repository implements MarsRepository {
         } catch (SQLException ex) {
             LOGGER.log(Level.WARNING, ex.getMessage(), ex);
             throw new DatabaseException("Can't get business subscription information");
+        }
+    }
+
+    private void dailyCheck(BusinessAccount acc){
+        Timer timer = new Timer();
+        Calendar date = Calendar.getInstance();
+        date.set(Calendar.HOUR, 12);
+        date.set(Calendar.MINUTE, 0);
+        date.set(Calendar.SECOND, 0);
+        date.set(Calendar.MILLISECOND, 0);
+        timer.schedule(
+                new TimerTask() {
+                    @Override
+                    public void run() {
+                        resetPods(acc);
+                    }
+                },
+                date.getTime(),
+                1000 * 60 * 60 * 24
+        );
+    }
+
+    private void resetPods(BusinessAccount acc) {
+        try(Connection con = MarsConnection.getConnection();
+            PreparedStatement stmt = con.prepareStatement(SQL_UPDATE_BUSINESS_SUBSCRIPTION_INFO)){
+            stmt.setString(1, acc.getUsername());
+            stmt.setInt(2, 0);
+            stmt.setInt(3, 0);
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
+            throw new DatabaseException("Could not reset the daily-pods");
         }
     }
 
