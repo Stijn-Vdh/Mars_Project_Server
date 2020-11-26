@@ -93,6 +93,7 @@ public class MarsH2Repository implements MarsRepository {
         try (Connection con = MarsConnection.getConnection();
              PreparedStatement stmt = con.prepareStatement(SQL_INSERT_ENDPOINT)) {
             stmt.setString(1, endpoint);
+            stmt.executeUpdate();
         } catch (SQLException ex) {
             throw new DatabaseException("Can't add endpoint!");
         }
@@ -242,7 +243,6 @@ public class MarsH2Repository implements MarsRepository {
              PreparedStatement stmt = con.prepareStatement(SQL_UPDATE_USER_DN)) {
             stmt.setString(1, displayName);
             stmt.setString(2, acc.getUsername());
-            acc.setDisplayName(displayName);
             stmt.executeUpdate();
         } catch (SQLException ex) {
             LOGGER.log(Level.WARNING, ex.getMessage(), ex);
