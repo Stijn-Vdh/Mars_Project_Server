@@ -4,8 +4,8 @@ import be.howest.ti.mars.logic.controller.MarsController;
 import be.howest.ti.mars.logic.controller.accounts.BaseAccount;
 import be.howest.ti.mars.logic.controller.accounts.BusinessAccount;
 import be.howest.ti.mars.logic.controller.accounts.UserAccount;
-import be.howest.ti.mars.logic.controller.enums.NotificationType;
 import be.howest.ti.mars.logic.controller.enums.DeliveryType;
+import be.howest.ti.mars.logic.controller.enums.NotificationType;
 import be.howest.ti.mars.logic.controller.security.AccountToken;
 import be.howest.ti.mars.logic.controller.security.SecureHash;
 import io.vertx.core.Vertx;
@@ -51,14 +51,20 @@ class MarsOpenApiBridge {
         return "Successfully created an account";
     }
 
+    private Long getETA() { // randomized delay
+        return rand.nextInt(5) * 1000L;
+    }
+
     public Object sendPackage(RoutingContext ctx) { // TODO: 21-11-2020 add missing validation: only business can send large packages, etc , from != dest
         JsonObject json = ctx.getBodyAsJson();
+        boolean isUser = isUserAccountToken(ctx);
         int id = controller.sendPackage(DeliveryType.enumOf(json.getString("deliveryType")),
                 json.getInteger("from"),
                 json.getInteger("destination"),
                 getAccount(ctx),
-                isUserAccountToken(ctx)
+                isUser
         );
+        if (isUser) new Timer().schedule(wrap(() -> getUserAccount(ctx).sendNotification(vertx, NotificationType.PACKAGE, id)), getETA());
         JsonObject delivery = new JsonObject();
         delivery.put("deliveryId", id);
         return delivery;
@@ -139,7 +145,6 @@ class MarsOpenApiBridge {
     }
 
     public Object shareLocation(RoutingContext ctx) {
-
         getUserAccount(ctx).setSharesLocation(true);
         return "Now sharing location with friends.";
     }
@@ -199,7 +204,7 @@ class MarsOpenApiBridge {
         UserAccount user = getUserAccount(ctx);
         controller.travel(user, from, destination, podType);
         int id = 0; // travel should return it
-        new Timer().schedule(wrap(() -> user.sendNotification(vertx, NotificationType.TRAVEL, id)), rand.nextInt(5)* 1000L);
+        new Timer().schedule(wrap(() -> user.sendNotification(vertx, NotificationType.TRAVEL, id)), getETA());
         return "Your pod is on route to your location.";
     }
 
@@ -267,7 +272,6 @@ class MarsOpenApiBridge {
             return header.substring(AUTHORIZATION_TOKEN_PREFIX.length());
         }
     }
-
 
 
 }
