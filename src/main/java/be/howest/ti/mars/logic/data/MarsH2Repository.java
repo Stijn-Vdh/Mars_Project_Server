@@ -60,6 +60,8 @@ public class MarsH2Repository implements MarsRepository {
     private static final String SQL_UPDATE_USER_SUBSCRIPTION = "UPDATE users SET subscriptionid = ? WHERE name = ?";
     private static final String SQL_UPDATE_BUSINESS_SUBSCRIPTION = "UPDATE businesses SET subscriptionid = ? WHERE name = ?";
     private static final String SQL_UPDATE_BUSINESS_SUBSCRIPTION_INFO = "UPDATE businesses SET LARGEPODSUSED = ? and SMALLPODSUSED = ? WHERE name = ?";
+    private static final String SQL_UPDATE_BUSINESS_SUBSCRIPTION_INFO_SMALL = "UPDATE businesses SET SMALLPODSUSED = ? WHERE name = ?";
+    private static final String SQL_UPDATE_BUSINESS_SUBSCRIPTION_INFO_LARGE = "UPDATE businesses SET LARGEPODSUSED = ? WHERE name = ?";
 
     // Endpoints
     @Override
@@ -497,6 +499,30 @@ public class MarsH2Repository implements MarsRepository {
         } catch (SQLException ex) {
             LOGGER.log(Level.WARNING, ex.getMessage(), ex);
             throw new DatabaseException("Can't get business subscription information");
+        }
+    }
+
+    @Override
+    public void updateBusinessSubscription(boolean LargePackage, BusinessAccount acc) {
+        BusinessSubscriptionInfo currentInfo = getBusinessSubscriptionInfo(acc);
+        int currentUsedPods;
+        String sqlStatement;
+        if (LargePackage){
+            sqlStatement = SQL_UPDATE_BUSINESS_SUBSCRIPTION_INFO_LARGE;
+            currentUsedPods = currentInfo.getLargePodsUsed();
+        }else{
+            sqlStatement = SQL_UPDATE_BUSINESS_SUBSCRIPTION_INFO_SMALL;
+            currentUsedPods = currentInfo.getSmallPodsUsed();
+        }
+
+        try(Connection con = MarsConnection.getConnection();
+            PreparedStatement stmt = con.prepareStatement(sqlStatement)){
+            stmt.setInt(1,currentUsedPods+1);
+            stmt.setString(2, acc.getUsername());
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
+            throw new DatabaseException("Could not update business subscription information");
         }
     }
 

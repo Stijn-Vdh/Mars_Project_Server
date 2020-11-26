@@ -41,10 +41,11 @@ class MarsOpenApiBridge {
 
     public Object sendPackage(RoutingContext ctx) { // TODO: 21-11-2020 add missing validation: only business can send large packages, etc , from != dest
         JsonObject json = ctx.getBodyAsJson();
-        int id = controller.createDelivery(json.getString("deliveryType"),
+        int id = controller.sendPackage(json.getString("deliveryType"),
                 json.getInteger("from"),
                 json.getInteger("destination"),
-                getAccount(ctx).getUsername()
+                getAccount(ctx),
+                isUserAccountToken(ctx)
         );
         JsonObject delivery = new JsonObject();
         delivery.put("deliveryId", id);
