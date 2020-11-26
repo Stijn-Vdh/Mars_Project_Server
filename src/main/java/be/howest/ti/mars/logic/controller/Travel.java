@@ -4,17 +4,21 @@ import be.howest.ti.mars.logic.controller.converters.ShortEndpoint;
 import be.howest.ti.mars.logic.controller.enums.PodType;
 
 public class Travel {
+    private final int id;
     private final ShortEndpoint from;
     private final ShortEndpoint destination;
     private final PodType podType;
     private final String dateTime;
 
-    public Travel(ShortEndpoint from, ShortEndpoint destination, PodType podType, String dateTime) {
+    public Travel(int id,ShortEndpoint from, ShortEndpoint destination, PodType podType, String dateTime) {
+        this.id = id;
         this.from = from;
         this.destination = destination;
         this.podType = podType;
         this.dateTime = dateTime;
     }
+
+    public int getId(){return id;}
 
     public ShortEndpoint getFrom() {
         return from;

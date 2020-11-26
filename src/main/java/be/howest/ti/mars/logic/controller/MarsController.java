@@ -76,7 +76,7 @@ public class MarsController extends AuthController {
 
     public void travel(UserAccount acc, int from, int destination, String type) { // getShortEndpoint also validates if endpoint exists
         if (from == destination) throw new EndpointException("Destination and from are the same endpoint");
-        repo.travel(acc, new Travel(repo.getShortEndpoint(from), repo.getShortEndpoint(destination), PodType.enumOf(type), ""));
+        repo.travel(acc, new Travel(0,repo.getShortEndpoint(from), repo.getShortEndpoint(destination), PodType.enumOf(type), ""));
     }
 
     public Object getTravelHistory(UserAccount acc) {
