@@ -46,7 +46,7 @@ class MarsOpenApiBridge {
                 json.getString("name"),
                 SecureHash.getHashEncoded(json.getString("password")),
                 json.getString("homeAddress"),
-                json.getInteger("homeEndpointID"),
+                json.getInteger("homeEndpointId"),
                 json.getBoolean("businessAccount")
         );
 
@@ -204,10 +204,12 @@ class MarsOpenApiBridge {
         int destination = ctx.getBodyAsJson().getInteger("destination");
         String podType = ctx.getBodyAsJson().getString("podType");
         UserAccount user = getUserAccount(ctx);
-        controller.travel(user, from, destination, podType);
-        int id = 0; // travel should return it
+        int id = controller.travel(user, from, destination, podType);
         timer.schedule(wrap(() -> user.sendNotification(vertx, NotificationType.TRAVEL, id)), getETA());
-        return "Your pod is on route to your location.";
+
+        JsonObject travel = new JsonObject();
+        travel.put("travelId", id);
+        return travel;
     }
 
     public Object getTravelHistory(RoutingContext ctx) {

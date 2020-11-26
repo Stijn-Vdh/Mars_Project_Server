@@ -336,15 +336,20 @@ public class MarsH2Repository implements MarsRepository {
     }
 
     @Override
-    public void travel(UserAccount user, Travel travel) {
+    public int travel(UserAccount user, Travel travel) {
         try (Connection conn = MarsConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(SQL_INSERT_TRAVEL)) {
+             PreparedStatement stmt = conn.prepareStatement(SQL_INSERT_TRAVEL, Statement.RETURN_GENERATED_KEYS)) {
 
             stmt.setInt(1, travel.getFrom().getId());
             stmt.setInt(2, travel.getDestination().getId());
             stmt.setString(3, user.getUsername());
             stmt.setString(4, travel.getPodType().toString());
             stmt.executeUpdate();
+
+            try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
+                generatedKeys.next();
+                return generatedKeys.getInt(1);
+            }
         } catch (SQLException ex) {
             LOGGER.log(Level.WARNING, ex.getMessage(), ex);
             throw new DatabaseException("Could not add travel to DB");
