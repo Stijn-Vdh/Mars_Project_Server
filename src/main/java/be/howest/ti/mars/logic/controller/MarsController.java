@@ -6,12 +6,10 @@ import be.howest.ti.mars.logic.controller.accounts.UserAccount;
 import be.howest.ti.mars.logic.controller.enums.DeliveryType;
 import be.howest.ti.mars.logic.controller.enums.PodType;
 import be.howest.ti.mars.logic.controller.exceptions.EndpointException;
+import be.howest.ti.mars.logic.controller.exceptions.UsernameException;
 import io.vertx.core.json.JsonObject;
-
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 public class MarsController extends AuthController {
@@ -24,11 +22,7 @@ public class MarsController extends AuthController {
 
     public int sendPackage(DeliveryType deliveryType, int from, int destination, BaseAccount acc, boolean userAcc) {
         if (!userAcc){
-            if (deliveryType.equals(DeliveryType.LARGE)){
-                repo.updateBusinessSubscription(true,(BusinessAccount) acc);
-            }else{
-                repo.updateBusinessSubscription(false,(BusinessAccount) acc);
-            }
+            repo.updateBusinessSubscription(deliveryType.equals(DeliveryType.LARGE),(BusinessAccount) acc);
         }
        return repo.addDelivery(new Delivery(deliveryType, repo.getShortEndpoint(from), repo.getShortEndpoint(destination), "", acc.getUsername()));
     }
@@ -37,7 +31,7 @@ public class MarsController extends AuthController {
         if (userAccounts.contains(new UserAccount(friendName))) {
             user.addFriend(friendName);
         } else {
-            //throw error
+            throw new UsernameException("Could not add a friend with the given username");
         }
         return "You just added a friend called:" + friendName;
     }
@@ -46,7 +40,7 @@ public class MarsController extends AuthController {
         if (userAccounts.contains(new UserAccount(friendName))) {
             user.removeFriend(friendName);
         } else {
-            //throw error
+            throw new UsernameException("Could not remove a friend with the given username");
         }
         return "You just removed a friend called:" + friendName;
     }
@@ -100,6 +94,9 @@ public class MarsController extends AuthController {
 
     public Object getCurrentRouteInfo(UserAccount acc) {
         List<Travel> travelList = new LinkedList<>(repo.getTravelHistory(acc));
-        return travelList.get(travelList.size()-1);
+        if (!travelList.isEmpty()){
+            return travelList.get(travelList.size()-1);
+        }
+        return "You have not current trip.";
     }
 }
