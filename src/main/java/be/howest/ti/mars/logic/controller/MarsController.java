@@ -97,6 +97,6 @@ public class MarsController extends AuthController {
         if (!travelList.isEmpty()){
             return travelList.get(travelList.size()-1);
         }
-        return "You have not current trip.";
+        return "You have not requested any travel pods recently";
     }
 }
