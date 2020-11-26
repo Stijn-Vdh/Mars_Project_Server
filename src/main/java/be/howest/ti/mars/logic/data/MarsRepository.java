@@ -64,6 +64,8 @@ public interface MarsRepository {
 
     int addDelivery(Delivery delivery);
 
+    Object getDeliveryInformation(BaseAccount acc, int id);
+
     // Subscriptions
     Set<UserSubscription> getUserSubscriptions(); // TODO: 21-11-2020 add to spec and webserver
 
@@ -85,7 +87,4 @@ public interface MarsRepository {
     Set<String> getReportSections();
 
     void addReport(BaseAccount baseAccount, String section, String body);
-
-
-
 }

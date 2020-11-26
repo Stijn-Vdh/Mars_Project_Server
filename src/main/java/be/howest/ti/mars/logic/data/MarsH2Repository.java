@@ -38,6 +38,7 @@ public class MarsH2Repository implements MarsRepository {
     // Deliveries
     private static final String SQL_ADD_DELIVERY = "INSERT INTO DELIVERIES VALUES(DEFAULT, ?, ?, ?, DEFAULT, ?)";
     private static final String SQL_SELECT_DELIVERIES = "SELECT * FROM DELIVERIES WHERE sender=?";
+    private static final String SQL_SELECT_DELIVERY = "SELECT * FROM DELIVERIES WHERE sender=? and id=?";
     // Travels
     private static final String SQL_INSERT_TRAVEL = "INSERT INTO TRAVELS VALUES(default, ?, ?, ?, DEFAULT, ?, NULL)";
     private static final String SQL_SELECT_TRAVEL_HISTORY = "SELECT * FROM TRAVELS t WHERE userName=? ";
@@ -375,13 +376,14 @@ public class MarsH2Repository implements MarsRepository {
 
             try(ResultSet rs = stmt.executeQuery()){
                 while (rs.next()){
+                    int id = rs.getInt("id");
                     String type = rs.getString("deliveryType");
                     int source = rs.getInt("from");
                     int destination = rs.getInt("destination");
                     String date = rs.getString("dateTime");
                     String sender = rs.getString("sender");
 
-                    Delivery delivery = new Delivery(DeliveryType.enumOf(type), getShortEndpoint(source), getShortEndpoint(destination), date, sender);
+                    Delivery delivery = new Delivery(id,DeliveryType.enumOf(type), getShortEndpoint(source), getShortEndpoint(destination), date, sender);
                     deliveries.add(delivery);
                 }
             }
@@ -411,6 +413,35 @@ public class MarsH2Repository implements MarsRepository {
         } catch (SQLException ex) {
             LOGGER.log(Level.WARNING, ex.getMessage(), ex);
             throw new DatabaseException("Can't add delivery!");
+        }
+    }
+
+    @Override
+    public Object getDeliveryInformation(BaseAccount acc, int id) {
+        Delivery delivery = null;
+        try(Connection con = MarsConnection.getConnection();
+            PreparedStatement stmt = con.prepareStatement(SQL_SELECT_DELIVERY)) {
+            stmt.setString(1,acc.getUsername());
+            stmt.setInt(2,id);
+
+            try(ResultSet rs = stmt.executeQuery()){
+                while (rs.next()){
+                    int deliveryId = rs.getInt("id");
+                    String type = rs.getString("deliveryType");
+                    int source = rs.getInt("from");
+                    int destination = rs.getInt("destination");
+                    String date = rs.getString("dateTime");
+                    String sender = rs.getString("sender");
+
+
+                     delivery = new Delivery(deliveryId,DeliveryType.enumOf(type), getShortEndpoint(source), getShortEndpoint(destination), date, sender);
+                }
+            }
+            return delivery;
+
+        } catch (SQLException ex) {
+            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
+            throw new DatabaseException("Could not get deliveries from DB");
         }
     }
 
