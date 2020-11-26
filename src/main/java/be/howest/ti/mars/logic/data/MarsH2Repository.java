@@ -7,6 +7,7 @@ import be.howest.ti.mars.logic.controller.accounts.BaseAccount;
 import be.howest.ti.mars.logic.controller.accounts.BusinessAccount;
 import be.howest.ti.mars.logic.controller.accounts.UserAccount;
 import be.howest.ti.mars.logic.controller.converters.ShortEndpoint;
+import be.howest.ti.mars.logic.controller.enums.DeliveryType;
 import be.howest.ti.mars.logic.controller.enums.PodType;
 import be.howest.ti.mars.logic.controller.exceptions.DatabaseException;
 import be.howest.ti.mars.logic.controller.exceptions.EndpointException;
@@ -36,6 +37,7 @@ public class MarsH2Repository implements MarsRepository {
     private static final String SQL_DELETE_FRIEND = "DELETE FROM friends WHERE friendName=? AND userName=?";
     // Deliveries
     private static final String SQL_ADD_DELIVERY = "INSERT INTO DELIVERIES VALUES(DEFAULT, ?, ?, ?, DEFAULT, ?)";
+    private static final String SQL_SELECT_DELIVERIES = "SELECT * FROM DELIVERIES WHERE sender=?";
     // Travels
     private static final String SQL_INSERT_TRAVEL = "INSERT INTO TRAVELS VALUES(default, ?, ?, ?, DEFAULT, ?, NULL)";
     private static final String SQL_SELECT_TRAVEL_HISTORY = "SELECT * FROM TRAVELS t WHERE userName=? ";
@@ -364,8 +366,31 @@ public class MarsH2Repository implements MarsRepository {
     }
 
     @Override
-    public Set<Delivery> getDeliveries() {
-        return Collections.emptySet();
+    public List<Delivery> getDeliveries(BusinessAccount acc) {
+        List<Delivery> deliveries = new LinkedList<>();
+
+        try(Connection con = MarsConnection.getConnection();
+            PreparedStatement stmt = con.prepareStatement(SQL_SELECT_DELIVERIES)) {
+            stmt.setString(1,acc.getUsername());
+
+            try(ResultSet rs = stmt.executeQuery()){
+                while (rs.next()){
+                    String type = rs.getString("deliveryType");
+                    int source = rs.getInt("from");
+                    int destination = rs.getInt("destination");
+                    String date = rs.getString("dateTime");
+                    String sender = rs.getString("sender");
+
+                    Delivery delivery = new Delivery(DeliveryType.enumOf(type), getShortEndpoint(source), getShortEndpoint(destination), date, sender);
+                    deliveries.add(delivery);
+                }
+            }
+            return deliveries;
+
+        } catch (SQLException ex) {
+            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
+            throw new DatabaseException("Could not get deliveries from DB");
+        }
     }
 
     @Override

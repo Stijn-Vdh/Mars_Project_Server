@@ -588,6 +588,8 @@ paths:
               schema:
                 type: object
                 properties:
+                  deliveryID:
+                    type: int
                   deliveryType:
                     type: string
                     enum: [ small, large ]
@@ -603,7 +605,6 @@ paths:
           description: Unexpected error.
       security:
         - Token: [ Business ]
-
   /api/delivery/{id}: #Get delivery information
     description: get delivery information
     get:

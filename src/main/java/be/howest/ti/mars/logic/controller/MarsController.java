@@ -99,4 +99,8 @@ public class MarsController extends AuthController {
         }
         return "You have not requested any travel pods recently";
     }
+
+    public Object getDeliveries(BusinessAccount acc) {
+        return repo.getDeliveries(acc);
+    }
 }
