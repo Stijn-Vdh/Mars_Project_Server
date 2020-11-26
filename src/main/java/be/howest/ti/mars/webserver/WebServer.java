@@ -46,6 +46,7 @@ public class WebServer extends AbstractVerticle {
 
     @Override
     public void start(Promise<Void> promise) {
+        MarsOpenApiBridge.setVertx(vertx); // there should be a better way
         ConfigRetriever.create(vertx).getConfig(ar -> {
             if (ar.failed()) {
                 LOGGER.warning("Config not available");

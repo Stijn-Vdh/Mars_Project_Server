@@ -4,19 +4,30 @@ import be.howest.ti.mars.logic.controller.MarsController;
 import be.howest.ti.mars.logic.controller.accounts.BaseAccount;
 import be.howest.ti.mars.logic.controller.accounts.BusinessAccount;
 import be.howest.ti.mars.logic.controller.accounts.UserAccount;
+import be.howest.ti.mars.logic.controller.enums.NotificationType;
 import be.howest.ti.mars.logic.controller.security.AccountToken;
 import be.howest.ti.mars.logic.controller.security.SecureHash;
+import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 
+import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.stream.Collectors;
 
 class MarsOpenApiBridge {
     private final MarsController controller;
     public static final String AUTHORIZATION_TOKEN_PREFIX = "Bearer ";
     private static final String TOKEN = "token";
+    private static final Random rand = new Random();
+    private static Vertx vertx;
+
+    public static void setVertx(Vertx vertx) {
+        MarsOpenApiBridge.vertx = vertx;
+    }
 
     MarsOpenApiBridge() {
         this.controller = new MarsController();
@@ -170,13 +181,24 @@ class MarsOpenApiBridge {
         return controller.getRepo().getReportSections();
     }
 
+    private static TimerTask wrap(Runnable r) { // wish this could be cleaner but it isn't a functional interface
+        return new TimerTask() {
+            @Override
+            public void run() {
+                r.run();
+            }
+        };
+    }
+
     public Object travel(RoutingContext ctx) {
         int from = ctx.getBodyAsJson().getInteger("from");
         int destination = ctx.getBodyAsJson().getInteger("destination");
         String podType = ctx.getBodyAsJson().getString("podType");
         UserAccount user = getUserAccount(ctx);
         controller.travel(user, from, destination, podType);
-
+        int id = 0; // travel should return it
+        System.out.println(vertx);
+        new Timer().schedule(wrap(() -> user.sendNotification(vertx, NotificationType.TRAVEL, id)), rand.nextInt(5));
         return "Your pod is on route to your location.";
     }
 

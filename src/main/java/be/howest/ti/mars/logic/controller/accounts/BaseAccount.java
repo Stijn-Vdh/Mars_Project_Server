@@ -51,8 +51,6 @@ public abstract class BaseAccount {
 
     @JsonIgnore
     public AccountToken getAccountToken() {
-
-        System.out.println(accountToken.getTokenBase64());
         return accountToken;
     }
 

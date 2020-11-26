@@ -1,7 +1,7 @@
 package be.howest.ti.mars.logic.controller.enums;
 
 public enum NotificationType {
-    POD, PACKAGE;
+    TRAVEL, PACKAGE;
 
     @Override
     public String toString() {

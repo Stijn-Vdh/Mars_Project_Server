@@ -7,7 +7,6 @@ import io.vertx.core.json.JsonObject;
 public class UserAccount extends BaseAccount {
     private boolean sharesLocation;
     private String displayName;
-
     private static final String CHNL_TO_CLIENT_NOTIFICATION = "events.client.";
 
     public UserAccount(String username, String password, int homeAddressEndpoint, String address) {
@@ -61,7 +60,8 @@ public class UserAccount extends BaseAccount {
             JsonObject message = new JsonObject();
             message.put("id", id);
             message.put("type", type);
-            vertx.eventBus().send(CHNL_TO_CLIENT_NOTIFICATION + accountToken.getTokenBase64(), message);
+            System.out.println("send message"); // TODO: 26-11-2020 append token
+            vertx.eventBus().send(CHNL_TO_CLIENT_NOTIFICATION + "test", message);
         }
     }
 
