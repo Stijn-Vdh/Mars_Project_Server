@@ -18,15 +18,15 @@ public class MarsController extends AuthController {
         return MOTD;
     }
 
-    public int sendPackage(String deliveryType, int from, int destination, BaseAccount acc, boolean userAcc) {
+    public int sendPackage(DeliveryType deliveryType, int from, int destination, BaseAccount acc, boolean userAcc) {
         if (!userAcc){
-            if (deliveryType.equals("large")){
+            if (deliveryType.equals(DeliveryType.LARGE)){
                 repo.updateBusinessSubscription(true,(BusinessAccount) acc);
             }else{
                 repo.updateBusinessSubscription(false,(BusinessAccount) acc);
             }
         }
-       return repo.addDelivery(new Delivery(DeliveryType.enumOf(deliveryType), repo.getShortEndpoint(from), repo.getShortEndpoint(destination), "", acc.getUsername()));
+       return repo.addDelivery(new Delivery(deliveryType, repo.getShortEndpoint(from), repo.getShortEndpoint(destination), "", acc.getUsername()));
     }
 
     public Object addFriend(UserAccount user, String friendName) { // TODO: 20-11-2020 validation friend exists and not already friended and user and friend not same

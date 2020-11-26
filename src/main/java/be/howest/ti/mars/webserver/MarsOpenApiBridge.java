@@ -4,6 +4,7 @@ import be.howest.ti.mars.logic.controller.MarsController;
 import be.howest.ti.mars.logic.controller.accounts.BaseAccount;
 import be.howest.ti.mars.logic.controller.accounts.BusinessAccount;
 import be.howest.ti.mars.logic.controller.accounts.UserAccount;
+import be.howest.ti.mars.logic.controller.enums.DeliveryType;
 import be.howest.ti.mars.logic.controller.security.AccountToken;
 import be.howest.ti.mars.logic.controller.security.SecureHash;
 import io.vertx.core.http.HttpHeaders;
@@ -41,7 +42,7 @@ class MarsOpenApiBridge {
 
     public Object sendPackage(RoutingContext ctx) { // TODO: 21-11-2020 add missing validation: only business can send large packages, etc , from != dest
         JsonObject json = ctx.getBodyAsJson();
-        int id = controller.sendPackage(json.getString("deliveryType"),
+        int id = controller.sendPackage(DeliveryType.enumOf(json.getString("deliveryType")),
                 json.getInteger("from"),
                 json.getInteger("destination"),
                 getAccount(ctx),
