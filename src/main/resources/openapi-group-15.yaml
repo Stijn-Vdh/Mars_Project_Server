@@ -574,6 +574,36 @@ paths:
           description: Unexpected error.
       security:
         - Token: [ ]
+
+  /api/deliveries:
+    description: Get all deliveries ever made.
+    get:
+      summary: Get all deliveries ever made.
+      operationId: getDeliveries
+      responses:
+        '200':
+          description: list of all deliveries.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  deliveryType:
+                    type: string
+                    enum: [ small, large ]
+                  from:
+                    type: integer
+                  destination:
+                    type: integer
+                  date:
+                    type: string
+        '403':
+          description: Forbidden!
+        '500':
+          description: Unexpected error.
+      security:
+        - Token: [ Business ]
+
   /api/delivery/{id}: #Get delivery information
     description: get delivery information
     get:
