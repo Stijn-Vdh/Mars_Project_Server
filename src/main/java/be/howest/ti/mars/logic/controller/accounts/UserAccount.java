@@ -1,5 +1,7 @@
 package be.howest.ti.mars.logic.controller.accounts;
 
+import be.howest.ti.mars.logic.controller.security.AccountToken;
+
 public class UserAccount extends BaseAccount {
     private boolean sharesLocation;
     private String displayName;
@@ -9,6 +11,12 @@ public class UserAccount extends BaseAccount {
         sharesLocation = false;
         displayName = username;
         subscriptionId = 0;
+    }
+
+    public UserAccount(String username, String password, String displayName, int homeAddressEndpoint, String address, boolean sharesLocation) {
+        super(null, homeAddressEndpoint, password, username, address);
+        this.sharesLocation = sharesLocation;
+        this.displayName = displayName;
     }
 
     public UserAccount(String name) {
