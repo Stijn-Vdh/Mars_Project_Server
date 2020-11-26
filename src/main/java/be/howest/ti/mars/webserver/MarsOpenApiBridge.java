@@ -197,8 +197,7 @@ class MarsOpenApiBridge {
         UserAccount user = getUserAccount(ctx);
         controller.travel(user, from, destination, podType);
         int id = 0; // travel should return it
-        System.out.println(vertx);
-        new Timer().schedule(wrap(() -> user.sendNotification(vertx, NotificationType.TRAVEL, id)), rand.nextInt(5));
+        new Timer().schedule(wrap(() -> user.sendNotification(vertx, NotificationType.TRAVEL, id)), rand.nextInt(5)* 1000L);
         return "Your pod is on route to your location.";
     }
 

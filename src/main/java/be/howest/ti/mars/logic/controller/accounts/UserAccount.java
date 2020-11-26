@@ -60,9 +60,7 @@ public class UserAccount extends BaseAccount {
             JsonObject message = new JsonObject();
             message.put("id", id);
             message.put("type", type);
-            System.out.println("send message"); // TODO: 26-11-2020 append token
-            vertx.eventBus().send(CHNL_TO_CLIENT_NOTIFICATION + "test", message);
+            vertx.eventBus().send(CHNL_TO_CLIENT_NOTIFICATION + accountToken.getTokenBase64(), message);
         }
     }
-
 }
