@@ -653,18 +653,13 @@ paths:
       security:
         - Token: [ ]
 
-  /api/routeInfo/{id}:
+  /api/routeInfo:
     description: Get route information.
     get:
+      operationId: getCurrentRouteInfo
       summary: Get your current route information.
       tags:
         - travel
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer
       responses:
         '200':
           description: OK
@@ -690,7 +685,7 @@ paths:
         '500':
           description: Unexpected error.
       security:
-        - Token: [ ]
+        - Token: [ user ]
   /api/travel:
     description: travel from one point to another.
     get:

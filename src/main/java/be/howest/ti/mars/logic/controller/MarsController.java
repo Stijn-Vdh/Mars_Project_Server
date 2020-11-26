@@ -8,6 +8,10 @@ import be.howest.ti.mars.logic.controller.enums.PodType;
 import be.howest.ti.mars.logic.controller.exceptions.EndpointException;
 import io.vertx.core.json.JsonObject;
 
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class MarsController extends AuthController {
@@ -92,5 +96,10 @@ public class MarsController extends AuthController {
 
     public void cancelTrip(UserAccount acc, int id) {
         repo.cancelTravel(acc, id);
+    }
+
+    public Object getCurrentRouteInfo(UserAccount acc) {
+        List<Travel> travelList = new LinkedList<>(repo.getTravelHistory(acc));
+        return travelList.get(travelList.size()-1);
     }
 }

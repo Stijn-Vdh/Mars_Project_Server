@@ -202,6 +202,10 @@ class MarsOpenApiBridge {
         return "Successfully changed your display name to " + newDN;
     }
 
+    public Object getCurrentRouteInfo(RoutingContext ctx) {
+        return controller.getCurrentRouteInfo(getUserAccount(ctx));
+    }
+
     //------------------------------------------------------------------------------------------------------------------
 
     public boolean isUserAccountToken(RoutingContext ctx) {
@@ -241,6 +245,7 @@ class MarsOpenApiBridge {
             return header.substring(AUTHORIZATION_TOKEN_PREFIX.length());
         }
     }
+
 
 
 }

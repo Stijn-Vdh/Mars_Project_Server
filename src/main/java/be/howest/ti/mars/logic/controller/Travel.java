@@ -35,4 +35,15 @@ public class Travel {
     public String getDateTime() {
         return dateTime;
     }
+
+    @Override
+    public String toString() {
+        return "Travel{" +
+                "id=" + id +
+                ", from=" + from +
+                ", destination=" + destination +
+                ", podType=" + podType +
+                ", dateTime='" + dateTime + '\'' +
+                '}';
+    }
 }
