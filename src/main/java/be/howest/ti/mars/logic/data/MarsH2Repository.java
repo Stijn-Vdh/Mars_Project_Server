@@ -325,11 +325,12 @@ public class MarsH2Repository implements MarsRepository {
 
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
+                    int id = rs.getInt("id");
                     int from = rs.getInt("from");
                     int destination = rs.getInt("destination");
                     String podType = rs.getString("podType");
                     String date = rs.getString("dateTime");
-                    travels.add(new Travel(getShortEndpoint(from), getShortEndpoint(destination), PodType.enumOf(podType), date));
+                    travels.add(new Travel(id, getShortEndpoint(from), getShortEndpoint(destination), PodType.enumOf(podType), date));
                 }
             }
         } catch (SQLException ex) {
