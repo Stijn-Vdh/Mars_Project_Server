@@ -517,7 +517,7 @@ public class MarsH2Repository implements MarsRepository {
         }
     }
 
-    private void resetPods(BusinessAccount acc) {
+    public void resetPods(BusinessAccount acc) {
         try(Connection con = MarsConnection.getConnection();
             PreparedStatement stmt = con.prepareStatement(SQL_UPDATE_BUSINESS_SUBSCRIPTION_INFO)){
             stmt.setString(1, acc.getUsername());

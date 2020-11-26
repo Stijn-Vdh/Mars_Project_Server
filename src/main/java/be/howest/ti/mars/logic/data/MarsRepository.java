@@ -50,6 +50,7 @@ public interface MarsRepository {
 
     // business
     void addBusiness(BusinessAccount business);
+    void resetPods(BusinessAccount acc);
 
     // Travel
     List<Travel> getTravelHistory(UserAccount acc);

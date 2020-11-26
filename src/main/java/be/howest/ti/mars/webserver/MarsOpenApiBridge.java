@@ -24,7 +24,9 @@ class MarsOpenApiBridge {
     public static final String AUTHORIZATION_TOKEN_PREFIX = "Bearer ";
     private static final String TOKEN = "token";
     private static final Random rand = new Random();
+    private static final Timer timer = new Timer();
     private static Vertx vertx;
+    private static final long RESET_PERIOD = 1000L * 60L * 60L * 24L;
 
     public static void setVertx(Vertx vertx) {
         MarsOpenApiBridge.vertx = vertx;
@@ -64,7 +66,7 @@ class MarsOpenApiBridge {
                 getAccount(ctx),
                 isUser
         );
-        if (isUser) new Timer().schedule(wrap(() -> getUserAccount(ctx).sendNotification(vertx, NotificationType.PACKAGE, id)), getETA());
+        if (isUser) timer.schedule(wrap(() -> getUserAccount(ctx).sendNotification(vertx, NotificationType.PACKAGE, id)), getETA());
         JsonObject delivery = new JsonObject();
         delivery.put("deliveryId", id);
         return delivery;
@@ -204,7 +206,7 @@ class MarsOpenApiBridge {
         UserAccount user = getUserAccount(ctx);
         controller.travel(user, from, destination, podType);
         int id = 0; // travel should return it
-        new Timer().schedule(wrap(() -> user.sendNotification(vertx, NotificationType.TRAVEL, id)), getETA());
+        timer.schedule(wrap(() -> user.sendNotification(vertx, NotificationType.TRAVEL, id)), getETA());
         return "Your pod is on route to your location.";
     }
 
@@ -273,5 +275,12 @@ class MarsOpenApiBridge {
         }
     }
 
+    private void resetBusinessUsedPods() {
+        controller.getBusinessAccounts().forEach(acc -> controller.getRepo().resetPods(acc));
+    }
+
+    public void startDailyResetCompanyPods() {
+        timer.scheduleAtFixedRate(wrap(this::resetBusinessUsedPods), 0, RESET_PERIOD);
+    }
 
 }
