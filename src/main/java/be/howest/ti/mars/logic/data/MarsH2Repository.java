@@ -484,7 +484,6 @@ public class MarsH2Repository implements MarsRepository {
 
     @Override
     public BusinessSubscriptionInfo getBusinessSubscriptionInfo(BusinessAccount business) {
-        dailyCheck(business);
         try (Connection con = MarsConnection.getConnection();
              PreparedStatement stmt = con.prepareStatement(SQL_SELECT_BUSINESS_SUBSCRIPTION_INFO)) {
             stmt.setString(1, business.getUsername());
@@ -524,25 +523,6 @@ public class MarsH2Repository implements MarsRepository {
             LOGGER.log(Level.WARNING, ex.getMessage(), ex);
             throw new DatabaseException("Could not update business subscription information");
         }
-    }
-
-    private void dailyCheck(BusinessAccount acc){
-        Timer timer = new Timer();
-        Calendar date = Calendar.getInstance();
-        date.set(Calendar.HOUR, 12);
-        date.set(Calendar.MINUTE, 0);
-        date.set(Calendar.SECOND, 0);
-        date.set(Calendar.MILLISECOND, 0);
-        timer.schedule(
-                new TimerTask() {
-                    @Override
-                    public void run() {
-                        resetPods(acc);
-                    }
-                },
-                date.getTime(),
-                1000 * 60 * 60 * 24
-        );
     }
 
     private void resetPods(BusinessAccount acc) {
