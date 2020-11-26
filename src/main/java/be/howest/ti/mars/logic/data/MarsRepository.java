@@ -11,6 +11,7 @@ import be.howest.ti.mars.logic.controller.subscription.BusinessSubscription;
 import be.howest.ti.mars.logic.controller.subscription.BusinessSubscriptionInfo;
 import be.howest.ti.mars.logic.controller.subscription.UserSubscription;
 
+import java.util.List;
 import java.util.Set;
 
 public interface MarsRepository {
@@ -51,7 +52,7 @@ public interface MarsRepository {
     void addBusiness(BusinessAccount business);
 
     // Travel
-    Set<Travel> getTravelHistory(UserAccount acc);
+    List<Travel> getTravelHistory(UserAccount acc);
 
     void travel(UserAccount user, Travel travel);
 

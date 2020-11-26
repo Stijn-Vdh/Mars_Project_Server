@@ -114,15 +114,6 @@ public class MarsH2Repository implements MarsRepository {
         }
     }
 
-    private boolean endpointExists(int id) {
-        try {
-            getEndpoint(id);
-            return true;
-        } catch (Exception ex) {
-            return false;
-        }
-    }
-
     @Override
     public Set<ShortEndpoint> getFavoriteEndpoints(BaseAccount acc) {
         Set<ShortEndpoint> favouredTrips = new HashSet<>();
@@ -318,8 +309,8 @@ public class MarsH2Repository implements MarsRepository {
 
     // Travel / Delivery (packages)
     @Override
-    public Set<Travel> getTravelHistory(UserAccount acc) {
-        Set<Travel> travels = new HashSet<>();
+    public List<Travel> getTravelHistory(UserAccount acc) {
+        List<Travel> travels = new LinkedList<>();
         try (Connection conn = MarsConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(SQL_SELECT_TRAVEL_HISTORY)) {
             stmt.setString(1, acc.getUsername());
@@ -502,11 +493,11 @@ public class MarsH2Repository implements MarsRepository {
     }
 
     @Override
-    public void updateBusinessSubscription(boolean LargePackage, BusinessAccount acc) {
+    public void updateBusinessSubscription(boolean largePackage, BusinessAccount acc) {
         BusinessSubscriptionInfo currentInfo = getBusinessSubscriptionInfo(acc);
         int currentUsedPods;
         String sqlStatement;
-        if (LargePackage){
+        if (largePackage){
             sqlStatement = SQL_UPDATE_BUSINESS_SUBSCRIPTION_INFO_LARGE;
             currentUsedPods = currentInfo.getLargePodsUsed();
         }else{

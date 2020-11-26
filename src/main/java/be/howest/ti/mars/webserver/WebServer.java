@@ -171,6 +171,7 @@ public class WebServer extends AbstractVerticle {
         addRouteWithCtxFunction(factory, "ping", bridge::ping);
         addRouteWithCtxFunction(factory, "changeDisplayName", bridge::setDisplayName);
         addRouteWithCtxFunction(factory, "changePassword", bridge::changePassword);
+        addRouteWithCtxFunction(factory, "getCurrentRouteInfo", bridge::getCurrentRouteInfo);
     }
 
     private void addRouteWithCtxFunction(OpenAPI3RouterFactory factory, String operationId, Function<RoutingContext, Object> bridgeFunction) {
