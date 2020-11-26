@@ -667,7 +667,7 @@ paths:
             type: integer
       responses:
         '200':
-          description: Succesfully bought a ticket.
+          description: OK
           content:
             application/json:
               schema:
