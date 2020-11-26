@@ -52,7 +52,7 @@ public class MarsH2Repository implements MarsRepository {
     private static final String SQL_SELECT_FAVORITE_ENDPOINT = "SELECT * FROM favorite_endpoints fe JOIN endpoints e ON fe.endpointid = e.id WHERE accountname = ?";
     // Accounts
     private static final String SQL_SELECT_ACCOUNTS = "SELECT * FROM ACCOUNTS";
-    private static final String SQL_SELECT_USERS = "SELECT * FROM users u join accounts a on a.name = u.name";
+    private static final String SQL_SELECT_USERS = "SELECT * FROM users u JOIN accounts a ON a.name = u.name";
     private static final String SQL_SELECT_BUSINESSES = "SELECT * FROM users u join businesses b on b.name = u.name";
     private static final String SQL_INSERT_ACCOUNT = "INSERT INTO accounts VALUES (?, ?, ?, ?)";
     private static final String SQL_INSERT_USER = "INSERT INTO users VALUES (?, ?, default, default)";
@@ -205,14 +205,34 @@ public class MarsH2Repository implements MarsRepository {
             }
         } catch (SQLException ex) {
             LOGGER.log(Level.WARNING, ex.getMessage(), ex);
-            throw new DatabaseException("Cannot get all favorites.");
+            throw new DatabaseException("Cannot get all accounts.");
         }
         return accounts;
     }
 
     @Override
     public Set<UserAccount> getUserAccounts() {
-        return null;
+        Set<UserAccount> accounts = new HashSet<>();
+
+        try (Connection con = MarsConnection.getConnection();
+             PreparedStatement stmt = con.prepareStatement(SQL_SELECT_USERS);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                String name = rs.getString("name");
+                String password = rs.getString("password");
+                String address = rs.getString("homeAddress");
+                boolean sharesLocation = rs.getBoolean("sharesLocation");
+                String displayName = rs.getString("displayName");
+                int endpointId = rs.getInt("homeEndpointId");
+                int subscriptionId = rs.getInt("subscriptionId");
+                accounts.add(new UserAccount(name, password, address, endpointId, displayName, sharesLocation, subscriptionId));
+            }
+        } catch (SQLException ex) {
+            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
+            throw new DatabaseException("Cannot get all userAccounts.");
+        }
+        return accounts;
     }
 
     @Override

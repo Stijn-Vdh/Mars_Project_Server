@@ -16,15 +16,17 @@ public class UserAccount extends BaseAccount {
         subscriptionId = 0;
     }
 
-    public UserAccount(String username, String password, String displayName, int homeAddressEndpoint, String address, boolean sharesLocation) {
-        super(null, homeAddressEndpoint, password, username, address);
+    public UserAccount(String name, String password, String address, int homeAddressEndpoint, String displayName, boolean sharesLocation, int subscriptionId) {
+        super(name, password, address, homeAddressEndpoint);
         this.sharesLocation = sharesLocation;
         this.displayName = displayName;
+        this.subscriptionId = subscriptionId;
     }
 
     public UserAccount(String name) {
         super(name);
     }
+
 
     public String getDisplayName() {
         return displayName;
