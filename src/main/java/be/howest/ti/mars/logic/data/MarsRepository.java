@@ -55,7 +55,7 @@ public interface MarsRepository {
     // Travel
     List<Travel> getTravelHistory(UserAccount acc);
 
-    void travel(UserAccount user, Travel travel);
+    int travel(UserAccount user, Travel travel);
 
     void cancelTravel(UserAccount user, int tripID);
 
