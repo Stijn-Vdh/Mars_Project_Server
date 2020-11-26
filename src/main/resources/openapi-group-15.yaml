@@ -608,6 +608,7 @@ paths:
   /api/delivery/{id}: #Get delivery information
     description: get delivery information
     get:
+      operationId: getDeliveryInformation
       summary: Get deliver information.
       tags:
         - delivery
@@ -630,8 +631,12 @@ paths:
                   deliveryType:
                     type: string
                     enum: [ small, large ]
-                  business:
-                    type: boolean
+                  from:
+                    type: integer
+                  destination:
+                    type: integer
+                  date:
+                    type: string
         '401':
           description: Authorization information is missing or invalid.
         '403':

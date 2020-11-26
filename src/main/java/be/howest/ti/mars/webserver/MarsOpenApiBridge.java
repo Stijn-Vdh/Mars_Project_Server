@@ -239,6 +239,10 @@ class MarsOpenApiBridge {
         return controller.getDeliveries(getBusinessAccount(ctx));
     }
 
+    public Object getDeliveryInformation(RoutingContext ctx) {
+        return controller.getDelivery(getAccount(ctx), Integer.parseInt(ctx.request().getParam("id")));
+    }
+
     //------------------------------------------------------------------------------------------------------------------
 
     public boolean isUserAccountToken(RoutingContext ctx) {
@@ -286,5 +290,6 @@ class MarsOpenApiBridge {
     public void startDailyResetCompanyPods() {
         timer.scheduleAtFixedRate(wrap(this::resetBusinessUsedPods), 0, RESET_PERIOD);
     }
+
 
 }
