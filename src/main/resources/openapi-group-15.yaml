@@ -129,7 +129,7 @@ paths:
                   minLength: 1
                 homeAddress:
                   type: string
-                homeEndpointID:
+                homeEndpointId:
                   type: integer
                 businessAccount:
                   type: boolean
