@@ -65,4 +65,8 @@ public abstract class AuthController {
     }
 
 
+    public void changePassword(BaseAccount acc, String newPW) {
+       repo.changePassword(acc,newPW);
+       acc.setPassword(newPW);
+    }
 }

@@ -32,7 +32,7 @@ class MarsOpenApiBridge {
                 json.getString("name"),
                 SecureHash.getHashEncoded(json.getString("password")),
                 json.getString("homeAddress"),
-                json.getInteger("homeEndpointId"),
+                json.getInteger("homeEndpointID"),
                 json.getBoolean("businessAccount")
         );
 
@@ -59,6 +59,11 @@ class MarsOpenApiBridge {
     public Object logout(RoutingContext ctx) {
         controller.logout(getAccount(ctx));
         return "Bye bye";
+    }
+
+    public Object changePassword(RoutingContext ctx) {
+        controller.changePassword(getAccount(ctx), SecureHash.getHashEncoded(ctx.getBodyAsJson().getString("newPassword")));
+        return "Successfully changed your password.";
     }
 
     public Object getAccountInformation(RoutingContext ctx) {
@@ -234,4 +239,6 @@ class MarsOpenApiBridge {
             return header.substring(AUTHORIZATION_TOKEN_PREFIX.length());
         }
     }
+
+
 }
