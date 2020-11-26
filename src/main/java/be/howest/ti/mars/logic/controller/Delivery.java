@@ -11,7 +11,7 @@ public class Delivery {
     private final String dateTime;
     private final String sender;
 
-    public Delivery(int id,DeliveryType deliveryType, ShortEndpoint source, ShortEndpoint destination, String dateTime, String sender) {
+    public Delivery(int id, DeliveryType deliveryType, ShortEndpoint source, ShortEndpoint destination, String dateTime, String sender) {
         this.id = id;
         this.deliveryType = deliveryType;
         this.source = source;
@@ -20,7 +20,9 @@ public class Delivery {
         this.sender = sender;
     }
 
-    public int getId(){return id;};
+    public int getId() {
+        return id;
+    }
 
     public DeliveryType getDeliveryType() {
         return deliveryType;

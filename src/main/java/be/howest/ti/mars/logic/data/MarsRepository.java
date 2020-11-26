@@ -15,8 +15,11 @@ import java.util.List;
 import java.util.Set;
 
 public interface MarsRepository {
-    // account
+    // accounts
     void addAccount(BaseAccount account);
+    Set<BaseAccount> getAccounts();
+    Set<UserAccount> getUserAccounts();
+    Set<BusinessAccount> getBusinessAccounts();
 
     // Endpoint
     Set<ShortEndpoint> getEndpoints();
