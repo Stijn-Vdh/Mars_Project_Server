@@ -1,6 +1,7 @@
 package be.howest.ti.mars.logic.controller.accounts;
 
 import be.howest.ti.mars.logic.data.Repositories;
+import be.howest.ti.mars.logic.data.repoInterfaces.AccountsRepoInt;
 import be.howest.ti.mars.logic.data.repoInterfaces.FavoritesRepoInt;
 import be.howest.ti.mars.logic.data.repoInterfaces.FriendsRepoInt;
 import be.howest.ti.mars.logic.data.util.MarsConnection;
@@ -18,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class UserAccountTest {
 
-    private static final SubscriptionRepoInt repo = new SubscriptionRepository();
+    private static final AccountsRepoInt repo = Repositories.getAccountsRepoInt();
     private static final UserAccount testDanny = new UserAccount("Danny", "Danny", 5, "MarsStreet 69");
     private static final UserAccount testDebby = new UserAccount("Debby", "Debby", 3, "WestStreet 420");
     private static final UserAccount testPol = new UserAccount("Pol", "Pol", 6, "Earthstreet 23");
