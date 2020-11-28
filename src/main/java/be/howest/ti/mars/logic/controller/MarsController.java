@@ -69,7 +69,7 @@ public class MarsController extends AuthController {
         accInformation.put("displayName:", account.getDisplayName());
         accInformation.put("shareLocation:", account.isSharesLocation());
         accInformation.put("subscription:", repo.getUserSubscription(account));
-        accInformation.put("friends:", repo.getFriends(account, userAccounts).stream().map(UserAccount::getUsername).collect(Collectors.toList()));
+        accInformation.put("friends:", Repositories.getFriendsRepoInt().getFriends(account, userAccounts).stream().map(UserAccount::getUsername).collect(Collectors.toList()));
         accInformation.put("travelHistory:", repo.getTravelHistory(account));
         return accInformation;
     }

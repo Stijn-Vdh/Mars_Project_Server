@@ -2,6 +2,7 @@ package be.howest.ti.mars.logic.controller.accounts;
 
 import be.howest.ti.mars.logic.data.Repositories;
 import be.howest.ti.mars.logic.data.repoInterfaces.FavoritesRepoInt;
+import be.howest.ti.mars.logic.data.repoInterfaces.FriendsRepoInt;
 import be.howest.ti.mars.logic.data.util.MarsConnection;
 import be.howest.ti.mars.logic.data.MarsH2Repository;
 import be.howest.ti.mars.logic.data.MarsRepository;
@@ -50,18 +51,19 @@ class UserAccountTest {
 
     @Test
     void testFriendsToDB() {
+        FriendsRepoInt friendRepo = Repositories.getFriendsRepoInt();
         Set<UserAccount> users = new HashSet<>();
 
         users.add(testDanny);
         users.add(testDebby);
         users.add(testPol);
 
-        assertEquals(0, repo.getFriends(testDanny, users).size());
+        assertEquals(0, friendRepo.getFriends(testDanny, users).size());
         testDanny.addFriend("Debby");
         testDanny.addFriend("Pol");
-        assertEquals(2, repo.getFriends(testDanny, users).size());
+        assertEquals(2, friendRepo.getFriends(testDanny, users).size());
         testDanny.removeFriend("Debby");
-        assertEquals(1, repo.getFriends(testDanny, users).size());
+        assertEquals(1, friendRepo.getFriends(testDanny, users).size());
 
     }
 

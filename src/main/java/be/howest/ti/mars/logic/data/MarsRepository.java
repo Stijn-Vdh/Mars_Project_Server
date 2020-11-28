@@ -38,11 +38,6 @@ public interface MarsRepository {
     void setDisplayName(UserAccount acc, String displayName);
 
     // Friends
-    Set<UserAccount> getFriends(UserAccount user, Set<UserAccount> users);
-
-    void beFriend(String name, String friendName);
-
-    void removeFriend(String name, String friendName);
 
     // business
     void addBusiness(BusinessAccount business);

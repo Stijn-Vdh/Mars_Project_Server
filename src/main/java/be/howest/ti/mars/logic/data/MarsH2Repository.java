@@ -236,61 +236,8 @@ public class MarsH2Repository implements MarsRepository {
         }
     }
 
-    // FriendsRepoInt
-    @Override
-    public Set<UserAccount> getFriends(UserAccount user, Set<UserAccount> users) { // TODO: 20-11-2020 hacky?
-        Set<UserAccount> friends = new HashSet<>();
+    // Friends
 
-        try (Connection con = MarsConnection.getConnection();
-             PreparedStatement stmt = con.prepareStatement(SQL_SELECT_ALL_FRIENDS)) {
-            stmt.setString(1, user.getUsername());
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    String name = rs.getString("friendName");
-                    friends.add(
-                            users.stream()
-                                    .filter(userAccount -> userAccount.getUsername().equals(name))
-                                    .findAny()
-                                    .orElseThrow()
-                    );
-                }
-            }
-
-        } catch (SQLException ex) {
-            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
-            throw new DatabaseException("Can't view all your friends.");
-        }
-        return friends;
-    }
-
-    @Override
-    public void beFriend(String name, String friendName) {
-        try (Connection con = MarsConnection.getConnection();
-             PreparedStatement stmt = con.prepareStatement(SQL_INSERT_FRIEND)) {
-
-            stmt.setString(1, friendName);
-            stmt.setString(2, name);
-            stmt.executeUpdate();
-        } catch (SQLException ex) {
-            LOGGER.log(Level.WARNING, ex.getMessage());
-            throw new DatabaseException("Can't add a friend.");
-        }
-    }
-
-    @Override
-    public void removeFriend(String name, String friendName) {
-        try (Connection con = MarsConnection.getConnection();
-             PreparedStatement stmt = con.prepareStatement(SQL_DELETE_FRIEND)) {
-
-            stmt.setString(1, friendName);
-            stmt.setString(2, name);
-            stmt.executeUpdate();
-        } catch (SQLException ex) {
-            LOGGER.log(Level.WARNING, ex.getMessage());
-            throw new DatabaseException("Can't remove a friend.");
-        }
-
-    }
 
     public ShortEndpoint getShortEndpoint(int id) {
         Endpoint endpoint = Repositories.getEndpointsRepoInt().getEndpoint(id);
