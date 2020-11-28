@@ -24,9 +24,9 @@ public class MarsController extends AuthController {
 
     public int sendPackage(DeliveryType deliveryType, int from, int destination, BaseAccount acc, boolean userAcc) {
         if (!userAcc){
-            repo.updateBusinessSubscription(deliveryType.equals(DeliveryType.LARGE),(BusinessAccount) acc);
+            Repositories.getSubscriptionRepoInt().updateBusinessSubscription(deliveryType.equals(DeliveryType.LARGE),(BusinessAccount) acc);
         }
-       return Repositories.getDeliveriesRepoInt().addDelivery(new Delivery(0,deliveryType, repo.getShortEndpoint(from), repo.getShortEndpoint(destination), "", acc.getUsername()));
+       return Repositories.getDeliveriesRepoInt().addDelivery(new Delivery(0,deliveryType, Repositories.getEndpointsRepoInt().getShortEndpoint(from), Repositories.getEndpointsRepoInt().getShortEndpoint(destination), "", acc.getUsername()));
     }
 
     public Object addFriend(UserAccount user, String friendName) { // TODO: 20-11-2020 validation friend exists and not already friended and user and friend not same
@@ -68,7 +68,7 @@ public class MarsController extends AuthController {
         JsonObject accInformation = getAccountInformation(account);
         accInformation.put("displayName:", account.getDisplayName());
         accInformation.put("shareLocation:", account.isSharesLocation());
-        accInformation.put("subscription:", repo.getUserSubscription(account));
+        accInformation.put("subscription:", Repositories.getSubscriptionRepoInt().getUserSubscription(account));
         accInformation.put("friends:", Repositories.getFriendsRepoInt().getFriends(account, userAccounts).stream().map(UserAccount::getUsername).collect(Collectors.toList()));
         accInformation.put("travelHistory:", Repositories.getTravelsRepoInt().getTravelHistory(account));
         return accInformation;
@@ -76,14 +76,14 @@ public class MarsController extends AuthController {
 
     public Object getBusinessAccountInformation(BusinessAccount business) {
         JsonObject accInformation = getAccountInformation(business);
-        accInformation.put("subscription:", repo.getBusinessSubscription(business));
-        accInformation.put("Current usage subscription:", repo.getBusinessSubscriptionInfo(business));
+        accInformation.put("subscription:", Repositories.getSubscriptionRepoInt().getBusinessSubscription(business));
+        accInformation.put("Current usage subscription:", Repositories.getSubscriptionRepoInt().getBusinessSubscriptionInfo(business));
         return accInformation;
     }
 
     public int travel(UserAccount acc, int from, int destination, String type) { // getShortEndpoint also validates if endpoint exists
         if (from == destination) throw new EndpointException("Destination and from are the same endpoint");
-        return Repositories.getTravelsRepoInt().travel(acc, new Travel(0,repo.getShortEndpoint(from), repo.getShortEndpoint(destination), PodType.enumOf(type), ""));
+        return Repositories.getTravelsRepoInt().travel(acc, new Travel(0,Repositories.getEndpointsRepoInt().getShortEndpoint(from), Repositories.getEndpointsRepoInt().getShortEndpoint(destination), PodType.enumOf(type), ""));
     }
 
     public Object getTravelHistory(UserAccount acc) {

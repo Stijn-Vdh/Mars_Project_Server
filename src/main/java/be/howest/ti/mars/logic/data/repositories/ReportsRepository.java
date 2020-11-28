@@ -4,7 +4,6 @@ import be.howest.ti.mars.logic.controller.accounts.BaseAccount;
 import be.howest.ti.mars.logic.controller.exceptions.DatabaseException;
 import be.howest.ti.mars.logic.controller.exceptions.EntityNotFoundException;
 import be.howest.ti.mars.logic.data.util.MarsConnection;
-import be.howest.ti.mars.logic.data.MarsH2Repository;
 import be.howest.ti.mars.logic.data.repoInterfaces.ReportsRepoInt;
 
 import java.sql.Connection;
@@ -17,7 +16,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class ReportsRepository implements ReportsRepoInt {
-    private static final Logger LOGGER = Logger.getLogger(MarsH2Repository.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(SubscriptionRepository.class.getName());
 
     // Reports SQL QUERIES
     private static final String SQL_GET_REPORT_SECTIONS = "SELECT * FROM REPORT_SECTIONS";

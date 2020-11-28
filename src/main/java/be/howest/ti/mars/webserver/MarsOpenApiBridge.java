@@ -129,9 +129,9 @@ class MarsOpenApiBridge {
 
     public Object viewSubscriptions(RoutingContext ctx) {
         if (isUserAccountToken(ctx)) {
-            return controller.getRepo().getUserSubscriptions();
+            return Repositories.getSubscriptionRepoInt().getUserSubscriptions();
         } else {
-            return controller.getRepo().getBusinessSubscriptions();
+            return Repositories.getSubscriptionRepoInt().getBusinessSubscriptions();
         }
     }
 
@@ -156,7 +156,7 @@ class MarsOpenApiBridge {
     }
 
     public Object viewSubscriptionInfo(RoutingContext ctx) {
-        return controller.getRepo().getBusinessSubscriptionInfo(getBusinessAccount(ctx));
+        return Repositories.getSubscriptionRepoInt().getBusinessSubscriptionInfo(getBusinessAccount(ctx));
     }
 
     public Object shareLocation(RoutingContext ctx) {
@@ -286,7 +286,7 @@ class MarsOpenApiBridge {
     }
 
     private void resetBusinessUsedPods() {
-        controller.getBusinessAccounts().forEach(acc -> controller.getRepo().resetPods(acc));
+        controller.getBusinessAccounts().forEach(acc -> Repositories.getSubscriptionRepoInt().resetPods(acc));
     }
 
     public void startDailyResetCompanyPods() {

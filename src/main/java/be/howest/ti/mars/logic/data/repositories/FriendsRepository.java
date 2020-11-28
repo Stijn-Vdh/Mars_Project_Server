@@ -3,7 +3,6 @@ package be.howest.ti.mars.logic.data.repositories;
 import be.howest.ti.mars.logic.controller.accounts.UserAccount;
 import be.howest.ti.mars.logic.controller.exceptions.DatabaseException;
 import be.howest.ti.mars.logic.data.util.MarsConnection;
-import be.howest.ti.mars.logic.data.MarsH2Repository;
 import be.howest.ti.mars.logic.data.repoInterfaces.FriendsRepoInt;
 
 import java.sql.Connection;
@@ -16,7 +15,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class FriendsRepository implements FriendsRepoInt {
-    private static final Logger LOGGER = Logger.getLogger(MarsH2Repository.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(SubscriptionRepository.class.getName());
 
     // Friends SQL QUERIES
     private static final String SQL_SELECT_ALL_FRIENDS = "SELECT * FROM friends f LEFT JOIN users u ON u.name = f.friendName WHERE f.userName=?";

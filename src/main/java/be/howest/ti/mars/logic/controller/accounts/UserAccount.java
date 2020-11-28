@@ -43,7 +43,7 @@ public class UserAccount extends BaseAccount {
     }
 
     public void setSubscriptionId(int subscriptionId) {
-        repo.setUserSubscription(this, subscriptionId);
+        Repositories.getSubscriptionRepoInt().setUserSubscription(this, subscriptionId);
         this.subscriptionId = subscriptionId;
     }
 

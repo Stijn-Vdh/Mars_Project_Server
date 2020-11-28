@@ -4,8 +4,8 @@ import be.howest.ti.mars.logic.data.Repositories;
 import be.howest.ti.mars.logic.data.repoInterfaces.FavoritesRepoInt;
 import be.howest.ti.mars.logic.data.repoInterfaces.FriendsRepoInt;
 import be.howest.ti.mars.logic.data.util.MarsConnection;
-import be.howest.ti.mars.logic.data.MarsH2Repository;
-import be.howest.ti.mars.logic.data.MarsRepository;
+import be.howest.ti.mars.logic.data.repositories.SubscriptionRepository;
+import be.howest.ti.mars.logic.data.repoInterfaces.SubscriptionRepoInt;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class UserAccountTest {
 
-    private static final MarsRepository repo = new MarsH2Repository();
+    private static final SubscriptionRepoInt repo = new SubscriptionRepository();
     private static final UserAccount testDanny = new UserAccount("Danny", "Danny", 5, "MarsStreet 69");
     private static final UserAccount testDebby = new UserAccount("Debby", "Debby", 3, "WestStreet 420");
     private static final UserAccount testPol = new UserAccount("Pol", "Pol", 6, "Earthstreet 23");

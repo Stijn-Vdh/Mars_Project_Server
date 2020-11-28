@@ -1,4 +1,4 @@
-package be.howest.ti.mars.logic.data;
+package be.howest.ti.mars.logic.data.repoInterfaces;
 
 import be.howest.ti.mars.logic.controller.Delivery;
 import be.howest.ti.mars.logic.controller.Endpoint;
@@ -14,41 +14,7 @@ import be.howest.ti.mars.logic.controller.subscription.UserSubscription;
 import java.util.List;
 import java.util.Set;
 
-public interface MarsRepository {
-    // accounts
-    void addAccount(BaseAccount account);
-
-    Set<BaseAccount> getAccounts();
-
-    Set<UserAccount> getUserAccounts();
-
-    Set<BusinessAccount> getBusinessAccounts();
-
-    // Endpoint
-
-    // Favorite
-
-    // User
-    void addUser(UserAccount user);
-
-    void changePassword(BaseAccount acc, String newPW);
-
-    void setShareLocation(UserAccount user, boolean shareLocation);
-
-    void setDisplayName(UserAccount acc, String displayName);
-
-    // Friends
-
-    // business
-    void addBusiness(BusinessAccount business);
-
-    void resetPods(BusinessAccount acc);
-
-    // Travel
-
-    // Deliveries
-
-    // Subscriptions
+public interface SubscriptionRepoInt {
     Set<UserSubscription> getUserSubscriptions(); // TODO: 21-11-2020 add to spec and webserver
 
     Set<BusinessSubscription> getBusinessSubscriptions(); // TODO: 21-11-2020 add to spec and webserver
@@ -65,6 +31,7 @@ public interface MarsRepository {
 
     void setBusinessSubscription(BusinessAccount business, int subscriptionId);
 
-    // Report
+    void resetPods(BusinessAccount acc);
+
 
 }

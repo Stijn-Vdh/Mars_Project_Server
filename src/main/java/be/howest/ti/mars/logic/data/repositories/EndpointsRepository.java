@@ -5,7 +5,6 @@ import be.howest.ti.mars.logic.controller.converters.ShortEndpoint;
 import be.howest.ti.mars.logic.controller.exceptions.DatabaseException;
 import be.howest.ti.mars.logic.controller.exceptions.EndpointException;
 import be.howest.ti.mars.logic.data.util.MarsConnection;
-import be.howest.ti.mars.logic.data.MarsH2Repository;
 import be.howest.ti.mars.logic.data.Repositories;
 import be.howest.ti.mars.logic.data.repoInterfaces.EndpointsRepoInt;
 
@@ -19,7 +18,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class EndpointsRepository implements EndpointsRepoInt {
-    private static final Logger LOGGER = Logger.getLogger(MarsH2Repository.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(SubscriptionRepository.class.getName());
 
     // Endpoints
     private static final String SQL_GET_ENDPOINT = "SELECT * FROM ENDPOINTS WHERE ID = ?";

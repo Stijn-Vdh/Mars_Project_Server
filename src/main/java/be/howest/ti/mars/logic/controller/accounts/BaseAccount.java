@@ -1,14 +1,16 @@
 package be.howest.ti.mars.logic.controller.accounts;
 
 import be.howest.ti.mars.logic.controller.security.AccountToken;
-import be.howest.ti.mars.logic.data.MarsH2Repository;
-import be.howest.ti.mars.logic.data.MarsRepository;
+import be.howest.ti.mars.logic.data.Repositories;
+import be.howest.ti.mars.logic.data.repoInterfaces.AccountsRepoInt;
+import be.howest.ti.mars.logic.data.repositories.SubscriptionRepository;
+import be.howest.ti.mars.logic.data.repoInterfaces.SubscriptionRepoInt;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.util.Objects;
 
 public class BaseAccount {
-    protected static final MarsRepository repo = new MarsH2Repository();
+    protected static final AccountsRepoInt repo = Repositories.getAccountsRepoInt();
     protected AccountToken accountToken;
     private Integer homeAddressEndpoint; //replace with endpoint class
     private String password; // needs to be replaced with Password class which will contain hashed version

@@ -12,6 +12,7 @@ public class Repositories {
     private static final FriendsRepoInt FRIENDS_REPO_INT = new FriendsRepository();
     private static final ReportsRepoInt REPORTS_REPO_INT = new ReportsRepository();
     private static final TravelsRepoInt TRAVELS_REPO_INT = new TravelsRepository();
+    private static final SubscriptionRepoInt SUBSCRIPTION_REPO_INT = new SubscriptionRepository();
 
     private Repositories(){}
 
@@ -41,5 +42,9 @@ public class Repositories {
 
     public static TravelsRepoInt getTravelsRepoInt() {
         return TRAVELS_REPO_INT;
+    }
+
+    public static SubscriptionRepoInt getSubscriptionRepoInt() {
+        return SUBSCRIPTION_REPO_INT;
     }
 }

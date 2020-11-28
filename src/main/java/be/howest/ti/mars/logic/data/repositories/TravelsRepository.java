@@ -5,7 +5,6 @@ import be.howest.ti.mars.logic.controller.accounts.UserAccount;
 import be.howest.ti.mars.logic.controller.enums.PodType;
 import be.howest.ti.mars.logic.controller.exceptions.DatabaseException;
 import be.howest.ti.mars.logic.data.util.MarsConnection;
-import be.howest.ti.mars.logic.data.MarsH2Repository;
 import be.howest.ti.mars.logic.data.Repositories;
 import be.howest.ti.mars.logic.data.repoInterfaces.EndpointsRepoInt;
 import be.howest.ti.mars.logic.data.repoInterfaces.TravelsRepoInt;
@@ -18,7 +17,7 @@ import java.util.logging.Logger;
 
 public class TravelsRepository implements TravelsRepoInt {
 
-    private static final Logger LOGGER = Logger.getLogger(MarsH2Repository.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(SubscriptionRepository.class.getName());
 
     // Travels SQL QUERIES
     private static final String SQL_INSERT_TRAVEL = "INSERT INTO TRAVELS VALUES(default, ?, ?, ?, DEFAULT, ?, NULL)";

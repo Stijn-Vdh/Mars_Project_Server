@@ -6,7 +6,6 @@ import be.howest.ti.mars.logic.controller.accounts.BusinessAccount;
 import be.howest.ti.mars.logic.controller.enums.DeliveryType;
 import be.howest.ti.mars.logic.controller.exceptions.DatabaseException;
 import be.howest.ti.mars.logic.data.util.MarsConnection;
-import be.howest.ti.mars.logic.data.MarsH2Repository;
 import be.howest.ti.mars.logic.data.Repositories;
 import be.howest.ti.mars.logic.data.repoInterfaces.DeliveriesRepoInt;
 import be.howest.ti.mars.logic.data.repoInterfaces.EndpointsRepoInt;
@@ -18,7 +17,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class DeliveryRepository implements DeliveriesRepoInt {
-    private static final Logger LOGGER = Logger.getLogger(MarsH2Repository.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(SubscriptionRepository.class.getName());
 
     // Deliveries SQL Queries
     private static final String SQL_ADD_DELIVERY = "INSERT INTO DELIVERIES VALUES(DEFAULT, ?, ?, ?, DEFAULT, ?)";
