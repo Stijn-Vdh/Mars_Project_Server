@@ -79,105 +79,6 @@ public class MarsH2Repository implements MarsRepository {
     public static final String DESTINATION = "destination";
     public static final String DATE_TIME = "dateTime";
 
-    // Endpoints
-    @Override
-    // TODO: 21-11-2020 add endpoint visibility logic: users see only their endpoint and public endpoints and friend home endpoints(if sharing), companies see all endpoints but what if normal person needs to send package to other person ???
-    public Set<ShortEndpoint> getEndpoints() { //will be short for the meantime
-        Set<ShortEndpoint> endpoints = new HashSet<>();
-
-        try (Connection con = MarsConnection.getConnection();
-             PreparedStatement stmt = con.prepareStatement(SQL_GET_ENDPOINTS)) {
-
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    endpoints.add(new ShortEndpoint(rs.getInt("id"), rs.getString("name")));
-                }
-            }
-        } catch (SQLException ex) {
-            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
-            throw new DatabaseException("Cannot retrieve endpoints");
-        }
-        return endpoints;
-    }
-
-    @Override
-    public void addEndpoint(String endpoint) {
-
-        try (Connection con = MarsConnection.getConnection();
-             PreparedStatement stmt = con.prepareStatement(SQL_INSERT_ENDPOINT)) {
-            stmt.setString(1, endpoint);
-            stmt.executeUpdate();
-        } catch (SQLException ex) {
-            throw new DatabaseException("Can't add endpoint!");
-        }
-    }
-
-    @Override
-    public Endpoint getEndpoint(int id) {
-        try (Connection con = MarsConnection.getConnection();
-             PreparedStatement stmt = con.prepareStatement(SQL_GET_ENDPOINT)
-        ) {
-            stmt.setInt(1, id);
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return new Endpoint(id, rs.getString("name"), true, "todo", false);
-                } else {
-                    throw new EndpointException("Endpoint with ID (" + id + ") doesn't exist!");
-                }
-            }
-        } catch (SQLException ex) {
-            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
-            throw new DatabaseException("Cannot retrieve endpoint with id: " + id + "!");
-        }
-    }
-
-    @Override
-    public Set<ShortEndpoint> getFavoriteEndpoints(BaseAccount acc) {
-        Set<ShortEndpoint> favouredTrips = new HashSet<>();
-
-        try (Connection con = MarsConnection.getConnection();
-             PreparedStatement stmt = con.prepareStatement(SQL_SELECT_FAVORITE_ENDPOINT)) {
-
-            stmt.setString(1, acc.getUsername());
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    String name = rs.getString("name");
-                    int id = rs.getInt("id");
-                    favouredTrips.add(new ShortEndpoint(id, name));
-                }
-            }
-        } catch (SQLException ex) {
-            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
-            throw new DatabaseException("Cannot get all favorites.");
-        }
-        return favouredTrips;
-    }
-
-    @Override
-    public void favoriteEndpoint(BaseAccount acc, int id) { // TODO: 20-11-2020:   add validation
-        try (Connection con = MarsConnection.getConnection();
-             PreparedStatement stmt = con.prepareStatement(SQL_INSERT_FAVORITE_ENDPOINT)) {
-            stmt.setString(1, acc.getUsername());
-            stmt.setInt(2, id);
-            stmt.executeUpdate();
-        } catch (SQLException ex) {
-            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
-            throw new DatabaseException("Could not favorite endpoint.");
-        }
-    }
-
-    @Override
-    public void unFavoriteEndpoint(BaseAccount acc, int id) {  // TODO: 20-11-2020: add validation (endpoint exists and that endpoint is favored)
-        try (Connection con = MarsConnection.getConnection();
-             PreparedStatement stmt = con.prepareStatement(SQL_DELETE_FAVORITE_ENDPOINT)) {
-            stmt.setString(1, acc.getUsername());
-            stmt.setInt(2, id);
-            stmt.executeUpdate();
-        } catch (SQLException ex) {
-            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
-            throw new DatabaseException("Could not un favorite endpoint.");
-        }
-    }
 
     @Override
     public void addAccount(BaseAccount account) {
@@ -392,7 +293,7 @@ public class MarsH2Repository implements MarsRepository {
     }
 
     public ShortEndpoint getShortEndpoint(int id) {
-        Endpoint endpoint = getEndpoint(id);
+        Endpoint endpoint = Repositories.getEndpointsRepoInt().getEndpoint(id);
         return new ShortEndpoint(endpoint.getId(), endpoint.getName());
     }
 

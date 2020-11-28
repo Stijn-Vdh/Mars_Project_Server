@@ -1,5 +1,7 @@
 package be.howest.ti.mars.logic.controller.accounts;
 
+import be.howest.ti.mars.logic.data.Repositories;
+import be.howest.ti.mars.logic.data.repoInterfaces.FavoritesRepoInt;
 import be.howest.ti.mars.logic.data.util.MarsConnection;
 import be.howest.ti.mars.logic.data.MarsH2Repository;
 import be.howest.ti.mars.logic.data.MarsRepository;
@@ -65,17 +67,18 @@ class UserAccountTest {
 
     @Test
     void testDBEndpoints() {
-        assertEquals(102, repo.getEndpoints().size());
-        repo.addEndpoint("Home");
-        assertEquals(103, repo.getEndpoints().size());
+        FavoritesRepoInt favoRepo = Repositories.getFavoritesRepoInt();
+        assertEquals(102, Repositories.getEndpointsRepoInt().getEndpoints().size());
+        Repositories.getEndpointsRepoInt().addEndpoint("Home");
+        assertEquals(103, Repositories.getEndpointsRepoInt().getEndpoints().size());
 
-        assertEquals(0, repo.getFavoriteEndpoints(testDanny).size());
+        assertEquals(0, favoRepo.getFavoriteEndpoints(testDanny).size());
         System.out.println(repo.getUserAccounts());
-        repo.favoriteEndpoint(testDanny, 5);
-        repo.favoriteEndpoint(testDanny, 10);
-        assertEquals(2, repo.getFavoriteEndpoints(testDanny).size());
-        repo.unFavoriteEndpoint(testDanny, 10);
-        assertEquals(1, repo.getFavoriteEndpoints(testDanny).size());
+        favoRepo.favoriteEndpoint(testDanny, 5);
+        favoRepo.favoriteEndpoint(testDanny, 10);
+        assertEquals(2, favoRepo.getFavoriteEndpoints(testDanny).size());
+        favoRepo.unFavoriteEndpoint(testDanny, 10);
+        assertEquals(1, favoRepo.getFavoriteEndpoints(testDanny).size());
 
     }
 

@@ -32,6 +32,7 @@ public class EndpointsRepository implements EndpointsRepoInt {
     }
 
     @Override
+    // TODO: 21-11-2020 add endpoint visibility logic: users see only their endpoint and public endpoints and friend home endpoints(if sharing), companies see all endpoints but what if normal person needs to send package to other person ???
     public Set<ShortEndpoint> getEndpoints() {
         Set<ShortEndpoint> endpoints = new HashSet<>();
 

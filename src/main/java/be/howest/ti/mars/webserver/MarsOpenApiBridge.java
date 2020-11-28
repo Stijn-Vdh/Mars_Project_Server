@@ -8,6 +8,8 @@ import be.howest.ti.mars.logic.controller.enums.DeliveryType;
 import be.howest.ti.mars.logic.controller.enums.NotificationType;
 import be.howest.ti.mars.logic.controller.security.AccountToken;
 import be.howest.ti.mars.logic.controller.security.SecureHash;
+import be.howest.ti.mars.logic.data.Repositories;
+import be.howest.ti.mars.logic.data.repoInterfaces.EndpointsRepoInt;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.json.Json;
@@ -27,6 +29,8 @@ class MarsOpenApiBridge {
     private static final long RESET_PERIOD = 1000L * 60L * 60L * 24L;
     private static Vertx vertx;
     private final MarsController controller;
+
+
 
     MarsOpenApiBridge() {
         this.controller = new MarsController();
@@ -166,11 +170,11 @@ class MarsOpenApiBridge {
     }
 
     public Object getEndpoints(RoutingContext ctx) {
-        return controller.getRepo().getEndpoints();
+        return Repositories.getEndpointsRepoInt().getEndpoints();
     }
 
     public Object getEndpoint(RoutingContext ctx) {
-        return controller.getRepo().getEndpoint(Integer.parseInt(ctx.request().getParam("id")));
+        return Repositories.getEndpointsRepoInt().getEndpoint(Integer.parseInt(ctx.request().getParam("id")));
     }
 
     public Object favoriteEndpoint(RoutingContext ctx) {

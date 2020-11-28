@@ -7,6 +7,8 @@ import be.howest.ti.mars.logic.controller.enums.DeliveryType;
 import be.howest.ti.mars.logic.controller.enums.PodType;
 import be.howest.ti.mars.logic.controller.exceptions.EndpointException;
 import be.howest.ti.mars.logic.controller.exceptions.UsernameException;
+import be.howest.ti.mars.logic.data.Repositories;
+import be.howest.ti.mars.logic.data.repoInterfaces.EndpointsRepoInt;
 import io.vertx.core.json.JsonObject;
 import java.util.LinkedList;
 import java.util.List;
@@ -14,7 +16,7 @@ import java.util.stream.Collectors;
 
 public class MarsController extends AuthController {
     private static final String MOTD = "SmellyEllie";
-
+    private final EndpointsRepoInt endpointRepo = Repositories.getEndpointsRepoInt();
 
     public String getMessage() {
         return MOTD;
@@ -46,11 +48,11 @@ public class MarsController extends AuthController {
     }
 
     public void favoriteEndpoint(BaseAccount acc, int id) {
-        repo.favoriteEndpoint(acc, id);
+        Repositories.getFavoritesRepoInt().favoriteEndpoint(acc, id);
     }
 
     public void unFavoriteEndpoint(BaseAccount acc, int id) {
-        repo.unFavoriteEndpoint(acc, id);
+        Repositories.getFavoritesRepoInt().unFavoriteEndpoint(acc, id);
     }
 
     private JsonObject getAccountInformation(BaseAccount acc) {
@@ -58,7 +60,7 @@ public class MarsController extends AuthController {
         accInformation.put("name:", acc.getUsername());
         accInformation.put("homeAddress:", acc.getAddress());
         accInformation.put("homeEndpoint:", acc.getHomeAddressEndpoint());
-        accInformation.put("favouriteEndpoints:", repo.getFavoriteEndpoints(acc));
+        accInformation.put("favouriteEndpoints:", Repositories.getFavoritesRepoInt().getFavoriteEndpoints(acc));
         return accInformation;
     }
 

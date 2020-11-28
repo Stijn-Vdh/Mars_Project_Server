@@ -25,18 +25,8 @@ public interface MarsRepository {
     Set<BusinessAccount> getBusinessAccounts();
 
     // Endpoint
-    Set<ShortEndpoint> getEndpoints();
-
-    void addEndpoint(String endpoint);
-
-    Endpoint getEndpoint(int id);
 
     // Favorite
-    Set<ShortEndpoint> getFavoriteEndpoints(BaseAccount acc);
-
-    void favoriteEndpoint(BaseAccount acc, int id);
-
-    void unFavoriteEndpoint(BaseAccount user, int id);
 
     // User
     void addUser(UserAccount user);
