@@ -9,6 +9,7 @@ import be.howest.ti.mars.logic.controller.exceptions.DatabaseException;
 import be.howest.ti.mars.logic.data.MarsConnection;
 import be.howest.ti.mars.logic.data.MarsH2Repository;
 import be.howest.ti.mars.logic.data.Repositories;
+import be.howest.ti.mars.logic.data.repoInterfaces.EndpointsRepoInt;
 import be.howest.ti.mars.logic.data.repoInterfaces.TravelsRepoInt;
 
 import java.sql.*;
@@ -29,13 +30,11 @@ public class TravelsRepository implements TravelsRepoInt {
     public static final String DESTINATION = "destination";
     public static final String DATE_TIME = "dateTime";
 
-    public ShortEndpoint getShortEndpoint(int id) {
-        Endpoint endpoint = Repositories.getEndpointsRepoInt().getEndpoint(id);
-        return new ShortEndpoint(endpoint.getId(), endpoint.getName());
-    }
+
 
     @Override
     public List<Travel> getTravelHistory(UserAccount acc) {
+        EndpointsRepoInt repo = Repositories.getEndpointsRepoInt();
         List<Travel> travels = new LinkedList<>();
         try (Connection conn = MarsConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(SQL_SELECT_TRAVEL_HISTORY)) {
@@ -48,7 +47,7 @@ public class TravelsRepository implements TravelsRepoInt {
                     int destination = rs.getInt(DESTINATION);
                     String podType = rs.getString("podType");
                     String date = rs.getString(DATE_TIME);
-                    travels.add(new Travel(id, getShortEndpoint(from), getShortEndpoint(destination), PodType.enumOf(podType), date));
+                    travels.add(new Travel(id, repo.getShortEndpoint(from), repo.getShortEndpoint(destination), PodType.enumOf(podType), date));
                 }
             }
         } catch (SQLException ex) {

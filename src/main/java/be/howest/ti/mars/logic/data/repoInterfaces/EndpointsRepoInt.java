@@ -11,4 +11,6 @@ public interface EndpointsRepoInt {
     void addEndpoint(String endpoint);
 
     Endpoint getEndpoint(int id);
+
+    ShortEndpoint getShortEndpoint(int id);
 }

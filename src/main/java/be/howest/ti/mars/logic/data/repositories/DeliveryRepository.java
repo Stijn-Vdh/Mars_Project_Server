@@ -11,6 +11,7 @@ import be.howest.ti.mars.logic.data.MarsConnection;
 import be.howest.ti.mars.logic.data.MarsH2Repository;
 import be.howest.ti.mars.logic.data.Repositories;
 import be.howest.ti.mars.logic.data.repoInterfaces.DeliveriesRepoInt;
+import be.howest.ti.mars.logic.data.repoInterfaces.EndpointsRepoInt;
 
 import java.sql.*;
 import java.util.LinkedList;
@@ -29,13 +30,11 @@ public class DeliveryRepository implements DeliveriesRepoInt {
     public static final String DESTINATION = "destination";
     public static final String DATE_TIME = "dateTime";
 
-    public ShortEndpoint getShortEndpoint(int id) {
-        Endpoint endpoint = Repositories.getEndpointsRepoInt().getEndpoint(id);
-        return new ShortEndpoint(endpoint.getId(), endpoint.getName());
-    }
+    private EndpointsRepoInt repo = Repositories.getEndpointsRepoInt();
 
     @Override
     public List<Delivery> getDeliveries(BusinessAccount acc) {
+
         List<Delivery> deliveries = new LinkedList<>();
 
         try (Connection con = MarsConnection.getConnection();
@@ -51,7 +50,7 @@ public class DeliveryRepository implements DeliveriesRepoInt {
                     String date = rs.getString(DATE_TIME);
                     String sender = rs.getString("sender");
 
-                    Delivery delivery = new Delivery(id, DeliveryType.enumOf(type), getShortEndpoint(source), getShortEndpoint(destination), date, sender);
+                    Delivery delivery = new Delivery(id, DeliveryType.enumOf(type), repo.getShortEndpoint(source), repo.getShortEndpoint(destination), date, sender);
                     deliveries.add(delivery);
                 }
             }
@@ -102,7 +101,7 @@ public class DeliveryRepository implements DeliveriesRepoInt {
                     String sender = rs.getString("sender");
 
 
-                    delivery = new Delivery(deliveryId, DeliveryType.enumOf(type), getShortEndpoint(source), getShortEndpoint(destination), date, sender);
+                    delivery = new Delivery(deliveryId, DeliveryType.enumOf(type), repo.getShortEndpoint(source), repo.getShortEndpoint(destination), date, sender);
                 }
             }
             return delivery;

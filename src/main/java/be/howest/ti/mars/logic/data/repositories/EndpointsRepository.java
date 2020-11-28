@@ -6,6 +6,7 @@ import be.howest.ti.mars.logic.controller.exceptions.DatabaseException;
 import be.howest.ti.mars.logic.controller.exceptions.EndpointException;
 import be.howest.ti.mars.logic.data.MarsConnection;
 import be.howest.ti.mars.logic.data.MarsH2Repository;
+import be.howest.ti.mars.logic.data.Repositories;
 import be.howest.ti.mars.logic.data.repoInterfaces.EndpointsRepoInt;
 
 import java.sql.Connection;
@@ -24,6 +25,11 @@ public class EndpointsRepository implements EndpointsRepoInt {
     private static final String SQL_GET_ENDPOINT = "SELECT * FROM ENDPOINTS WHERE ID = ?";
     private static final String SQL_GET_ENDPOINTS = "SELECT * FROM ENDPOINTS";
     private static final String SQL_INSERT_ENDPOINT = "INSERT INTO ENDPOINTS(name) VALUES(?)";
+    @Override
+    public ShortEndpoint getShortEndpoint(int id) {
+        Endpoint endpoint = Repositories.getEndpointsRepoInt().getEndpoint(id);
+        return new ShortEndpoint(endpoint.getId(), endpoint.getName());
+    }
 
     @Override
     public Set<ShortEndpoint> getEndpoints() {
