@@ -66,7 +66,5 @@ public interface MarsRepository {
     void setBusinessSubscription(BusinessAccount business, int subscriptionId);
 
     // Report
-    Set<String> getReportSections();
 
-    void addReport(BaseAccount baseAccount, String section, String body);
 }

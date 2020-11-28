@@ -415,41 +415,5 @@ public class MarsH2Repository implements MarsRepository {
         }
     }
 
-    @Override
-    public Set<String> getReportSections() {
-        Set<String> sections = new HashSet<>();
 
-        try (
-                Connection con = MarsConnection.getConnection();
-                PreparedStatement stmt = con.prepareStatement(SQL_GET_REPORT_SECTIONS)
-        ) {
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    sections.add(rs.getString("name"));
-                }
-            }
-        } catch (SQLException ex) {
-            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
-            throw new DatabaseException("Cannot retrieve report sections");
-        }
-        return sections;
-    }
-
-    @Override
-    public void addReport(BaseAccount baseAccount, String section, String body) {
-        if (!getReportSections().contains(section))
-            throw new EntityNotFoundException("Section (" + section + ") does not currently exist");
-
-        try (Connection con = MarsConnection.getConnection();
-             PreparedStatement stmt = con.prepareStatement(SQL_INSERT_REPORTS)) {
-
-            stmt.setString(1, baseAccount.getUsername());
-            stmt.setString(2, section);
-            stmt.setString(3, body);
-            stmt.execute();
-        } catch (SQLException ex) {
-            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
-            throw new DatabaseException("Can't add report");
-        }
-    }
 }

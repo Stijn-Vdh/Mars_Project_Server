@@ -191,7 +191,7 @@ class MarsOpenApiBridge {
 
     public Object addReport(RoutingContext ctx) {
         JsonObject json = ctx.getBodyAsJson();
-        controller.getRepo().addReport(
+        Repositories.getReportsRepoInt().addReport(
                 getAccount(ctx),
                 json.getString("section"),
                 json.getString("description")
@@ -200,7 +200,7 @@ class MarsOpenApiBridge {
     }
 
     public Object getReportSections(RoutingContext ctx) {
-        return controller.getRepo().getReportSections();
+        return Repositories.getReportsRepoInt().getReportSections();
     }
 
     public Object travel(RoutingContext ctx) {
