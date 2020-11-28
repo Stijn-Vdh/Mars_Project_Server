@@ -25,9 +25,6 @@ public class EndpointsRepository implements EndpointsRepoInt {
     private static final String SQL_GET_ENDPOINTS = "SELECT * FROM ENDPOINTS";
     private static final String SQL_INSERT_ENDPOINT = "INSERT INTO ENDPOINTS(name) VALUES(?)";
 
-    public static final String DESTINATION = "destination";
-    public static final String DATE_TIME = "dateTime";
-
     @Override
     public Set<ShortEndpoint> getEndpoints() {
         Set<ShortEndpoint> endpoints = new HashSet<>();
