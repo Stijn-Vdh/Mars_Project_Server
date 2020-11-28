@@ -26,7 +26,7 @@ public class MarsController extends AuthController {
         if (!userAcc){
             repo.updateBusinessSubscription(deliveryType.equals(DeliveryType.LARGE),(BusinessAccount) acc);
         }
-       return repo.addDelivery(new Delivery(0,deliveryType, repo.getShortEndpoint(from), repo.getShortEndpoint(destination), "", acc.getUsername()));
+       return Repositories.getDeliveriesRepoInt().addDelivery(new Delivery(0,deliveryType, repo.getShortEndpoint(from), repo.getShortEndpoint(destination), "", acc.getUsername()));
     }
 
     public Object addFriend(UserAccount user, String friendName) { // TODO: 20-11-2020 validation friend exists and not already friended and user and friend not same
@@ -103,10 +103,10 @@ public class MarsController extends AuthController {
     }
 
     public Object getDeliveries(BusinessAccount acc) {
-        return repo.getDeliveries(acc);
+        return Repositories.getDeliveriesRepoInt().getDeliveries(acc);
     }
 
     public Object getDelivery(BaseAccount acc, int id) {
-        return repo.getDeliveryInformation(acc, id);
+        return Repositories.getDeliveriesRepoInt().getDeliveryInformation(acc, id);
     }
 }

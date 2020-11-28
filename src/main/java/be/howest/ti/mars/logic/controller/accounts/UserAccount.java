@@ -1,6 +1,7 @@
 package be.howest.ti.mars.logic.controller.accounts;
 
 import be.howest.ti.mars.logic.controller.enums.NotificationType;
+import be.howest.ti.mars.logic.data.Repositories;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 
@@ -52,11 +53,11 @@ public class UserAccount extends BaseAccount {
     }
 
     public void addFriend(String friendName) {
-        repo.beFriend(getUsername(), friendName);
+        Repositories.getFriendsRepoInt().beFriend(getUsername(), friendName);
     }
 
     public void removeFriend(String friendName) {
-        repo.removeFriend(getUsername(), friendName);
+        Repositories.getFriendsRepoInt().removeFriend(getUsername(), friendName);
     }
 
     public boolean isSharesLocation() {

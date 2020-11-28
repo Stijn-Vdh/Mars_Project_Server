@@ -47,11 +47,6 @@ public interface MarsRepository {
     // Travel
 
     // Deliveries
-    List<Delivery> getDeliveries(BusinessAccount acc); // TODO: 21-11-2020 also not available in spec
-
-    int addDelivery(Delivery delivery);
-
-    Object getDeliveryInformation(BaseAccount acc, int id);
 
     // Subscriptions
     Set<UserSubscription> getUserSubscriptions(); // TODO: 21-11-2020 add to spec and webserver
