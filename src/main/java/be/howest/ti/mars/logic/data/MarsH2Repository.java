@@ -15,6 +15,7 @@ import be.howest.ti.mars.logic.controller.exceptions.EntityNotFoundException;
 import be.howest.ti.mars.logic.controller.subscription.BusinessSubscription;
 import be.howest.ti.mars.logic.controller.subscription.BusinessSubscriptionInfo;
 import be.howest.ti.mars.logic.controller.subscription.UserSubscription;
+import be.howest.ti.mars.logic.data.util.MarsConnection;
 
 import java.sql.*;
 import java.util.HashSet;

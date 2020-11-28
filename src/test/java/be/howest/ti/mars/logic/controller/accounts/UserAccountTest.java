@@ -1,6 +1,6 @@
 package be.howest.ti.mars.logic.controller.accounts;
 
-import be.howest.ti.mars.logic.data.MarsConnection;
+import be.howest.ti.mars.logic.data.util.MarsConnection;
 import be.howest.ti.mars.logic.data.MarsH2Repository;
 import be.howest.ti.mars.logic.data.MarsRepository;
 import org.junit.jupiter.api.BeforeAll;

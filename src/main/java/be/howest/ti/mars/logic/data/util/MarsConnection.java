@@ -1,4 +1,4 @@
-package be.howest.ti.mars.logic.data;
+package be.howest.ti.mars.logic.data.util;
 
 import org.h2.tools.Server;
 

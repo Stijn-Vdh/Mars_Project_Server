@@ -1,13 +1,11 @@
 package be.howest.ti.mars.logic.data.repositories;
 
 import be.howest.ti.mars.logic.controller.Delivery;
-import be.howest.ti.mars.logic.controller.Endpoint;
 import be.howest.ti.mars.logic.controller.accounts.BaseAccount;
 import be.howest.ti.mars.logic.controller.accounts.BusinessAccount;
-import be.howest.ti.mars.logic.controller.converters.ShortEndpoint;
 import be.howest.ti.mars.logic.controller.enums.DeliveryType;
 import be.howest.ti.mars.logic.controller.exceptions.DatabaseException;
-import be.howest.ti.mars.logic.data.MarsConnection;
+import be.howest.ti.mars.logic.data.util.MarsConnection;
 import be.howest.ti.mars.logic.data.MarsH2Repository;
 import be.howest.ti.mars.logic.data.Repositories;
 import be.howest.ti.mars.logic.data.repoInterfaces.DeliveriesRepoInt;

@@ -2,7 +2,7 @@ package be.howest.ti.mars.logic.data.repositories;
 
 import be.howest.ti.mars.logic.controller.accounts.UserAccount;
 import be.howest.ti.mars.logic.controller.exceptions.DatabaseException;
-import be.howest.ti.mars.logic.data.MarsConnection;
+import be.howest.ti.mars.logic.data.util.MarsConnection;
 import be.howest.ti.mars.logic.data.MarsH2Repository;
 import be.howest.ti.mars.logic.data.repoInterfaces.FriendsRepoInt;
 
