@@ -17,8 +17,11 @@ import java.util.Set;
 public interface MarsRepository {
     // accounts
     void addAccount(BaseAccount account);
+
     Set<BaseAccount> getAccounts();
+
     Set<UserAccount> getUserAccounts();
+
     Set<BusinessAccount> getBusinessAccounts();
 
     // Endpoint
@@ -53,6 +56,7 @@ public interface MarsRepository {
 
     // business
     void addBusiness(BusinessAccount business);
+
     void resetPods(BusinessAccount acc);
 
     // Travel

@@ -334,7 +334,7 @@ public class MarsH2Repository implements MarsRepository {
         }
     }
 
-    // Friends
+    // FriendsRepoInt
     @Override
     public Set<UserAccount> getFriends(UserAccount user, Set<UserAccount> users) { // TODO: 20-11-2020 hacky?
         Set<UserAccount> friends = new HashSet<>();
