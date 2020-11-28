@@ -245,64 +245,6 @@ public class MarsH2Repository implements MarsRepository {
     }
 
     // Travel / Delivery (packages)
-    @Override
-    public List<Travel> getTravelHistory(UserAccount acc) {
-        List<Travel> travels = new LinkedList<>();
-        try (Connection conn = MarsConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(SQL_SELECT_TRAVEL_HISTORY)) {
-            stmt.setString(1, acc.getUsername());
-
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    int id = rs.getInt("id");
-                    int from = rs.getInt("from");
-                    int destination = rs.getInt(DESTINATION);
-                    String podType = rs.getString("podType");
-                    String date = rs.getString(DATE_TIME);
-                    travels.add(new Travel(id, getShortEndpoint(from), getShortEndpoint(destination), PodType.enumOf(podType), date));
-                }
-            }
-        } catch (SQLException ex) {
-            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
-            throw new DatabaseException("Could not add trip to DB.");
-        }
-        return travels;
-    }
-
-    @Override
-    public int travel(UserAccount user, Travel travel) {
-        try (Connection conn = MarsConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(SQL_INSERT_TRAVEL, Statement.RETURN_GENERATED_KEYS)) {
-
-            stmt.setInt(1, travel.getFrom().getId());
-            stmt.setInt(2, travel.getDestination().getId());
-            stmt.setString(3, user.getUsername());
-            stmt.setString(4, travel.getPodType().toString());
-            stmt.executeUpdate();
-
-            try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
-                generatedKeys.next();
-                return generatedKeys.getInt(1);
-            }
-        } catch (SQLException ex) {
-            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
-            throw new DatabaseException("Could not add travel to DB");
-        }
-    }
-
-    @Override
-    public void cancelTravel(UserAccount user, int tripID) {
-        try (Connection con = MarsConnection.getConnection();
-             PreparedStatement stmt = con.prepareStatement(SQL_DELETE_TRAVEL)) {
-            stmt.setString(1, user.getUsername());
-            stmt.setInt(2, tripID);
-
-            stmt.executeUpdate();
-        } catch (SQLException ex) {
-            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
-            throw new DatabaseException("Could not cancel travel/trip.");
-        }
-    }
 
     @Override
     public List<Delivery> getDeliveries(BusinessAccount acc) {

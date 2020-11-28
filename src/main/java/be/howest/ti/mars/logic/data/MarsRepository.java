@@ -45,11 +45,6 @@ public interface MarsRepository {
     void resetPods(BusinessAccount acc);
 
     // Travel
-    List<Travel> getTravelHistory(UserAccount acc);
-
-    int travel(UserAccount user, Travel travel);
-
-    void cancelTravel(UserAccount user, int tripID);
 
     // Deliveries
     List<Delivery> getDeliveries(BusinessAccount acc); // TODO: 21-11-2020 also not available in spec

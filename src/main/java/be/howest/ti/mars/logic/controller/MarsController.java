@@ -70,7 +70,7 @@ public class MarsController extends AuthController {
         accInformation.put("shareLocation:", account.isSharesLocation());
         accInformation.put("subscription:", repo.getUserSubscription(account));
         accInformation.put("friends:", Repositories.getFriendsRepoInt().getFriends(account, userAccounts).stream().map(UserAccount::getUsername).collect(Collectors.toList()));
-        accInformation.put("travelHistory:", repo.getTravelHistory(account));
+        accInformation.put("travelHistory:", Repositories.getTravelsRepoInt().getTravelHistory(account));
         return accInformation;
     }
 
@@ -83,19 +83,19 @@ public class MarsController extends AuthController {
 
     public int travel(UserAccount acc, int from, int destination, String type) { // getShortEndpoint also validates if endpoint exists
         if (from == destination) throw new EndpointException("Destination and from are the same endpoint");
-        return repo.travel(acc, new Travel(0,repo.getShortEndpoint(from), repo.getShortEndpoint(destination), PodType.enumOf(type), ""));
+        return Repositories.getTravelsRepoInt().travel(acc, new Travel(0,repo.getShortEndpoint(from), repo.getShortEndpoint(destination), PodType.enumOf(type), ""));
     }
 
     public Object getTravelHistory(UserAccount acc) {
-        return repo.getTravelHistory(acc);
+        return Repositories.getTravelsRepoInt().getTravelHistory(acc);
     }
 
     public void cancelTrip(UserAccount acc, int id) {
-        repo.cancelTravel(acc, id);
+        Repositories.getTravelsRepoInt().cancelTravel(acc, id);
     }
 
     public Object getCurrentRouteInfo(UserAccount acc) {
-        List<Travel> travelList = new LinkedList<>(repo.getTravelHistory(acc));
+        List<Travel> travelList = new LinkedList<>(Repositories.getTravelsRepoInt().getTravelHistory(acc));
         if (!travelList.isEmpty()){
             return travelList.get(travelList.size()-1);
         }
