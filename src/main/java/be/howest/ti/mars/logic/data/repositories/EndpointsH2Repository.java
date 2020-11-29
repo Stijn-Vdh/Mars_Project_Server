@@ -7,6 +7,7 @@ import be.howest.ti.mars.logic.controller.exceptions.EndpointException;
 import be.howest.ti.mars.logic.data.util.MarsConnection;
 import be.howest.ti.mars.logic.data.Repositories;
 import be.howest.ti.mars.logic.data.repoInterfaces.EndpointsRepository;
+import com.sun.jdi.ShortType;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -24,10 +25,22 @@ public class EndpointsH2Repository implements EndpointsRepository {
     private static final String SQL_GET_ENDPOINT = "SELECT * FROM ENDPOINTS WHERE ID = ?";
     private static final String SQL_GET_ENDPOINTS = "SELECT * FROM ENDPOINTS";
     private static final String SQL_INSERT_ENDPOINT = "INSERT INTO ENDPOINTS(name) VALUES(?)";
+
     @Override
     public ShortEndpoint getShortEndpoint(int id) {
         Endpoint endpoint = Repositories.getEndpointsRepo().getEndpoint(id);
         return new ShortEndpoint(endpoint.getId(), endpoint.getName());
+    }
+
+    @Override
+    public boolean endpointExists(int id) {
+        boolean res = false;
+        for(ShortEndpoint endpoint : getEndpoints()){
+            if (endpoint.getId() == id){
+                res = true;
+            }
+        }
+        return  res;
     }
 
     @Override
@@ -63,20 +76,24 @@ public class EndpointsH2Repository implements EndpointsRepository {
 
     @Override
     public Endpoint getEndpoint(int id) {
-        try (Connection con = MarsConnection.getConnection();
-             PreparedStatement stmt = con.prepareStatement(SQL_GET_ENDPOINT)
-        ) {
-            stmt.setInt(1, id);
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return new Endpoint(id, rs.getString("name"), true, "todo", false);
-                } else {
-                    throw new EndpointException("Endpoint with ID (" + id + ") doesn't exist!");
+        if (endpointExists(id)){
+            try (Connection con = MarsConnection.getConnection();
+                 PreparedStatement stmt = con.prepareStatement(SQL_GET_ENDPOINT)
+            ) {
+                stmt.setInt(1, id);
+                try (ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next()) {
+                        return new Endpoint(id, rs.getString("name"), true, "todo", false);
+                    } else {
+                        throw new EndpointException("Endpoint with ID (" + id + ") doesn't exist!");
+                    }
                 }
+            } catch (SQLException ex) {
+                LOGGER.log(Level.WARNING, ex.getMessage(), ex);
+                throw new DatabaseException("Cannot retrieve endpoint with id: " + id + "!");
             }
-        } catch (SQLException ex) {
-            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
-            throw new DatabaseException("Cannot retrieve endpoint with id: " + id + "!");
+        }else{
+            throw new IllegalArgumentException("Endpoint does not exist");
         }
     }
 }

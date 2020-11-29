@@ -27,8 +27,6 @@ public class TravelsH2Repository implements TravelsRepository {
     public static final String DESTINATION = "destination";
     public static final String DATE_TIME = "dateTime";
 
-
-
     @Override
     public List<Travel> getTravelHistory(UserAccount acc) {
         EndpointsRepository repo = Repositories.getEndpointsRepo();

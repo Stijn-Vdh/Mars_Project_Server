@@ -165,6 +165,9 @@ public class AccountsH2Repository implements AccountsRepository {
 
     @Override
     public void setDisplayName(UserAccount acc, String displayName) {
+        if (displayName.equals("")){
+            displayName = acc.getUsername();
+        }
         try (Connection con = MarsConnection.getConnection();
              PreparedStatement stmt = con.prepareStatement(SQL_UPDATE_USER_DN)) {
             stmt.setString(1, displayName);
