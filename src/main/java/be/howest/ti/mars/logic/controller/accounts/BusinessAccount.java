@@ -1,5 +1,7 @@
 package be.howest.ti.mars.logic.controller.accounts;
 
+import be.howest.ti.mars.logic.data.Repositories;
+
 public class BusinessAccount extends BaseAccount {
     private int largePodsUsed;
     private int smallPodsUsed;
@@ -40,7 +42,7 @@ public class BusinessAccount extends BaseAccount {
     }
 
     public void setSubscriptionId(int subscriptionId) {
-        repo.setBusinessSubscription(this, subscriptionId);
+        Repositories.getSubscriptionRepo().setBusinessSubscription(this, subscriptionId);
         this.subscriptionId = subscriptionId;
     }
 }

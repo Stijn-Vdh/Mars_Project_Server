@@ -6,14 +6,15 @@ import be.howest.ti.mars.logic.controller.accounts.UserAccount;
 import be.howest.ti.mars.logic.controller.exceptions.AuthenticationException;
 import be.howest.ti.mars.logic.controller.exceptions.UsernameException;
 import be.howest.ti.mars.logic.controller.security.AccountToken;
-import be.howest.ti.mars.logic.data.MarsH2Repository;
+import be.howest.ti.mars.logic.data.Repositories;
+import be.howest.ti.mars.logic.data.repoInterfaces.AccountsRepository;
 
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Stream;
 
 public abstract class AuthController {
-    protected MarsH2Repository repo = new MarsH2Repository();
+    protected AccountsRepository repo = Repositories.getAccountsRepo();
     protected Set<UserAccount> userAccounts = new HashSet<>();
     protected Set<BusinessAccount> businessAccounts = new HashSet<>();
 
@@ -25,7 +26,7 @@ public abstract class AuthController {
         return businessAccounts;
     }
 
-    public MarsH2Repository getRepo() {
+    public AccountsRepository getRepo() {
         return repo;
     }
 

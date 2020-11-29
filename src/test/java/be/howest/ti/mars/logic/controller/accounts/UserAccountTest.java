@@ -1,8 +1,10 @@
 package be.howest.ti.mars.logic.controller.accounts;
 
-import be.howest.ti.mars.logic.data.MarsConnection;
-import be.howest.ti.mars.logic.data.MarsH2Repository;
-import be.howest.ti.mars.logic.data.MarsRepository;
+import be.howest.ti.mars.logic.data.Repositories;
+import be.howest.ti.mars.logic.data.repoInterfaces.AccountsRepository;
+import be.howest.ti.mars.logic.data.repoInterfaces.FavoritesRepository;
+import be.howest.ti.mars.logic.data.repoInterfaces.FriendsRepository;
+import be.howest.ti.mars.logic.data.util.MarsConnection;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -15,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class UserAccountTest {
 
-    private static final MarsRepository repo = new MarsH2Repository();
+    private static final AccountsRepository repo = Repositories.getAccountsRepo();
     private static final UserAccount testDanny = new UserAccount("Danny", "Danny", 5, "MarsStreet 69");
     private static final UserAccount testDebby = new UserAccount("Debby", "Debby", 3, "WestStreet 420");
     private static final UserAccount testPol = new UserAccount("Pol", "Pol", 6, "Earthstreet 23");
@@ -48,34 +50,36 @@ class UserAccountTest {
 
     @Test
     void testFriendsToDB() {
+        FriendsRepository friendRepo = Repositories.getFriendsRepo();
         Set<UserAccount> users = new HashSet<>();
 
         users.add(testDanny);
         users.add(testDebby);
         users.add(testPol);
 
-        assertEquals(0, repo.getFriends(testDanny, users).size());
+        assertEquals(0, friendRepo.getFriends(testDanny, users).size());
         testDanny.addFriend("Debby");
         testDanny.addFriend("Pol");
-        assertEquals(2, repo.getFriends(testDanny, users).size());
+        assertEquals(2, friendRepo.getFriends(testDanny, users).size());
         testDanny.removeFriend("Debby");
-        assertEquals(1, repo.getFriends(testDanny, users).size());
+        assertEquals(1, friendRepo.getFriends(testDanny, users).size());
 
     }
 
     @Test
     void testDBEndpoints() {
-        assertEquals(102, repo.getEndpoints().size());
-        repo.addEndpoint("Home");
-        assertEquals(103, repo.getEndpoints().size());
+        FavoritesRepository favoRepo = Repositories.getFavoritesRepo();
+        assertEquals(102, Repositories.getEndpointsRepo().getEndpoints().size());
+        Repositories.getEndpointsRepo().addEndpoint("Home");
+        assertEquals(103, Repositories.getEndpointsRepo().getEndpoints().size());
 
-        assertEquals(0, repo.getFavoriteEndpoints(testDanny).size());
+        assertEquals(0, favoRepo.getFavoriteEndpoints(testDanny).size());
         System.out.println(repo.getUserAccounts());
-        repo.favoriteEndpoint(testDanny, 5);
-        repo.favoriteEndpoint(testDanny, 10);
-        assertEquals(2, repo.getFavoriteEndpoints(testDanny).size());
-        repo.unFavoriteEndpoint(testDanny, 10);
-        assertEquals(1, repo.getFavoriteEndpoints(testDanny).size());
+        favoRepo.favoriteEndpoint(testDanny, 5);
+        favoRepo.favoriteEndpoint(testDanny, 10);
+        assertEquals(2, favoRepo.getFavoriteEndpoints(testDanny).size());
+        favoRepo.unFavoriteEndpoint(testDanny, 10);
+        assertEquals(1, favoRepo.getFavoriteEndpoints(testDanny).size());
 
     }
 

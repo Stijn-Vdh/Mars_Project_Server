@@ -8,6 +8,7 @@ import be.howest.ti.mars.logic.controller.enums.DeliveryType;
 import be.howest.ti.mars.logic.controller.enums.NotificationType;
 import be.howest.ti.mars.logic.controller.security.AccountToken;
 import be.howest.ti.mars.logic.controller.security.SecureHash;
+import be.howest.ti.mars.logic.data.Repositories;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.json.Json;
@@ -27,6 +28,8 @@ class MarsOpenApiBridge {
     private static final long RESET_PERIOD = 1000L * 60L * 60L * 24L;
     private static Vertx vertx;
     private final MarsController controller;
+
+
 
     MarsOpenApiBridge() {
         this.controller = new MarsController();
@@ -105,7 +108,7 @@ class MarsOpenApiBridge {
     }
 
     public Object viewFriends(RoutingContext ctx) {
-        return controller.getRepo().getFriends(getUserAccount(ctx), controller.getUserAccounts())
+        return Repositories.getFriendsRepo().getFriends(getUserAccount(ctx), controller.getUserAccounts())
                 .stream()
                 .map(UserAccount::getUsername)
                 .collect(Collectors.toUnmodifiableList());
@@ -125,9 +128,9 @@ class MarsOpenApiBridge {
 
     public Object viewSubscriptions(RoutingContext ctx) {
         if (isUserAccountToken(ctx)) {
-            return controller.getRepo().getUserSubscriptions();
+            return Repositories.getSubscriptionRepo().getUserSubscriptions();
         } else {
-            return controller.getRepo().getBusinessSubscriptions();
+            return Repositories.getSubscriptionRepo().getBusinessSubscriptions();
         }
     }
 
@@ -152,7 +155,7 @@ class MarsOpenApiBridge {
     }
 
     public Object viewSubscriptionInfo(RoutingContext ctx) {
-        return controller.getRepo().getBusinessSubscriptionInfo(getBusinessAccount(ctx));
+        return Repositories.getSubscriptionRepo().getBusinessSubscriptionInfo(getBusinessAccount(ctx));
     }
 
     public Object shareLocation(RoutingContext ctx) {
@@ -166,11 +169,11 @@ class MarsOpenApiBridge {
     }
 
     public Object getEndpoints(RoutingContext ctx) {
-        return controller.getRepo().getEndpoints();
+        return Repositories.getEndpointsRepo().getEndpoints();
     }
 
     public Object getEndpoint(RoutingContext ctx) {
-        return controller.getRepo().getEndpoint(Integer.parseInt(ctx.request().getParam("id")));
+        return Repositories.getEndpointsRepo().getEndpoint(Integer.parseInt(ctx.request().getParam("id")));
     }
 
     public Object favoriteEndpoint(RoutingContext ctx) {
@@ -187,7 +190,7 @@ class MarsOpenApiBridge {
 
     public Object addReport(RoutingContext ctx) {
         JsonObject json = ctx.getBodyAsJson();
-        controller.getRepo().addReport(
+        Repositories.getReportsRepo().addReport(
                 getAccount(ctx),
                 json.getString("section"),
                 json.getString("description")
@@ -196,7 +199,7 @@ class MarsOpenApiBridge {
     }
 
     public Object getReportSections(RoutingContext ctx) {
-        return controller.getRepo().getReportSections();
+        return Repositories.getReportsRepo().getReportSections();
     }
 
     public Object travel(RoutingContext ctx) {
@@ -282,7 +285,7 @@ class MarsOpenApiBridge {
     }
 
     private void resetBusinessUsedPods() {
-        controller.getBusinessAccounts().forEach(acc -> controller.getRepo().resetPods(acc));
+        controller.getBusinessAccounts().forEach(acc -> Repositories.getSubscriptionRepo().resetPods(acc));
     }
 
     public void startDailyResetCompanyPods() {
