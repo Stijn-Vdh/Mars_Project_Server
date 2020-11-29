@@ -5,7 +5,7 @@ import be.howest.ti.mars.logic.controller.accounts.BusinessAccount;
 import be.howest.ti.mars.logic.controller.accounts.UserAccount;
 import be.howest.ti.mars.logic.controller.exceptions.DatabaseException;
 import be.howest.ti.mars.logic.data.util.MarsConnection;
-import be.howest.ti.mars.logic.data.repoInterfaces.AccountsRepoInt;
+import be.howest.ti.mars.logic.data.repoInterfaces.AccountsRepository;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -16,8 +16,8 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class AccountRepository implements AccountsRepoInt {
-    private static final Logger LOGGER = Logger.getLogger(SubscriptionRepository.class.getName());
+public class AccountsH2Repository implements AccountsRepository {
+    private static final Logger LOGGER = Logger.getLogger(SubscriptionH2Repository.class.getName());
     // Accounts SQL QUERIES
     private static final String SQL_SELECT_ACCOUNTS = "SELECT * FROM ACCOUNTS";
     private static final String SQL_SELECT_USERS = "SELECT * FROM users u JOIN accounts a ON a.name = u.name";

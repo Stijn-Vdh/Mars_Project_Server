@@ -7,8 +7,8 @@ import be.howest.ti.mars.logic.controller.enums.DeliveryType;
 import be.howest.ti.mars.logic.controller.exceptions.DatabaseException;
 import be.howest.ti.mars.logic.data.util.MarsConnection;
 import be.howest.ti.mars.logic.data.Repositories;
-import be.howest.ti.mars.logic.data.repoInterfaces.DeliveriesRepoInt;
-import be.howest.ti.mars.logic.data.repoInterfaces.EndpointsRepoInt;
+import be.howest.ti.mars.logic.data.repoInterfaces.DeliveriesRepository;
+import be.howest.ti.mars.logic.data.repoInterfaces.EndpointsRepository;
 
 import java.sql.*;
 import java.util.LinkedList;
@@ -16,8 +16,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class DeliveryRepository implements DeliveriesRepoInt {
-    private static final Logger LOGGER = Logger.getLogger(SubscriptionRepository.class.getName());
+public class DeliveriesH2Repository implements DeliveriesRepository {
+    private static final Logger LOGGER = Logger.getLogger(SubscriptionH2Repository.class.getName());
 
     // Deliveries SQL Queries
     private static final String SQL_ADD_DELIVERY = "INSERT INTO DELIVERIES VALUES(DEFAULT, ?, ?, ?, DEFAULT, ?)";
@@ -29,7 +29,7 @@ public class DeliveryRepository implements DeliveriesRepoInt {
 
     @Override
     public List<Delivery> getDeliveries(BusinessAccount acc) {
-        EndpointsRepoInt repo = Repositories.getEndpointsRepo();
+        EndpointsRepository repo = Repositories.getEndpointsRepo();
         List<Delivery> deliveries = new LinkedList<>();
 
         try (Connection con = MarsConnection.getConnection();
@@ -79,7 +79,7 @@ public class DeliveryRepository implements DeliveriesRepoInt {
 
     @Override
     public Object getDeliveryInformation(BaseAccount acc, int id) {
-        EndpointsRepoInt repo = Repositories.getEndpointsRepo();
+        EndpointsRepository repo = Repositories.getEndpointsRepo();
         Delivery delivery = null;
         try (Connection con = MarsConnection.getConnection();
              PreparedStatement stmt = con.prepareStatement(SQL_SELECT_DELIVERY)) {

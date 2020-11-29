@@ -6,7 +6,7 @@ import be.howest.ti.mars.logic.controller.exceptions.DatabaseException;
 import be.howest.ti.mars.logic.controller.exceptions.EndpointException;
 import be.howest.ti.mars.logic.data.util.MarsConnection;
 import be.howest.ti.mars.logic.data.Repositories;
-import be.howest.ti.mars.logic.data.repoInterfaces.EndpointsRepoInt;
+import be.howest.ti.mars.logic.data.repoInterfaces.EndpointsRepository;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -17,8 +17,8 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class EndpointsRepository implements EndpointsRepoInt {
-    private static final Logger LOGGER = Logger.getLogger(SubscriptionRepository.class.getName());
+public class EndpointsH2Repository implements EndpointsRepository {
+    private static final Logger LOGGER = Logger.getLogger(SubscriptionH2Repository.class.getName());
 
     // Endpoints
     private static final String SQL_GET_ENDPOINT = "SELECT * FROM ENDPOINTS WHERE ID = ?";

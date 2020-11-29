@@ -5,7 +5,7 @@ import be.howest.ti.mars.logic.controller.converters.ShortEndpoint;
 
 import java.util.Set;
 
-public interface FavoritesRepoInt {
+public interface FavoritesRepository {
     Set<ShortEndpoint> getFavoriteEndpoints(BaseAccount acc);
 
     void favoriteEndpoint(BaseAccount acc, int id);

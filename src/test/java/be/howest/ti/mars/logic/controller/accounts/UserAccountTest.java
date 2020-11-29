@@ -1,9 +1,9 @@
 package be.howest.ti.mars.logic.controller.accounts;
 
 import be.howest.ti.mars.logic.data.Repositories;
-import be.howest.ti.mars.logic.data.repoInterfaces.AccountsRepoInt;
-import be.howest.ti.mars.logic.data.repoInterfaces.FavoritesRepoInt;
-import be.howest.ti.mars.logic.data.repoInterfaces.FriendsRepoInt;
+import be.howest.ti.mars.logic.data.repoInterfaces.AccountsRepository;
+import be.howest.ti.mars.logic.data.repoInterfaces.FavoritesRepository;
+import be.howest.ti.mars.logic.data.repoInterfaces.FriendsRepository;
 import be.howest.ti.mars.logic.data.util.MarsConnection;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class UserAccountTest {
 
-    private static final AccountsRepoInt repo = Repositories.getAccountsRepo();
+    private static final AccountsRepository repo = Repositories.getAccountsRepo();
     private static final UserAccount testDanny = new UserAccount("Danny", "Danny", 5, "MarsStreet 69");
     private static final UserAccount testDebby = new UserAccount("Debby", "Debby", 3, "WestStreet 420");
     private static final UserAccount testPol = new UserAccount("Pol", "Pol", 6, "Earthstreet 23");
@@ -50,7 +50,7 @@ class UserAccountTest {
 
     @Test
     void testFriendsToDB() {
-        FriendsRepoInt friendRepo = Repositories.getFriendsRepo();
+        FriendsRepository friendRepo = Repositories.getFriendsRepo();
         Set<UserAccount> users = new HashSet<>();
 
         users.add(testDanny);
@@ -68,7 +68,7 @@ class UserAccountTest {
 
     @Test
     void testDBEndpoints() {
-        FavoritesRepoInt favoRepo = Repositories.getFavoritesRepo();
+        FavoritesRepository favoRepo = Repositories.getFavoritesRepo();
         assertEquals(102, Repositories.getEndpointsRepo().getEndpoints().size());
         Repositories.getEndpointsRepo().addEndpoint("Home");
         assertEquals(103, Repositories.getEndpointsRepo().getEndpoints().size());

@@ -4,7 +4,7 @@ import be.howest.ti.mars.logic.controller.accounts.UserAccount;
 
 import java.util.Set;
 
-public interface FriendsRepoInt {
+public interface FriendsRepository {
     Set<UserAccount> getFriends(UserAccount user, Set<UserAccount> users);
 
     void beFriend(String name, String friendName);

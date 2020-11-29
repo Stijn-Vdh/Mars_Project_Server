@@ -8,7 +8,7 @@ import be.howest.ti.mars.logic.controller.enums.PodType;
 import be.howest.ti.mars.logic.controller.exceptions.EndpointException;
 import be.howest.ti.mars.logic.controller.exceptions.UsernameException;
 import be.howest.ti.mars.logic.data.Repositories;
-import be.howest.ti.mars.logic.data.repoInterfaces.EndpointsRepoInt;
+import be.howest.ti.mars.logic.data.repoInterfaces.EndpointsRepository;
 import io.vertx.core.json.JsonObject;
 import java.util.LinkedList;
 import java.util.List;
@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 
 public class MarsController extends AuthController {
     private static final String MOTD = "SmellyEllie";
-    private final EndpointsRepoInt endpointRepo = Repositories.getEndpointsRepo();
+    private final EndpointsRepository endpointRepo = Repositories.getEndpointsRepo();
 
     public String getMessage() {
         return MOTD;

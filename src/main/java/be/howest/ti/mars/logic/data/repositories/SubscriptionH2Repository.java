@@ -6,7 +6,7 @@ import be.howest.ti.mars.logic.controller.exceptions.DatabaseException;
 import be.howest.ti.mars.logic.controller.subscription.BusinessSubscription;
 import be.howest.ti.mars.logic.controller.subscription.BusinessSubscriptionInfo;
 import be.howest.ti.mars.logic.controller.subscription.UserSubscription;
-import be.howest.ti.mars.logic.data.repoInterfaces.SubscriptionRepoInt;
+import be.howest.ti.mars.logic.data.repoInterfaces.SubscriptionRepository;
 import be.howest.ti.mars.logic.data.util.MarsConnection;
 
 import java.sql.*;
@@ -15,8 +15,8 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class SubscriptionRepository implements SubscriptionRepoInt {
-    private static final Logger LOGGER = Logger.getLogger(SubscriptionRepository.class.getName());
+public class SubscriptionH2Repository implements SubscriptionRepository {
+    private static final Logger LOGGER = Logger.getLogger(SubscriptionH2Repository.class.getName());
 
     // Subscriptions
     private static final String SQL_SELECT_USER_SUBSCRIPTIONS = "SELECT * FROM user_subscriptions";

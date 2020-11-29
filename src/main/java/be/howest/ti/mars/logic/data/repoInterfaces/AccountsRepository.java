@@ -6,7 +6,7 @@ import be.howest.ti.mars.logic.controller.accounts.UserAccount;
 
 import java.util.Set;
 
-public interface AccountsRepoInt {
+public interface AccountsRepository {
     void addAccount(BaseAccount account);
 
     Set<BaseAccount> getAccounts();

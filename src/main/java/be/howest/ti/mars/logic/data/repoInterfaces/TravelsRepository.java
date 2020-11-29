@@ -5,7 +5,7 @@ import be.howest.ti.mars.logic.controller.accounts.UserAccount;
 
 import java.util.List;
 
-public interface TravelsRepoInt {
+public interface TravelsRepository {
     List<Travel> getTravelHistory(UserAccount acc);
 
     int travel(UserAccount user, Travel travel);

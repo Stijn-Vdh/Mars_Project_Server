@@ -5,7 +5,7 @@ import be.howest.ti.mars.logic.controller.converters.ShortEndpoint;
 
 import java.util.Set;
 
-public interface EndpointsRepoInt {
+public interface EndpointsRepository {
     Set<ShortEndpoint> getEndpoints();
 
     void addEndpoint(String endpoint);

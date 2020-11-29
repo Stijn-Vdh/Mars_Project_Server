@@ -6,8 +6,8 @@ import be.howest.ti.mars.logic.controller.enums.PodType;
 import be.howest.ti.mars.logic.controller.exceptions.DatabaseException;
 import be.howest.ti.mars.logic.data.util.MarsConnection;
 import be.howest.ti.mars.logic.data.Repositories;
-import be.howest.ti.mars.logic.data.repoInterfaces.EndpointsRepoInt;
-import be.howest.ti.mars.logic.data.repoInterfaces.TravelsRepoInt;
+import be.howest.ti.mars.logic.data.repoInterfaces.EndpointsRepository;
+import be.howest.ti.mars.logic.data.repoInterfaces.TravelsRepository;
 
 import java.sql.*;
 import java.util.LinkedList;
@@ -15,9 +15,9 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class TravelsRepository implements TravelsRepoInt {
+public class TravelsH2Repository implements TravelsRepository {
 
-    private static final Logger LOGGER = Logger.getLogger(SubscriptionRepository.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(SubscriptionH2Repository.class.getName());
 
     // Travels SQL QUERIES
     private static final String SQL_INSERT_TRAVEL = "INSERT INTO TRAVELS VALUES(default, ?, ?, ?, DEFAULT, ?, NULL)";
@@ -31,7 +31,7 @@ public class TravelsRepository implements TravelsRepoInt {
 
     @Override
     public List<Travel> getTravelHistory(UserAccount acc) {
-        EndpointsRepoInt repo = Repositories.getEndpointsRepo();
+        EndpointsRepository repo = Repositories.getEndpointsRepo();
         List<Travel> travels = new LinkedList<>();
         try (Connection conn = MarsConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(SQL_SELECT_TRAVEL_HISTORY)) {
