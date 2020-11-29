@@ -43,7 +43,7 @@ public class UserAccount extends BaseAccount {
     }
 
     public void setSubscriptionId(int subscriptionId) {
-        Repositories.getSubscriptionRepoInt().setUserSubscription(this, subscriptionId);
+        Repositories.getSubscriptionRepo().setUserSubscription(this, subscriptionId);
         this.subscriptionId = subscriptionId;
     }
 
@@ -53,11 +53,11 @@ public class UserAccount extends BaseAccount {
     }
 
     public void addFriend(String friendName) {
-        Repositories.getFriendsRepoInt().beFriend(getUsername(), friendName);
+        Repositories.getFriendsRepo().beFriend(getUsername(), friendName);
     }
 
     public void removeFriend(String friendName) {
-        Repositories.getFriendsRepoInt().removeFriend(getUsername(), friendName);
+        Repositories.getFriendsRepo().removeFriend(getUsername(), friendName);
     }
 
     public boolean isSharesLocation() {

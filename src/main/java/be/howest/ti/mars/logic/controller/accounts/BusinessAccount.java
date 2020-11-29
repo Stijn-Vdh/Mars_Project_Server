@@ -42,7 +42,7 @@ public class BusinessAccount extends BaseAccount {
     }
 
     public void setSubscriptionId(int subscriptionId) {
-        Repositories.getSubscriptionRepoInt().setBusinessSubscription(this, subscriptionId);
+        Repositories.getSubscriptionRepo().setBusinessSubscription(this, subscriptionId);
         this.subscriptionId = subscriptionId;
     }
 }

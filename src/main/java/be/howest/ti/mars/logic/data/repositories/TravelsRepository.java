@@ -31,7 +31,7 @@ public class TravelsRepository implements TravelsRepoInt {
 
     @Override
     public List<Travel> getTravelHistory(UserAccount acc) {
-        EndpointsRepoInt repo = Repositories.getEndpointsRepoInt();
+        EndpointsRepoInt repo = Repositories.getEndpointsRepo();
         List<Travel> travels = new LinkedList<>();
         try (Connection conn = MarsConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(SQL_SELECT_TRAVEL_HISTORY)) {

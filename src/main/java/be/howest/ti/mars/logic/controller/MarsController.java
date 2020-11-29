@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 
 public class MarsController extends AuthController {
     private static final String MOTD = "SmellyEllie";
-    private final EndpointsRepoInt endpointRepo = Repositories.getEndpointsRepoInt();
+    private final EndpointsRepoInt endpointRepo = Repositories.getEndpointsRepo();
 
     public String getMessage() {
         return MOTD;
@@ -24,9 +24,9 @@ public class MarsController extends AuthController {
 
     public int sendPackage(DeliveryType deliveryType, int from, int destination, BaseAccount acc, boolean userAcc) {
         if (!userAcc){
-            Repositories.getSubscriptionRepoInt().updateBusinessSubscription(deliveryType.equals(DeliveryType.LARGE),(BusinessAccount) acc);
+            Repositories.getSubscriptionRepo().updateBusinessSubscription(deliveryType.equals(DeliveryType.LARGE),(BusinessAccount) acc);
         }
-       return Repositories.getDeliveriesRepoInt().addDelivery(new Delivery(0,deliveryType, Repositories.getEndpointsRepoInt().getShortEndpoint(from), Repositories.getEndpointsRepoInt().getShortEndpoint(destination), "", acc.getUsername()));
+       return Repositories.getDeliveriesRepo().addDelivery(new Delivery(0,deliveryType, Repositories.getEndpointsRepo().getShortEndpoint(from), Repositories.getEndpointsRepo().getShortEndpoint(destination), "", acc.getUsername()));
     }
 
     public Object addFriend(UserAccount user, String friendName) { // TODO: 20-11-2020 validation friend exists and not already friended and user and friend not same
@@ -48,11 +48,11 @@ public class MarsController extends AuthController {
     }
 
     public void favoriteEndpoint(BaseAccount acc, int id) {
-        Repositories.getFavoritesRepoInt().favoriteEndpoint(acc, id);
+        Repositories.getFavoritesRepo().favoriteEndpoint(acc, id);
     }
 
     public void unFavoriteEndpoint(BaseAccount acc, int id) {
-        Repositories.getFavoritesRepoInt().unFavoriteEndpoint(acc, id);
+        Repositories.getFavoritesRepo().unFavoriteEndpoint(acc, id);
     }
 
     private JsonObject getAccountInformation(BaseAccount acc) {
@@ -60,7 +60,7 @@ public class MarsController extends AuthController {
         accInformation.put("name:", acc.getUsername());
         accInformation.put("homeAddress:", acc.getAddress());
         accInformation.put("homeEndpoint:", acc.getHomeAddressEndpoint());
-        accInformation.put("favouriteEndpoints:", Repositories.getFavoritesRepoInt().getFavoriteEndpoints(acc));
+        accInformation.put("favouriteEndpoints:", Repositories.getFavoritesRepo().getFavoriteEndpoints(acc));
         return accInformation;
     }
 
@@ -68,34 +68,34 @@ public class MarsController extends AuthController {
         JsonObject accInformation = getAccountInformation(account);
         accInformation.put("displayName:", account.getDisplayName());
         accInformation.put("shareLocation:", account.isSharesLocation());
-        accInformation.put("subscription:", Repositories.getSubscriptionRepoInt().getUserSubscription(account));
-        accInformation.put("friends:", Repositories.getFriendsRepoInt().getFriends(account, userAccounts).stream().map(UserAccount::getUsername).collect(Collectors.toList()));
-        accInformation.put("travelHistory:", Repositories.getTravelsRepoInt().getTravelHistory(account));
+        accInformation.put("subscription:", Repositories.getSubscriptionRepo().getUserSubscription(account));
+        accInformation.put("friends:", Repositories.getFriendsRepo().getFriends(account, userAccounts).stream().map(UserAccount::getUsername).collect(Collectors.toList()));
+        accInformation.put("travelHistory:", Repositories.getTravelsRepo().getTravelHistory(account));
         return accInformation;
     }
 
     public Object getBusinessAccountInformation(BusinessAccount business) {
         JsonObject accInformation = getAccountInformation(business);
-        accInformation.put("subscription:", Repositories.getSubscriptionRepoInt().getBusinessSubscription(business));
-        accInformation.put("Current usage subscription:", Repositories.getSubscriptionRepoInt().getBusinessSubscriptionInfo(business));
+        accInformation.put("subscription:", Repositories.getSubscriptionRepo().getBusinessSubscription(business));
+        accInformation.put("Current usage subscription:", Repositories.getSubscriptionRepo().getBusinessSubscriptionInfo(business));
         return accInformation;
     }
 
     public int travel(UserAccount acc, int from, int destination, String type) { // getShortEndpoint also validates if endpoint exists
         if (from == destination) throw new EndpointException("Destination and from are the same endpoint");
-        return Repositories.getTravelsRepoInt().travel(acc, new Travel(0,Repositories.getEndpointsRepoInt().getShortEndpoint(from), Repositories.getEndpointsRepoInt().getShortEndpoint(destination), PodType.enumOf(type), ""));
+        return Repositories.getTravelsRepo().travel(acc, new Travel(0,Repositories.getEndpointsRepo().getShortEndpoint(from), Repositories.getEndpointsRepo().getShortEndpoint(destination), PodType.enumOf(type), ""));
     }
 
     public Object getTravelHistory(UserAccount acc) {
-        return Repositories.getTravelsRepoInt().getTravelHistory(acc);
+        return Repositories.getTravelsRepo().getTravelHistory(acc);
     }
 
     public void cancelTrip(UserAccount acc, int id) {
-        Repositories.getTravelsRepoInt().cancelTravel(acc, id);
+        Repositories.getTravelsRepo().cancelTravel(acc, id);
     }
 
     public Object getCurrentRouteInfo(UserAccount acc) {
-        List<Travel> travelList = new LinkedList<>(Repositories.getTravelsRepoInt().getTravelHistory(acc));
+        List<Travel> travelList = new LinkedList<>(Repositories.getTravelsRepo().getTravelHistory(acc));
         if (!travelList.isEmpty()){
             return travelList.get(travelList.size()-1);
         }
@@ -103,10 +103,10 @@ public class MarsController extends AuthController {
     }
 
     public Object getDeliveries(BusinessAccount acc) {
-        return Repositories.getDeliveriesRepoInt().getDeliveries(acc);
+        return Repositories.getDeliveriesRepo().getDeliveries(acc);
     }
 
     public Object getDelivery(BaseAccount acc, int id) {
-        return Repositories.getDeliveriesRepoInt().getDeliveryInformation(acc, id);
+        return Repositories.getDeliveriesRepo().getDeliveryInformation(acc, id);
     }
 }

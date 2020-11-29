@@ -29,7 +29,7 @@ public class DeliveryRepository implements DeliveriesRepoInt {
 
     @Override
     public List<Delivery> getDeliveries(BusinessAccount acc) {
-        EndpointsRepoInt repo = Repositories.getEndpointsRepoInt();
+        EndpointsRepoInt repo = Repositories.getEndpointsRepo();
         List<Delivery> deliveries = new LinkedList<>();
 
         try (Connection con = MarsConnection.getConnection();
@@ -79,7 +79,7 @@ public class DeliveryRepository implements DeliveriesRepoInt {
 
     @Override
     public Object getDeliveryInformation(BaseAccount acc, int id) {
-        EndpointsRepoInt repo = Repositories.getEndpointsRepoInt();
+        EndpointsRepoInt repo = Repositories.getEndpointsRepo();
         Delivery delivery = null;
         try (Connection con = MarsConnection.getConnection();
              PreparedStatement stmt = con.prepareStatement(SQL_SELECT_DELIVERY)) {

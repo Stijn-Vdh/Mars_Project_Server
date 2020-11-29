@@ -9,7 +9,6 @@ import be.howest.ti.mars.logic.controller.enums.NotificationType;
 import be.howest.ti.mars.logic.controller.security.AccountToken;
 import be.howest.ti.mars.logic.controller.security.SecureHash;
 import be.howest.ti.mars.logic.data.Repositories;
-import be.howest.ti.mars.logic.data.repoInterfaces.EndpointsRepoInt;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.json.Json;
@@ -109,7 +108,7 @@ class MarsOpenApiBridge {
     }
 
     public Object viewFriends(RoutingContext ctx) {
-        return Repositories.getFriendsRepoInt().getFriends(getUserAccount(ctx), controller.getUserAccounts())
+        return Repositories.getFriendsRepo().getFriends(getUserAccount(ctx), controller.getUserAccounts())
                 .stream()
                 .map(UserAccount::getUsername)
                 .collect(Collectors.toUnmodifiableList());
@@ -129,9 +128,9 @@ class MarsOpenApiBridge {
 
     public Object viewSubscriptions(RoutingContext ctx) {
         if (isUserAccountToken(ctx)) {
-            return Repositories.getSubscriptionRepoInt().getUserSubscriptions();
+            return Repositories.getSubscriptionRepo().getUserSubscriptions();
         } else {
-            return Repositories.getSubscriptionRepoInt().getBusinessSubscriptions();
+            return Repositories.getSubscriptionRepo().getBusinessSubscriptions();
         }
     }
 
@@ -156,7 +155,7 @@ class MarsOpenApiBridge {
     }
 
     public Object viewSubscriptionInfo(RoutingContext ctx) {
-        return Repositories.getSubscriptionRepoInt().getBusinessSubscriptionInfo(getBusinessAccount(ctx));
+        return Repositories.getSubscriptionRepo().getBusinessSubscriptionInfo(getBusinessAccount(ctx));
     }
 
     public Object shareLocation(RoutingContext ctx) {
@@ -170,11 +169,11 @@ class MarsOpenApiBridge {
     }
 
     public Object getEndpoints(RoutingContext ctx) {
-        return Repositories.getEndpointsRepoInt().getEndpoints();
+        return Repositories.getEndpointsRepo().getEndpoints();
     }
 
     public Object getEndpoint(RoutingContext ctx) {
-        return Repositories.getEndpointsRepoInt().getEndpoint(Integer.parseInt(ctx.request().getParam("id")));
+        return Repositories.getEndpointsRepo().getEndpoint(Integer.parseInt(ctx.request().getParam("id")));
     }
 
     public Object favoriteEndpoint(RoutingContext ctx) {
@@ -191,7 +190,7 @@ class MarsOpenApiBridge {
 
     public Object addReport(RoutingContext ctx) {
         JsonObject json = ctx.getBodyAsJson();
-        Repositories.getReportsRepoInt().addReport(
+        Repositories.getReportsRepo().addReport(
                 getAccount(ctx),
                 json.getString("section"),
                 json.getString("description")
@@ -200,7 +199,7 @@ class MarsOpenApiBridge {
     }
 
     public Object getReportSections(RoutingContext ctx) {
-        return Repositories.getReportsRepoInt().getReportSections();
+        return Repositories.getReportsRepo().getReportSections();
     }
 
     public Object travel(RoutingContext ctx) {
@@ -286,7 +285,7 @@ class MarsOpenApiBridge {
     }
 
     private void resetBusinessUsedPods() {
-        controller.getBusinessAccounts().forEach(acc -> Repositories.getSubscriptionRepoInt().resetPods(acc));
+        controller.getBusinessAccounts().forEach(acc -> Repositories.getSubscriptionRepo().resetPods(acc));
     }
 
     public void startDailyResetCompanyPods() {

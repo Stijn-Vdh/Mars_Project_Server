@@ -26,7 +26,7 @@ public class EndpointsRepository implements EndpointsRepoInt {
     private static final String SQL_INSERT_ENDPOINT = "INSERT INTO ENDPOINTS(name) VALUES(?)";
     @Override
     public ShortEndpoint getShortEndpoint(int id) {
-        Endpoint endpoint = Repositories.getEndpointsRepoInt().getEndpoint(id);
+        Endpoint endpoint = Repositories.getEndpointsRepo().getEndpoint(id);
         return new ShortEndpoint(endpoint.getId(), endpoint.getName());
     }
 

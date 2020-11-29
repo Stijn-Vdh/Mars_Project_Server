@@ -5,8 +5,6 @@ import be.howest.ti.mars.logic.data.repoInterfaces.AccountsRepoInt;
 import be.howest.ti.mars.logic.data.repoInterfaces.FavoritesRepoInt;
 import be.howest.ti.mars.logic.data.repoInterfaces.FriendsRepoInt;
 import be.howest.ti.mars.logic.data.util.MarsConnection;
-import be.howest.ti.mars.logic.data.repositories.SubscriptionRepository;
-import be.howest.ti.mars.logic.data.repoInterfaces.SubscriptionRepoInt;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -19,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class UserAccountTest {
 
-    private static final AccountsRepoInt repo = Repositories.getAccountsRepoInt();
+    private static final AccountsRepoInt repo = Repositories.getAccountsRepo();
     private static final UserAccount testDanny = new UserAccount("Danny", "Danny", 5, "MarsStreet 69");
     private static final UserAccount testDebby = new UserAccount("Debby", "Debby", 3, "WestStreet 420");
     private static final UserAccount testPol = new UserAccount("Pol", "Pol", 6, "Earthstreet 23");
@@ -52,7 +50,7 @@ class UserAccountTest {
 
     @Test
     void testFriendsToDB() {
-        FriendsRepoInt friendRepo = Repositories.getFriendsRepoInt();
+        FriendsRepoInt friendRepo = Repositories.getFriendsRepo();
         Set<UserAccount> users = new HashSet<>();
 
         users.add(testDanny);
@@ -70,10 +68,10 @@ class UserAccountTest {
 
     @Test
     void testDBEndpoints() {
-        FavoritesRepoInt favoRepo = Repositories.getFavoritesRepoInt();
-        assertEquals(102, Repositories.getEndpointsRepoInt().getEndpoints().size());
-        Repositories.getEndpointsRepoInt().addEndpoint("Home");
-        assertEquals(103, Repositories.getEndpointsRepoInt().getEndpoints().size());
+        FavoritesRepoInt favoRepo = Repositories.getFavoritesRepo();
+        assertEquals(102, Repositories.getEndpointsRepo().getEndpoints().size());
+        Repositories.getEndpointsRepo().addEndpoint("Home");
+        assertEquals(103, Repositories.getEndpointsRepo().getEndpoints().size());
 
         assertEquals(0, favoRepo.getFavoriteEndpoints(testDanny).size());
         System.out.println(repo.getUserAccounts());

@@ -14,7 +14,7 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 public abstract class AuthController {
-    protected AccountsRepoInt repo = Repositories.getAccountsRepoInt();
+    protected AccountsRepoInt repo = Repositories.getAccountsRepo();
     protected Set<UserAccount> userAccounts = new HashSet<>();
     protected Set<BusinessAccount> businessAccounts = new HashSet<>();
 
