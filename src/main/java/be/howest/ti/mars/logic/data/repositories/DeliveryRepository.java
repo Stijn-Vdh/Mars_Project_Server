@@ -27,11 +27,9 @@ public class DeliveryRepository implements DeliveriesRepoInt {
     public static final String DESTINATION = "destination";
     public static final String DATE_TIME = "dateTime";
 
-    private EndpointsRepoInt repo = Repositories.getEndpointsRepoInt();
-
     @Override
     public List<Delivery> getDeliveries(BusinessAccount acc) {
-
+        EndpointsRepoInt repo = Repositories.getEndpointsRepoInt();
         List<Delivery> deliveries = new LinkedList<>();
 
         try (Connection con = MarsConnection.getConnection();
@@ -46,7 +44,6 @@ public class DeliveryRepository implements DeliveriesRepoInt {
                     int destination = rs.getInt(DESTINATION);
                     String date = rs.getString(DATE_TIME);
                     String sender = rs.getString("sender");
-
                     Delivery delivery = new Delivery(id, DeliveryType.enumOf(type), repo.getShortEndpoint(source), repo.getShortEndpoint(destination), date, sender);
                     deliveries.add(delivery);
                 }
@@ -82,6 +79,7 @@ public class DeliveryRepository implements DeliveriesRepoInt {
 
     @Override
     public Object getDeliveryInformation(BaseAccount acc, int id) {
+        EndpointsRepoInt repo = Repositories.getEndpointsRepoInt();
         Delivery delivery = null;
         try (Connection con = MarsConnection.getConnection();
              PreparedStatement stmt = con.prepareStatement(SQL_SELECT_DELIVERY)) {

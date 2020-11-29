@@ -141,7 +141,7 @@ paths:
                 - password
                 - businessAccount
                 - homeAddress
-                - homeEndpointID
+                - homeEndpointId
       responses:
         '200':
           description: user created
