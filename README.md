@@ -8,6 +8,7 @@
 - [Usage](#Usage)
 - [Features](#features)
 - [API](#API)
+- [Description](#Description)
 
 ## Introduction
 Together with a team of researchers and developers, we want to build an open web application that will allow 
@@ -42,3 +43,42 @@ We use an openAPI version(3.0.0) we use this API to establish communication betw
 ### Using the API
 You can use tools like Postman or your browser (only for GET methods).
 For information about our endpoints you can look them up [here](https://git.ti.howest.be/TI/2020-2021/s3/project-ii/projects/groep-15/server/-/blob/master/src/main/resources/openapi-group-15.yaml).
+
+## Description
+
+![Diagram](https://svgshare.com/i/S00.svg) 
+
+### WebServer
+When the WebServer starts it first creates the H2 database.
+### Bridge
+
+### Auth Controller
+
+### MTTS Controller
+
+### Repositories
+
+#### AccountsRepository
+
+#### FriendsRepository
+
+#### TravelsRepository
+
+#### EndpointsRepository
+
+#### DeliveriesRepository
+
+#### FavoritesRepository
+
+#### SubscriptionsRepository
+
+#### ReportsRepository
+
+### H2 Database
+The `MarsConnection` class creates the H2 Database. It uses the [Singleton](https://en.wikipedia.org/wiki/Singleton_pattern) pattern so that only one instance of the class can exist.
+It has a static `configure` method which creates the actual H2 database using the parameters and stores those inside the `MarsConnection` class. 
+Further it has a static `getConnection` method which returns the current connection to the H2 Database.
+`configure` also calls a private method which reads a sql file from resources/h2 folder which initialize all the tables.
+The sql file contains all the sql to set up all the tables we use.
+It is in fifth normal form, and it has all the constraints to keep the database consistent (ACID).
+Then it reads the sql files which populate our tables. Those sql files are also located in resources/h2 folder.
