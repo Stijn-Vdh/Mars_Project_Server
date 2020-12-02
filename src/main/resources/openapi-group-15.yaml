@@ -595,8 +595,8 @@ paths:
               schema:
                 type: object
                 properties:
-                  deliveryID:
-                    type: int
+                  deliveryId:
+                    type: integer
                   deliveryType:
                     type: string
                     enum: [ small, large ]
