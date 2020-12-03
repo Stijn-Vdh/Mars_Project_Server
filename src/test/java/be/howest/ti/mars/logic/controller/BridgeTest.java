@@ -250,11 +250,10 @@ public class BridgeTest {
 
     @Test
     public void changePassword(final VertxTestContext testContext) {
-        chain(testContext, HttpMethod.POST, "changePassword", token, new JsonObject().put("newPassword", "jak"), 200, IGNORE_BODY, () -> {
-            login(testContext, loginBodyJson.put("password", "jak"), testContext::completeNow);
-        });
+        chain(testContext, HttpMethod.POST, "changePassword", token, new JsonObject().put("newPassword", "jak"), 200, IGNORE_BODY,
+                () -> login(testContext, loginBodyJson.put("password", "jak"), testContext::completeNow)
+        );
     }
-
 
 
 }

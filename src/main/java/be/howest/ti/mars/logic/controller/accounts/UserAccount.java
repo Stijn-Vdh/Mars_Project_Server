@@ -1,5 +1,6 @@
 package be.howest.ti.mars.logic.controller.accounts;
 
+import be.howest.ti.mars.logic.controller.MTTSController;
 import be.howest.ti.mars.logic.controller.enums.NotificationType;
 import be.howest.ti.mars.logic.data.Repositories;
 import io.vertx.core.Vertx;
@@ -84,5 +85,9 @@ public class UserAccount extends BaseAccount {
         return super.hashCode();
     }
 
+    @Override
+    public Object getAccountInformation() {
+        return new MTTSController().getUserAccountInformation(this);
+    }
 
 }

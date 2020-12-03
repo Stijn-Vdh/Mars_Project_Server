@@ -4,6 +4,7 @@ import be.howest.ti.mars.logic.controller.security.AccountToken;
 import be.howest.ti.mars.logic.data.Repositories;
 import be.howest.ti.mars.logic.data.repositories.AccountsRepository;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.vertx.core.json.JsonObject;
 
 import java.util.Objects;
 
@@ -86,4 +87,6 @@ public abstract class BaseAccount {
     public abstract int getSubscriptionId();
 
     public abstract void setSubscriptionId(int subscriptionId);
+
+    public abstract Object getAccountInformation();
 }
