@@ -14,6 +14,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -33,10 +35,9 @@ public class SubscriptionH2Repository implements SubscriptionRepository {
     private static final String SQL_UPDATE_BUSINESS_SUBSCRIPTION_INFO_SMALL = "UPDATE businesses SET SMALLPODSUSED = ? WHERE name = ?";
     private static final String SQL_UPDATE_BUSINESS_SUBSCRIPTION_INFO_LARGE = "UPDATE businesses SET LARGEPODSUSED = ? WHERE name = ?";
 
-
     @Override
-    public Set<UserSubscription> getUserSubscriptions() {
-        Set<UserSubscription> subscriptions = new HashSet<>();
+    public List<UserSubscription> getUserSubscriptions() {
+        List<UserSubscription> subscriptions = new LinkedList<>();
 
         try (Connection con = MarsConnection.getConnection();
              PreparedStatement stmt = con.prepareStatement(SQL_SELECT_USER_SUBSCRIPTIONS);
@@ -53,8 +54,8 @@ public class SubscriptionH2Repository implements SubscriptionRepository {
     }
 
     @Override
-    public Set<BusinessSubscription> getBusinessSubscriptions() {
-        Set<BusinessSubscription> subscriptions = new HashSet<>();
+    public List<BusinessSubscription> getBusinessSubscriptions() {
+        List<BusinessSubscription> subscriptions = new LinkedList<>();
 
         try (Connection con = MarsConnection.getConnection();
              PreparedStatement stmt = con.prepareStatement(SQL_SELECT_BUSINESS_SUBSCRIPTIONS);
@@ -83,24 +84,6 @@ public class SubscriptionH2Repository implements SubscriptionRepository {
             LOGGER.log(Level.WARNING, ex.getMessage(), ex);
             throw new DatabaseException("Can't get user subscription");
         }
-    }
-
-    private UserSubscription getUserSubscription(ResultSet rs) throws SQLException {
-        int id = rs.getInt("id");
-        String name = rs.getString("name");
-        boolean unlimitedTravels = rs.getBoolean("unlimitedTravels");
-        boolean unlimitedPackages = rs.getBoolean("unlimitedPackages");
-        return new UserSubscription(id, name, unlimitedTravels, unlimitedPackages);
-    }
-
-    private BusinessSubscription getBusinessSubscription(ResultSet rs) throws SQLException {
-        int id = rs.getInt("id");
-        String name = rs.getString("name");
-        int smallPodsDaily = rs.getInt("smallPodsDaily");
-        int largePodsDaily = rs.getInt("largePodsDaily");
-        int dedicatedPods = rs.getInt("dedicatedPods");
-        int priorityLevel = rs.getInt("priorityLevel");
-        return new BusinessSubscription(id, name, smallPodsDaily, largePodsDaily, dedicatedPods, priorityLevel);
     }
 
     @Override
@@ -162,19 +145,6 @@ public class SubscriptionH2Repository implements SubscriptionRepository {
         }
     }
 
-    public void resetPods(BusinessAccount acc) {
-        try (Connection con = MarsConnection.getConnection();
-             PreparedStatement stmt = con.prepareStatement(SQL_UPDATE_BUSINESS_SUBSCRIPTION_INFO)) {
-            stmt.setString(1, acc.getUsername());
-            stmt.setInt(2, 0);
-            stmt.setInt(3, 0);
-            stmt.executeUpdate();
-        } catch (SQLException ex) {
-            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
-            throw new DatabaseException("Could not reset the daily-pods");
-        }
-    }
-
     @Override
     public void setUserSubscription(UserAccount user, int subscriptionId) {
         if (userSubscriptionExists(subscriptionId)) {
@@ -211,12 +181,44 @@ public class SubscriptionH2Repository implements SubscriptionRepository {
         }
     }
 
+
+    private UserSubscription getUserSubscription(ResultSet rs) throws SQLException {
+        int id = rs.getInt("id");
+        String name = rs.getString("name");
+        boolean unlimitedTravels = rs.getBoolean("unlimitedTravels");
+        boolean unlimitedPackages = rs.getBoolean("unlimitedPackages");
+        return new UserSubscription(id, name, unlimitedTravels, unlimitedPackages);
+    }
+
+    private BusinessSubscription getBusinessSubscription(ResultSet rs) throws SQLException {
+        int id = rs.getInt("id");
+        String name = rs.getString("name");
+        int smallPodsDaily = rs.getInt("smallPodsDaily");
+        int largePodsDaily = rs.getInt("largePodsDaily");
+        int dedicatedPods = rs.getInt("dedicatedPods");
+        int priorityLevel = rs.getInt("priorityLevel");
+        return new BusinessSubscription(id, name, smallPodsDaily, largePodsDaily, dedicatedPods, priorityLevel);
+    }
+
     private boolean businessSubscriptionExists(int id) {
         return getBusinessSubscriptions().stream().anyMatch(subscription -> subscription.getId() == id);
     }
 
     private boolean userSubscriptionExists(int id) {
         return getUserSubscriptions().stream().anyMatch(subscription -> subscription.getId() == id);
+    }
+
+    public void resetPods(BusinessAccount acc) {
+        try (Connection con = MarsConnection.getConnection();
+             PreparedStatement stmt = con.prepareStatement(SQL_UPDATE_BUSINESS_SUBSCRIPTION_INFO)) {
+            stmt.setString(1, acc.getUsername());
+            stmt.setInt(2, 0);
+            stmt.setInt(3, 0);
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
+            throw new DatabaseException("Could not reset the daily-pods");
+        }
     }
 
 }
