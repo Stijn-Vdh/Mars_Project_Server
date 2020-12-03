@@ -5,6 +5,7 @@ import be.howest.ti.mars.logic.controller.accounts.BusinessAccount;
 import be.howest.ti.mars.logic.controller.accounts.UserAccount;
 import be.howest.ti.mars.logic.controller.enums.DeliveryType;
 import be.howest.ti.mars.logic.controller.enums.PodType;
+import be.howest.ti.mars.logic.controller.exceptions.AuthenticationException;
 import be.howest.ti.mars.logic.controller.exceptions.EndpointException;
 import be.howest.ti.mars.logic.controller.exceptions.UsernameException;
 import be.howest.ti.mars.logic.data.Repositories;
@@ -20,6 +21,12 @@ public class MTTSController extends AuthController {
     }
 
     public int sendPackage(DeliveryType deliveryType, int from, int destination, BaseAccount acc, boolean userAcc) {
+        if (from == destination){
+            throw new AuthenticationException("!You cannot use the same endpoint as destination and from!");
+        }
+        if (deliveryType == DeliveryType.LARGE && userAcc){
+            throw new AuthenticationException("!Only businesses can send large package pods!");
+        }
         if (!userAcc) {
             Repositories.getSubscriptionRepo().updateBusinessSubscription(deliveryType.equals(DeliveryType.LARGE), (BusinessAccount) acc);
         }
