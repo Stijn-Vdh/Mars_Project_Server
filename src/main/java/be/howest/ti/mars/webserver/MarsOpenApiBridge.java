@@ -6,6 +6,7 @@ import be.howest.ti.mars.logic.controller.accounts.BusinessAccount;
 import be.howest.ti.mars.logic.controller.accounts.UserAccount;
 import be.howest.ti.mars.logic.controller.enums.DeliveryType;
 import be.howest.ti.mars.logic.controller.enums.NotificationType;
+import be.howest.ti.mars.logic.controller.exceptions.AuthenticationException;
 import be.howest.ti.mars.logic.controller.security.AccountToken;
 import be.howest.ti.mars.logic.controller.security.SecureHash;
 import be.howest.ti.mars.logic.data.Repositories;
@@ -73,10 +74,10 @@ class MarsOpenApiBridge {
         JsonObject json = ctx.getBodyAsJson();
         boolean isUser = isUserAccountToken(ctx);
         if (isUser && DeliveryType.enumOf(json.getString("deliveryType")) == DeliveryType.LARGE){
-            return "!Only businesses can send large package pods!";
+            throw new AuthenticationException("!Only businesses can send large package pods!");
         }
         if (json.getInteger("from").equals(json.getInteger("destination"))){
-            return "!You cannot use the same endpoint as destination and from!";
+            throw new AuthenticationException("!You cannot use the same endpoint as destination and from!");
         }
         int id = controller.sendPackage(DeliveryType.enumOf(json.getString("deliveryType")),
                 json.getInteger("from"),
@@ -172,7 +173,7 @@ class MarsOpenApiBridge {
         return "Now sharing location with friends.";
     }
 
-    public Object stopSharingLocation(RoutingContext ctx) { // TODO: 21-11-2020 should we care if someone tries stopping his location sharing when it is already stopped ?
+    public Object stopSharingLocation(RoutingContext ctx) {
         getUserAccount(ctx).setSharesLocation(false);
         return "Not sharing location anymore with friends.";
     }
@@ -232,7 +233,7 @@ class MarsOpenApiBridge {
         int id = Integer.parseInt(ctx.request().getParam("id"));
         controller.cancelTrip(getUserAccount(ctx), id);
 
-        return null;
+        return "Successfully canceled trip: " + id;
     }
 
     public Object setDisplayName(RoutingContext ctx) {

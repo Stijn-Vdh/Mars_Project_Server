@@ -189,6 +189,8 @@ public class SubscriptionH2Repository implements SubscriptionRepository {
                 LOGGER.log(Level.WARNING, ex.getMessage(), ex);
                 throw new DatabaseException("Can't buy user subscription");
             }
+        }else{
+            throw  new DatabaseException("Could not find a subscription with given id");
         }
     }
 
@@ -205,6 +207,8 @@ public class SubscriptionH2Repository implements SubscriptionRepository {
                 LOGGER.log(Level.WARNING, ex.getMessage(), ex);
                 throw new DatabaseException("Can't buy business subscription");
             }
+        }else{
+            throw  new DatabaseException("Could not find a subscription with given id");
         }
     }
 

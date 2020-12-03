@@ -87,6 +87,8 @@ public class TravelsH2Repository implements TravelsRepository {
                 LOGGER.log(Level.WARNING, ex.getMessage(), ex);
                 throw new DatabaseException("Could not cancel travel/trip.");
             }
+        }else{
+            throw new DatabaseException("This trip does not exist");
         }
     }
 
