@@ -91,6 +91,6 @@ public class TravelsH2Repository implements TravelsRepository {
     }
 
     private boolean tripExists(UserAccount acc ,int id){
-        return getTravelHistory(acc).stream().filter(trip -> trip.getId() == id).count() == 1;
+        return getTravelHistory(acc).stream().anyMatch(trip -> trip.getId() == id);
     }
 }

@@ -209,10 +209,7 @@ public class SubscriptionH2Repository implements SubscriptionRepository {
     }
 
     private boolean subscriptionExists(int id){
-        int uSub = (int) getUserSubscriptions().stream().filter(subscription -> subscription.getId() == id).count();
-        int bSub = (int) getBusinessSubscriptions().stream().filter(subscription -> subscription.getId() == id).count();
-
-        return uSub == 1 || bSub == 1;
+        return getUserSubscriptions().stream().anyMatch(subscription -> subscription.getId() == id) || getBusinessSubscriptions().stream().anyMatch(subscription -> subscription.getId() == id);
     }
 
 }
