@@ -37,7 +37,6 @@ public class WebServer extends AbstractVerticle {
     private static final Logger LOGGER = Logger.getLogger(WebServer.class.getName());
     private static final Integer DB_WEB_CONSOLE_FALLBACK = 9000;
     private static final String OPEN_API_SPEC = "openapi-group-15.yaml";
-    private static final String CHNL_ROOT_PATH = "/events/*";
     private final MarsOpenApiBridge bridge;
 
     public WebServer(MarsOpenApiBridge bridge) {
@@ -141,7 +140,7 @@ public class WebServer extends AbstractVerticle {
 
         // Build the router
         Router router = factory.getRouter();
-        router.route(CHNL_ROOT_PATH).handler(createSockJsHandler());
+        router.route("/events/*").handler(createSockJsHandler());
         router.route("/favicon.ico").handler(FaviconHandler.create());
 
         // Install general error handlers
@@ -241,7 +240,7 @@ public class WebServer extends AbstractVerticle {
         } catch (UsernameException | AuthenticationException | EndpointException ex) {
             replyWithFailure(ctx, 402, ex.getMessage(), ex.getMessage());
         } catch (EntityNotFoundException ex) {
-            replyWithFailure(ctx, 422, "Entity couldn't not be found", ex.getMessage());
+            replyWithFailure(ctx, 422, "Entity couldn't be found", ex.getMessage());
         } catch (Throwable ex) {
             LOGGER.log(Level.SEVERE, () -> String.format("onInternalServerError at %s", ctx.request().absoluteURI()));
             LOGGER.log(Level.WARNING, ex.getMessage(), ex);
