@@ -31,6 +31,7 @@ public class BridgeTest {
     // Parameters and headers
     private static final String DEFAULT_PLAYER_NAME = "alice";
     private static final String DEFAULT_PASS_WORD = "test";
+    private static final String AUTHORIZATION_TOKEN_PREFIX = "Bearer ";
     private static final MTTSController controller = new MTTSController();
     private static final AccountsRepository repo = Repositories.getAccountsRepo();
     private static final JsonObject createAccountJson = new JsonObject()
@@ -145,9 +146,19 @@ public class BridgeTest {
     @Test
     void login(final VertxTestContext testContext) {
         testRequest(testContext, HttpMethod.POST, "login", null, loginBodyJson, 200, body -> {
-            token = body;
+            token = AUTHORIZATION_TOKEN_PREFIX + body;
             return true;
         });
+    }
+
+    @Test
+    void logoutInvalidToken(final VertxTestContext testContext) {
+        testRequest(testContext, HttpMethod.DELETE, "login", null, 401, IGNORE_BODY);
+    }
+
+    @Test
+    void logout(final VertxTestContext testContext) {
+        testRequest(testContext, HttpMethod.DELETE, "login", null, 401, IGNORE_BODY);
     }
 }
 
