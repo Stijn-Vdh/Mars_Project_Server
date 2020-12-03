@@ -41,28 +41,14 @@ public class AccountsH2Repository implements AccountsRepository {
             stmt.setString(1, account.getUsername());
             stmt.setString(2, account.getPassword());
             stmt.setString(3, account.getAddress());
-            if (homeAddressIsAvailable(account.getHomeAddressEndpoint())){
-                stmt.setInt(4, account.getHomeAddressEndpoint());
-            }else{
-                throw new IllegalArgumentException("Home address endpoint is already used.");
-            }
+            stmt.setInt(4, account.getHomeAddressEndpoint());
+
 
             stmt.executeUpdate();
         } catch (SQLException ex) {
             LOGGER.log(Level.WARNING, ex.getMessage(), ex);
             throw new DatabaseException("Cannot add account!");
         }
-    }
-
-    private boolean homeAddressIsAvailable(int homeAddressEndpoint) {
-        boolean res = true;
-        for (BaseAccount acc: getAccounts()){
-            if (acc.getHomeAddressEndpoint() == homeAddressEndpoint){
-                res = false;
-                break;
-            }
-        }
-        return res;
     }
 
     @Override
@@ -181,7 +167,7 @@ public class AccountsH2Repository implements AccountsRepository {
 
     @Override
     public void setDisplayName(UserAccount acc, String displayName) {
-        if (displayName.equals("")){
+        if (displayName.equals("")) {
             displayName = acc.getUsername();
         }
         try (Connection con = MarsConnection.getConnection();

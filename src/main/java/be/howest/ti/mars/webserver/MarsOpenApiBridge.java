@@ -69,9 +69,15 @@ class MarsOpenApiBridge {
         return rand.nextInt(5) * 1000L;
     }
 
-    public Object sendPackage(RoutingContext ctx) { // TODO: 21-11-2020 add missing validation: only business can send large packages, etc , from != dest
+    public Object sendPackage(RoutingContext ctx) {
         JsonObject json = ctx.getBodyAsJson();
         boolean isUser = isUserAccountToken(ctx);
+        if (isUser && DeliveryType.enumOf(json.getString("deliveryType")) == DeliveryType.LARGE){
+            return "!Only businesses can send large package pods!";
+        }
+        if (json.getInteger("from").equals(json.getInteger("destination"))){
+            return "!You cannot use the same endpoint as destination and from!";
+        }
         int id = controller.sendPackage(DeliveryType.enumOf(json.getString("deliveryType")),
                 json.getInteger("from"),
                 json.getInteger("destination"),
@@ -114,9 +120,12 @@ class MarsOpenApiBridge {
                 .collect(Collectors.toUnmodifiableList());
     }
 
-    public Object addFriend(RoutingContext ctx) { // TODO: 21-11-2020 cant friend businesses
+    public Object addFriend(RoutingContext ctx) {
         UserAccount user = getUserAccount(ctx);
         String friendName = ctx.request().getParam("fName");
+
+
+
         return controller.addFriend(user, friendName);
     }
 
@@ -291,6 +300,5 @@ class MarsOpenApiBridge {
     public void startDailyResetCompanyPods() {
         timer.scheduleAtFixedRate(wrap(this::resetBusinessUsedPods), 0, RESET_PERIOD);
     }
-
 
 }

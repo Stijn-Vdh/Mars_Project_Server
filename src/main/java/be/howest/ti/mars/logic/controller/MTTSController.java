@@ -9,6 +9,7 @@ import be.howest.ti.mars.logic.controller.exceptions.EndpointException;
 import be.howest.ti.mars.logic.controller.exceptions.UsernameException;
 import be.howest.ti.mars.logic.data.Repositories;
 import io.vertx.core.json.JsonObject;
+import org.h2.engine.User;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -28,12 +29,16 @@ public class MTTSController extends AuthController {
     }
 
     public Object addFriend(UserAccount user, String friendName) {
-        if (userAccounts.contains(new UserAccount(friendName)) && user.getUsername().equals(friendName) && Repositories.getFriendsRepo().friendExists(friendName, user)) {
+        if (friendValidation(user,friendName)) {
             user.addFriend(friendName);
         } else {
             throw new UsernameException("Could not add a friend with the given username");
         }
         return "You just added a friend called:" + friendName;
+    }
+
+    private boolean friendValidation(UserAccount acc, String friendName){
+        return userAccounts.contains(new UserAccount(friendName)) && acc.getUsername().equals(friendName) && Repositories.getFriendsRepo().friendExists(friendName, acc) && !isBusinessAccByName(friendName);
     }
 
     public Object removeFriend(UserAccount user, String friendName) {
@@ -106,5 +111,16 @@ public class MTTSController extends AuthController {
 
     public Object getDelivery(BaseAccount acc, int id) {
         return Repositories.getDeliveriesRepo().getDeliveryInformation(acc, id);
+    }
+
+    private boolean isBusinessAccByName(String name){
+        boolean res = false;
+        for (BusinessAccount acc : businessAccounts){
+            if (acc.getUsername().equals(name)) {
+                res = true;
+                break;
+            }
+        }
+        return res;
     }
 }

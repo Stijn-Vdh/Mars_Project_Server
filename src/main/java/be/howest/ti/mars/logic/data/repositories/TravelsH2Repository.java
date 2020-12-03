@@ -14,6 +14,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 public class TravelsH2Repository implements TravelsRepository {
 
@@ -75,15 +76,21 @@ public class TravelsH2Repository implements TravelsRepository {
 
     @Override
     public void cancelTravel(UserAccount user, int tripID) {
-        try (Connection con = MarsConnection.getConnection();
-             PreparedStatement stmt = con.prepareStatement(SQL_DELETE_TRAVEL)) {
-            stmt.setString(1, user.getUsername());
-            stmt.setInt(2, tripID);
+        if (tripExists(user, tripID)){
+            try (Connection con = MarsConnection.getConnection();
+                 PreparedStatement stmt = con.prepareStatement(SQL_DELETE_TRAVEL)) {
+                stmt.setString(1, user.getUsername());
+                stmt.setInt(2, tripID);
 
-            stmt.executeUpdate();
-        } catch (SQLException ex) {
-            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
-            throw new DatabaseException("Could not cancel travel/trip.");
+                stmt.executeUpdate();
+            } catch (SQLException ex) {
+                LOGGER.log(Level.WARNING, ex.getMessage(), ex);
+                throw new DatabaseException("Could not cancel travel/trip.");
+            }
         }
+    }
+
+    private boolean tripExists(UserAccount acc ,int id){
+        return getTravelHistory(acc).stream().filter(trip -> trip.getId() == id).count() == 1;
     }
 }

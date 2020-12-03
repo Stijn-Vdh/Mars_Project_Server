@@ -34,13 +34,7 @@ public class EndpointsH2Repository implements EndpointsRepository {
 
     @Override
     public boolean endpointExists(int id) {
-        boolean res = false;
-        for(ShortEndpoint endpoint : getEndpoints()){
-            if (endpoint.getId() == id){
-                res = true;
-            }
-        }
-        return  res;
+        return getEndpoints().stream().anyMatch(endpoint -> endpoint.getId() == id);
     }
 
     @Override
@@ -76,24 +70,20 @@ public class EndpointsH2Repository implements EndpointsRepository {
 
     @Override
     public Endpoint getEndpoint(int id) {
-        if (endpointExists(id)){
-            try (Connection con = MarsConnection.getConnection();
-                 PreparedStatement stmt = con.prepareStatement(SQL_GET_ENDPOINT)
-            ) {
-                stmt.setInt(1, id);
-                try (ResultSet rs = stmt.executeQuery()) {
-                    if (rs.next()) {
-                        return new Endpoint(id, rs.getString("name"), true, "todo", false);
-                    } else {
-                        throw new EndpointException("Endpoint with ID (" + id + ") doesn't exist!");
-                    }
+        try (Connection con = MarsConnection.getConnection();
+             PreparedStatement stmt = con.prepareStatement(SQL_GET_ENDPOINT)
+        ) {
+            stmt.setInt(1, id);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return new Endpoint(id, rs.getString("name"), true, "todo", false);
+                } else {
+                    throw new EndpointException("Endpoint with ID (" + id + ") doesn't exist!");
                 }
-            } catch (SQLException ex) {
-                LOGGER.log(Level.WARNING, ex.getMessage(), ex);
-                throw new DatabaseException("Cannot retrieve endpoint with id: " + id + "!");
             }
-        }else{
-            throw new IllegalArgumentException("Endpoint does not exist");
+        } catch (SQLException ex) {
+            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
+            throw new DatabaseException("Cannot retrieve endpoint with id: " + id + "!");
         }
     }
 }
