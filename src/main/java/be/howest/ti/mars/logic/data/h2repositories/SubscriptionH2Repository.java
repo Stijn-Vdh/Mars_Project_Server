@@ -8,12 +8,16 @@ import be.howest.ti.mars.logic.controller.subscription.BusinessSubscriptionInfo;
 import be.howest.ti.mars.logic.controller.subscription.UserSubscription;
 import be.howest.ti.mars.logic.data.repositories.SubscriptionRepository;
 import be.howest.ti.mars.logic.data.util.MarsConnection;
+import jdk.jshell.JShell;
 
 import java.sql.*;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class SubscriptionH2Repository implements SubscriptionRepository {
     private static final Logger LOGGER = Logger.getLogger(SubscriptionH2Repository.class.getName());
@@ -174,31 +178,46 @@ public class SubscriptionH2Repository implements SubscriptionRepository {
 
     @Override
     public void setUserSubscription(UserAccount user, int subscriptionId) {
-        try (Connection con = MarsConnection.getConnection();
-             PreparedStatement stmt = con.prepareStatement(SQL_UPDATE_USER_SUBSCRIPTION)) {
+        if (userSubscriptionExists(subscriptionId)){
+            try (Connection con = MarsConnection.getConnection();
+                 PreparedStatement stmt = con.prepareStatement(SQL_UPDATE_USER_SUBSCRIPTION)) {
 
-            stmt.setInt(1, subscriptionId);
-            stmt.setString(2, user.getUsername());
-            stmt.execute();
-        } catch (SQLException ex) {
-            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
-            throw new DatabaseException("Can't buy user subscription");
+                stmt.setInt(1, subscriptionId);
+                stmt.setString(2, user.getUsername());
+                stmt.execute();
+            } catch (SQLException ex) {
+                LOGGER.log(Level.WARNING, ex.getMessage(), ex);
+                throw new DatabaseException("Can't buy user subscription");
+            }
+        }else{
+            throw  new DatabaseException("Could not find a subscription with given id");
         }
     }
 
     @Override
     public void setBusinessSubscription(BusinessAccount business, int subscriptionId) {
-        try (Connection con = MarsConnection.getConnection();
-             PreparedStatement stmt = con.prepareStatement(SQL_UPDATE_BUSINESS_SUBSCRIPTION)) {
+        if (businessSubscriptionExists(subscriptionId)){
+            try (Connection con = MarsConnection.getConnection();
+                 PreparedStatement stmt = con.prepareStatement(SQL_UPDATE_BUSINESS_SUBSCRIPTION)) {
 
-            stmt.setInt(1, subscriptionId);
-            stmt.setString(2, business.getUsername());
-            stmt.execute();
-        } catch (SQLException ex) {
-            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
-            throw new DatabaseException("Can't buy business subscription");
+                stmt.setInt(1, subscriptionId);
+                stmt.setString(2, business.getUsername());
+                stmt.execute();
+            } catch (SQLException ex) {
+                LOGGER.log(Level.WARNING, ex.getMessage(), ex);
+                throw new DatabaseException("Can't buy business subscription");
+            }
+        }else{
+            throw  new DatabaseException("Could not find a subscription with given id");
         }
     }
 
+    private boolean businessSubscriptionExists(int id){
+        return getBusinessSubscriptions().stream().anyMatch(subscription -> subscription.getId() == id);
+    }
+
+    private boolean userSubscriptionExists(int id){
+        return getUserSubscriptions().stream().anyMatch(subscription -> subscription.getId() == id);
+    }
 
 }

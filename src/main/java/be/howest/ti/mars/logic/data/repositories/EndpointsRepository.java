@@ -13,4 +13,6 @@ public interface EndpointsRepository {
     Endpoint getEndpoint(int id);
 
     ShortEndpoint getShortEndpoint(int id);
+
+    boolean endpointExists(int id);
 }

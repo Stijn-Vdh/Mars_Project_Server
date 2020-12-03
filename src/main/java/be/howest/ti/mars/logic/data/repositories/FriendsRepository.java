@@ -5,7 +5,9 @@ import be.howest.ti.mars.logic.controller.accounts.UserAccount;
 import java.util.Set;
 
 public interface FriendsRepository {
-    Set<UserAccount> getFriends(UserAccount user, Set<UserAccount> users);
+    boolean friendExists(String name, UserAccount acc);
+
+    Set<UserAccount> getFriends(UserAccount user);
 
     void beFriend(String name, String friendName);
 

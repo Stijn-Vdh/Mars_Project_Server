@@ -26,10 +26,9 @@ public class ReportsH2Repository implements ReportsRepository {
     public Set<String> getReportSections() {
         Set<String> sections = new HashSet<>();
 
-        try (
-                Connection con = MarsConnection.getConnection();
-                PreparedStatement stmt = con.prepareStatement(SQL_GET_REPORT_SECTIONS)
-        ) {
+        try (Connection con = MarsConnection.getConnection();
+             PreparedStatement stmt = con.prepareStatement(SQL_GET_REPORT_SECTIONS)) {
+
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     sections.add(rs.getString("name"));

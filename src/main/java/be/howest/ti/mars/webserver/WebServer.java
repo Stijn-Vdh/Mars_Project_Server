@@ -1,9 +1,6 @@
 package be.howest.ti.mars.webserver;
 
-import be.howest.ti.mars.logic.controller.exceptions.AuthenticationException;
-import be.howest.ti.mars.logic.controller.exceptions.EndpointException;
-import be.howest.ti.mars.logic.controller.exceptions.EntityNotFoundException;
-import be.howest.ti.mars.logic.controller.exceptions.UsernameException;
+import be.howest.ti.mars.logic.controller.exceptions.*;
 import be.howest.ti.mars.logic.data.util.MarsConnection;
 import io.vertx.config.ConfigRetriever;
 import io.vertx.core.AbstractVerticle;

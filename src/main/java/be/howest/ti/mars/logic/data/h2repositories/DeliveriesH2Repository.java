@@ -5,6 +5,7 @@ import be.howest.ti.mars.logic.controller.accounts.BaseAccount;
 import be.howest.ti.mars.logic.controller.accounts.BusinessAccount;
 import be.howest.ti.mars.logic.controller.enums.DeliveryType;
 import be.howest.ti.mars.logic.controller.exceptions.DatabaseException;
+import be.howest.ti.mars.logic.controller.exceptions.EntityNotFoundException;
 import be.howest.ti.mars.logic.data.util.MarsConnection;
 import be.howest.ti.mars.logic.data.Repositories;
 import be.howest.ti.mars.logic.data.repositories.DeliveriesRepository;
@@ -27,9 +28,20 @@ public class DeliveriesH2Repository implements DeliveriesRepository {
     public static final String DESTINATION = "destination";
     public static final String DATE_TIME = "dateTime";
 
+    private Delivery createDelivery(ResultSet rs) throws SQLException {
+        EndpointsRepository repo = Repositories.getEndpointsRepo();
+        int id = rs.getInt("id");
+        String type = rs.getString("deliveryType");
+        int source = rs.getInt("from");
+        int destination = rs.getInt(DESTINATION);
+        String date = rs.getString(DATE_TIME);
+        String sender = rs.getString("sender");
+        return new Delivery(id, DeliveryType.enumOf(type), repo.getShortEndpoint(source), repo.getShortEndpoint(destination), date, sender);
+    }
+
     @Override
     public List<Delivery> getDeliveries(BusinessAccount acc) {
-        EndpointsRepository repo = Repositories.getEndpointsRepo();
+
         List<Delivery> deliveries = new LinkedList<>();
 
         try (Connection con = MarsConnection.getConnection();
@@ -38,14 +50,7 @@ public class DeliveriesH2Repository implements DeliveriesRepository {
 
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-                    int id = rs.getInt("id");
-                    String type = rs.getString("deliveryType");
-                    int source = rs.getInt("from");
-                    int destination = rs.getInt(DESTINATION);
-                    String date = rs.getString(DATE_TIME);
-                    String sender = rs.getString("sender");
-                    Delivery delivery = new Delivery(id, DeliveryType.enumOf(type), repo.getShortEndpoint(source), repo.getShortEndpoint(destination), date, sender);
-                    deliveries.add(delivery);
+                    deliveries.add(createDelivery(rs));
                 }
             }
             return deliveries;
@@ -79,27 +84,19 @@ public class DeliveriesH2Repository implements DeliveriesRepository {
 
     @Override
     public Object getDeliveryInformation(BaseAccount acc, int id) {
-        EndpointsRepository repo = Repositories.getEndpointsRepo();
-        Delivery delivery = null;
+
         try (Connection con = MarsConnection.getConnection();
              PreparedStatement stmt = con.prepareStatement(SQL_SELECT_DELIVERY)) {
             stmt.setString(1, acc.getUsername());
             stmt.setInt(2, id);
 
             try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    int deliveryId = rs.getInt("id");
-                    String type = rs.getString("deliveryType");
-                    int source = rs.getInt("from");
-                    int destination = rs.getInt(DESTINATION);
-                    String date = rs.getString(DATE_TIME);
-                    String sender = rs.getString("sender");
-
-
-                    delivery = new Delivery(deliveryId, DeliveryType.enumOf(type), repo.getShortEndpoint(source), repo.getShortEndpoint(destination), date, sender);
+                if (rs.next()){
+                    return createDelivery(rs);
+                }else{
+                    throw new EntityNotFoundException("Could not get delivery information.");
                 }
             }
-            return delivery;
 
         } catch (SQLException ex) {
             LOGGER.log(Level.WARNING, ex.getMessage(), ex);

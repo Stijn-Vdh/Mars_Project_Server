@@ -26,10 +26,6 @@ public abstract class AuthController {
         return businessAccounts;
     }
 
-    public AccountsRepository getRepo() {
-        return repo;
-    }
-
     public void createAccount(String name, String password, String address, int endpoint, boolean isBusiness) {
         if (isBusiness) {
             BusinessAccount account = new BusinessAccount(name, password, endpoint, address);

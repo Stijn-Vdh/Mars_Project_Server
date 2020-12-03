@@ -51,18 +51,14 @@ class UserAccountTest {
     @Test
     void testFriendsToDB() {
         FriendsRepository friendRepo = Repositories.getFriendsRepo();
-        Set<UserAccount> users = new HashSet<>();
 
-        users.add(testDanny);
-        users.add(testDebby);
-        users.add(testPol);
 
-        assertEquals(0, friendRepo.getFriends(testDanny, users).size());
+        assertEquals(0, friendRepo.getFriends(testDanny).size());
         testDanny.addFriend("Debby");
         testDanny.addFriend("Pol");
-        assertEquals(2, friendRepo.getFriends(testDanny, users).size());
+        assertEquals(2, friendRepo.getFriends(testDanny).size());
         testDanny.removeFriend("Debby");
-        assertEquals(1, friendRepo.getFriends(testDanny, users).size());
+        assertEquals(1, friendRepo.getFriends(testDanny).size());
 
     }
 

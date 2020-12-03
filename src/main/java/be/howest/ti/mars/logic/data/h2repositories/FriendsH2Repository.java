@@ -2,6 +2,7 @@ package be.howest.ti.mars.logic.data.h2repositories;
 
 import be.howest.ti.mars.logic.controller.accounts.UserAccount;
 import be.howest.ti.mars.logic.controller.exceptions.DatabaseException;
+import be.howest.ti.mars.logic.data.Repositories;
 import be.howest.ti.mars.logic.data.util.MarsConnection;
 import be.howest.ti.mars.logic.data.repositories.FriendsRepository;
 
@@ -22,10 +23,16 @@ public class FriendsH2Repository implements FriendsRepository {
     private static final String SQL_INSERT_FRIEND = "INSERT INTO friends(friendName, userName) VALUES(?,?)";
     private static final String SQL_DELETE_FRIEND = "DELETE FROM friends WHERE friendName=? AND userName=?";
 
-    @Override
-    public Set<UserAccount> getFriends(UserAccount user, Set<UserAccount> users) { // TODO: 20-11-2020 hacky?
-        Set<UserAccount> friends = new HashSet<>();
 
+    @Override
+    public boolean friendExists(String name, UserAccount user){
+        return Repositories.getFriendsRepo().getFriends(user).contains(new UserAccount(name));
+    }
+
+
+    @Override
+    public Set<UserAccount> getFriends(UserAccount user) {
+        Set<UserAccount> friends = new HashSet<>();
         try (Connection con = MarsConnection.getConnection();
              PreparedStatement stmt = con.prepareStatement(SQL_SELECT_ALL_FRIENDS)) {
             stmt.setString(1, user.getUsername());
@@ -33,7 +40,7 @@ public class FriendsH2Repository implements FriendsRepository {
                 while (rs.next()) {
                     String name = rs.getString("friendName");
                     friends.add(
-                            users.stream()
+                            Repositories.getAccountsRepo().getUserAccounts().stream()
                                     .filter(userAccount -> userAccount.getUsername().equals(name))
                                     .findAny()
                                     .orElseThrow()

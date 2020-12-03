@@ -42,6 +42,8 @@ public class AccountsH2Repository implements AccountsRepository {
             stmt.setString(2, account.getPassword());
             stmt.setString(3, account.getAddress());
             stmt.setInt(4, account.getHomeAddressEndpoint());
+
+
             stmt.executeUpdate();
         } catch (SQLException ex) {
             LOGGER.log(Level.WARNING, ex.getMessage(), ex);
@@ -165,6 +167,9 @@ public class AccountsH2Repository implements AccountsRepository {
 
     @Override
     public void setDisplayName(UserAccount acc, String displayName) {
+        if (displayName.equals("")) {
+            displayName = acc.getUsername();
+        }
         try (Connection con = MarsConnection.getConnection();
              PreparedStatement stmt = con.prepareStatement(SQL_UPDATE_USER_DN)) {
             stmt.setString(1, displayName);
