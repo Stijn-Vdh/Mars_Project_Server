@@ -5,6 +5,7 @@ import be.howest.ti.mars.logic.controller.accounts.BaseAccount;
 import be.howest.ti.mars.logic.controller.accounts.BusinessAccount;
 import be.howest.ti.mars.logic.controller.enums.DeliveryType;
 import be.howest.ti.mars.logic.controller.exceptions.DatabaseException;
+import be.howest.ti.mars.logic.controller.exceptions.EntityNotFoundException;
 import be.howest.ti.mars.logic.data.util.MarsConnection;
 import be.howest.ti.mars.logic.data.Repositories;
 import be.howest.ti.mars.logic.data.repoInterfaces.DeliveriesRepository;
@@ -83,19 +84,19 @@ public class DeliveriesH2Repository implements DeliveriesRepository {
 
     @Override
     public Object getDeliveryInformation(BaseAccount acc, int id) {
-        EndpointsRepository repo = Repositories.getEndpointsRepo();
-        Delivery delivery = null;
+
         try (Connection con = MarsConnection.getConnection();
              PreparedStatement stmt = con.prepareStatement(SQL_SELECT_DELIVERY)) {
             stmt.setString(1, acc.getUsername());
             stmt.setInt(2, id);
 
             try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    delivery = createDelivery(rs);
+                if (rs.next()){
+                    return createDelivery(rs);
+                }else{
+                    throw new EntityNotFoundException("Could not get delivery information.");
                 }
             }
-            return delivery;
 
         } catch (SQLException ex) {
             LOGGER.log(Level.WARNING, ex.getMessage(), ex);
