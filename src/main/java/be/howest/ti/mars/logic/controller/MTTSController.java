@@ -14,7 +14,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class MarsController extends AuthController {
+public class MTTSController extends AuthController {
     private static final String MOTD = "SmellyEllie";
     private final EndpointsRepository endpointRepo = Repositories.getEndpointsRepo();
 
