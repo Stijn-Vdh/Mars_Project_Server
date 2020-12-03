@@ -42,7 +42,7 @@ public class EndpointsRepoTest {
     @Test
     void addEndpoint_1(){
        int totalEndpoints = Repositories.getEndpointsRepo().getEndpoints().size();
-       Repositories.getEndpointsRepo().addEndpoint("Beveren");
+       Repositories.getEndpointsRepo().addEndpoint("Brugge");
        assertEquals(totalEndpoints + 1,Repositories.getEndpointsRepo().getEndpoints().size());
 
        assertThrows(MarsIllegalArgumentException.class, ()-> Repositories.getEndpointsRepo().addEndpoint("Brugge"));
