@@ -73,12 +73,6 @@ class MarsOpenApiBridge {
     public Object sendPackage(RoutingContext ctx) {
         JsonObject json = ctx.getBodyAsJson();
         boolean isUser = isUserAccountToken(ctx);
-        if (isUser && DeliveryType.enumOf(json.getString("deliveryType")) == DeliveryType.LARGE) {
-            throw new AuthenticationException("!Only businesses can send large package pods!");
-        }
-        if (json.getInteger("from").equals(json.getInteger(DESTINATION))) {
-            throw new AuthenticationException("!You cannot use the same endpoint as destination and from!");
-        }
         int id = controller.sendPackage(DeliveryType.enumOf(json.getString("deliveryType")),
                 json.getInteger("from"),
                 json.getInteger(DESTINATION),
