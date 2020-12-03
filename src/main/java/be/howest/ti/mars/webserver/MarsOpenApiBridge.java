@@ -30,7 +30,6 @@ class MarsOpenApiBridge {
     private final MTTSController controller;
 
 
-
     MarsOpenApiBridge() {
         this.controller = new MTTSController();
     }
@@ -136,11 +135,8 @@ class MarsOpenApiBridge {
 
     public Object buySubscription(RoutingContext ctx) {
         int subscriptionId = ctx.getBodyAsJson().getInteger("subscriptionId");
-        if (isUserAccountToken(ctx)) {
-            getUserAccount(ctx).setSubscriptionId(subscriptionId);
-        } else {
-            getBusinessAccount(ctx).setSubscriptionId(subscriptionId);
-        }
+        getAccount(ctx).setSubscriptionId(subscriptionId);
+
         return "Thank you for buying a subscription.";
     }
 
@@ -255,12 +251,18 @@ class MarsOpenApiBridge {
     }
 
     private BaseAccount getAccount(RoutingContext ctx) {
-        UserAccount account = getUserAccount(ctx);
+        BaseAccount account = getUserAccount(ctx);
         return account != null ? account : getBusinessAccount(ctx);
+//        if (account != null) return account;
+//        account = getBusinessAccount(ctx);
+//        if (account != null) return account;
+//        return new NullAccount("");
+
     }
 
     private UserAccount getUserAccount(RoutingContext ctx) {
         AccountToken accountToken = Json.decodeValue(new JsonObject().put(TOKEN, getBearerToken(ctx)).toString(), AccountToken.class);
+
         return controller.getUserAccounts().stream()
                 .filter(acc -> accountToken.equals(acc.getAccountToken()))
                 .findAny()

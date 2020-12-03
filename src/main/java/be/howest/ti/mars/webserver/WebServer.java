@@ -236,12 +236,12 @@ public class WebServer extends AbstractVerticle {
 
     private void onInternalServerError(RoutingContext ctx) {
         try {
-            throw ctx.failure();
+            throw (Exception) ctx.failure();
         } catch (UsernameException | AuthenticationException | EndpointException ex) {
             replyWithFailure(ctx, 402, ex.getMessage(), ex.getMessage());
         } catch (EntityNotFoundException ex) {
             replyWithFailure(ctx, 422, "Entity couldn't be found", ex.getMessage());
-        } catch (Throwable ex) {
+        } catch (Exception ex) {
             LOGGER.log(Level.SEVERE, () -> String.format("onInternalServerError at %s", ctx.request().absoluteURI()));
             LOGGER.log(Level.WARNING, ex.getMessage(), ex);
             replyWithFailure(ctx, 500, "Internal Server Error", null);

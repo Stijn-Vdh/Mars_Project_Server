@@ -7,14 +7,14 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.util.Objects;
 
-public class BaseAccount {
+public abstract class BaseAccount {
     protected static final AccountsRepository repo = Repositories.getAccountsRepo();
+    private final String username; // needs to be unique
     protected AccountToken accountToken;
+    protected int subscriptionId;
     private Integer homeAddressEndpoint; //replace with endpoint class
     private String password; // needs to be replaced with Password class which will contain hashed version
-    private final String username; // needs to be unique
     private String address; // just random info
-    protected int subscriptionId;
 
     public BaseAccount(String username, String password, String address, int homeAddressEndpoint) {
         this(null, homeAddressEndpoint, password, username, address);
@@ -36,17 +36,21 @@ public class BaseAccount {
         return homeAddressEndpoint;
     }
 
+    public void setHomeAddressEndpoint(Integer homeAddressEndpoint) {
+        this.homeAddressEndpoint = homeAddressEndpoint;
+    }
+
     @JsonIgnore
     public String getPassword() {
         return password;
     }
 
-    public String getUsername() {
-        return username;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
-    public void setAccountToken(AccountToken accountToken) {
-        this.accountToken = accountToken;
+    public String getUsername() {
+        return username;
     }
 
     @JsonIgnore
@@ -54,20 +58,16 @@ public class BaseAccount {
         return accountToken;
     }
 
-    public void setHomeAddressEndpoint(Integer homeAddressEndpoint) {
-        this.homeAddressEndpoint = homeAddressEndpoint;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
+    public void setAccountToken(AccountToken accountToken) {
+        this.accountToken = accountToken;
     }
 
     public String getAddress() {
         return address;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setAddress(String address) {
+        this.address = address;
     }
 
     @Override
@@ -83,5 +83,7 @@ public class BaseAccount {
         return Objects.hash(username.toLowerCase());
     }
 
+    public abstract int getSubscriptionId();
 
+    public abstract void setSubscriptionId(int subscriptionId);
 }

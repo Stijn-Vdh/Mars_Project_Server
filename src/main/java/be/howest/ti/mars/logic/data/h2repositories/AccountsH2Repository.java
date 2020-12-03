@@ -48,28 +48,28 @@ public class AccountsH2Repository implements AccountsRepository {
             throw new DatabaseException("Cannot add account!");
         }
     }
-
-    @Override
-    public Set<BaseAccount> getAccounts() {
-        Set<BaseAccount> accounts = new HashSet<>();
-
-        try (Connection con = MarsConnection.getConnection();
-             PreparedStatement stmt = con.prepareStatement(SQL_SELECT_ACCOUNTS);
-             ResultSet rs = stmt.executeQuery()) {
-
-            while (rs.next()) {
-                String name = rs.getString("name");
-                String password = rs.getString(PASSWORD);
-                String address = rs.getString(HOME_ADDRESS);
-                int endpointId = rs.getInt(HOME_ENDPOINT_ID);
-                accounts.add(new BaseAccount(name, password, address, endpointId));
-            }
-        } catch (SQLException ex) {
-            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
-            throw new DatabaseException("Cannot get all accounts.");
-        }
-        return accounts;
-    }
+//
+//    @Override
+//    public Set<BaseAccount> getAccounts() {
+//        Set<BaseAccount> accounts = new HashSet<>();
+//
+//        try (Connection con = MarsConnection.getConnection();
+//             PreparedStatement stmt = con.prepareStatement(SQL_SELECT_ACCOUNTS);
+//             ResultSet rs = stmt.executeQuery()) {
+//
+//            while (rs.next()) {
+//                String name = rs.getString("name");
+//                String password = rs.getString(PASSWORD);
+//                String address = rs.getString(HOME_ADDRESS);
+//                int endpointId = rs.getInt(HOME_ENDPOINT_ID);
+//                accounts.add(new BaseAccount(name, password, address, endpointId));
+//            }
+//        } catch (SQLException ex) {
+//            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
+//            throw new DatabaseException("Cannot get all accounts.");
+//        }
+//        return accounts;
+//    }
 
     @Override
     public Set<UserAccount> getUserAccounts() {

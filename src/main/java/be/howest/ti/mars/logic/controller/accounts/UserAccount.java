@@ -42,6 +42,7 @@ public class UserAccount extends BaseAccount {
         return subscriptionId;
     }
 
+    @Override
     public void setSubscriptionId(int subscriptionId) {
         Repositories.getSubscriptionRepo().setUserSubscription(this, subscriptionId);
         this.subscriptionId = subscriptionId;

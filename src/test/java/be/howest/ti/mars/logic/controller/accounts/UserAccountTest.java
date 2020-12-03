@@ -114,4 +114,13 @@ class UserAccountTest {
         });
     }
 
+    @Test
+    void testEquals() {
+        UserAccount account2 = new UserAccount("Test");
+        UserAccount account1 = new UserAccount("Test");
+
+        assertEquals(account1, account2);
+
+    }
+
 }

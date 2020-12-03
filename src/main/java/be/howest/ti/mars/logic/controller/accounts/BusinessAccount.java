@@ -41,6 +41,7 @@ public class BusinessAccount extends BaseAccount {
         return subscriptionId;
     }
 
+    @Override
     public void setSubscriptionId(int subscriptionId) {
         Repositories.getSubscriptionRepo().setBusinessSubscription(this, subscriptionId);
         this.subscriptionId = subscriptionId;
