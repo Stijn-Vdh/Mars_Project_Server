@@ -65,6 +65,10 @@ public class BridgeTest {
         return body.substring(1, body.length() - 1);
     }
 
+    private void login(final VertxTestContext testContext, Runnable runnable) {
+        login(testContext, loginBodyJson, runnable);
+    }
+
     @BeforeEach
     void deploy(final VertxTestContext testContext) {
         vertx = Vertx.vertx();
@@ -154,7 +158,6 @@ public class BridgeTest {
         ));
     }
 
-
     @Test
     public void startWebServer(final VertxTestContext testContext) {
         testContext.completeNow();
@@ -190,10 +193,9 @@ public class BridgeTest {
                 400, IGNORE_BODY);
     }
 
-    private void login(final VertxTestContext testContext, Runnable runnable) {
+    private void login(final VertxTestContext testContext, JsonObject loginBodyJson, Runnable runnable) {
         chain(testContext, HttpMethod.POST, "login", null, loginBodyJson, 200, body -> {
             token = AUTHORIZATION_TOKEN_PREFIX + trimBody(body);
-            System.out.println("set token: " + token);
             return true;
         }, runnable);
     }
@@ -245,6 +247,14 @@ public class BridgeTest {
     public void shareLocationInvalid(final VertxTestContext testContext) {
         shareLocation(testContext, HttpMethod.POST, 200, () -> shareLocation(testContext, HttpMethod.POST, 402, testContext::completeNow));
     }
+
+    @Test
+    public void changePassword(final VertxTestContext testContext) {
+        chain(testContext, HttpMethod.POST, "changePassword", token, new JsonObject().put("newPassword", "jak"), 200, IGNORE_BODY, () -> {
+            login(testContext, loginBodyJson.put("password", "jak"), testContext::completeNow);
+        });
+    }
+
 
 
 }
