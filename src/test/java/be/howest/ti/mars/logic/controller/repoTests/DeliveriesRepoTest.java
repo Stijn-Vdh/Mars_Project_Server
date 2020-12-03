@@ -10,6 +10,7 @@ import be.howest.ti.mars.logic.data.Repositories;
 import be.howest.ti.mars.logic.data.repositories.AccountsRepository;
 import be.howest.ti.mars.logic.data.repositories.DeliveriesRepository;
 import be.howest.ti.mars.logic.data.util.MarsConnection;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -40,25 +41,30 @@ public class DeliveriesRepoTest {
         accountRepo.addBusiness(testPol);
     }
 
-    @Test
-    void addDelivery(){
-        assertEquals(1,controller.sendPackage(DeliveryType.SMALL,1,2,testDanny, true));
-        assertEquals(2,controller.sendPackage(DeliveryType.SMALL,1,2,testDanny, true));
-
-        assertEquals(3,controller.sendPackage(DeliveryType.SMALL,1,2,testDebby, true));
-
-        assertThrows(AuthenticationException.class, () -> controller.sendPackage(DeliveryType.LARGE, 1,2,testDebby, true));
-        assertThrows(AuthenticationException.class, () -> controller.sendPackage(DeliveryType.SMALL, 1,1,testDebby, true));
-
-        assertEquals(4,controller.sendPackage(DeliveryType.SMALL,1,2,testPol, false));
+    @AfterAll
+    static void end() {
+        MarsConnection.getInstance().cleanUp();
     }
 
     @Test
-    void getDeliveryInformation(){
-        Delivery delivery1 = (Delivery) controller.getDelivery(testDanny,1);
+    void addDelivery() {
+        assertEquals(1, controller.sendPackage(DeliveryType.SMALL, 1, 2, testDanny, true));
+        assertEquals(2, controller.sendPackage(DeliveryType.SMALL, 1, 2, testDanny, true));
+
+        assertEquals(3, controller.sendPackage(DeliveryType.SMALL, 1, 2, testDebby, true));
+
+        assertThrows(AuthenticationException.class, () -> controller.sendPackage(DeliveryType.LARGE, 1, 2, testDebby, true));
+        assertThrows(AuthenticationException.class, () -> controller.sendPackage(DeliveryType.SMALL, 1, 1, testDebby, true));
+
+        assertEquals(4, controller.sendPackage(DeliveryType.SMALL, 1, 2, testPol, false));
+    }
+
+    @Test
+    void getDeliveryInformation() {
+        Delivery delivery1 = (Delivery) controller.getDelivery(testDanny, 1);
         assertEquals(DeliveryType.SMALL, delivery1.getDeliveryType());
 
-        Delivery delivery2 = (Delivery) controller.getDelivery(testDebby,3);
+        Delivery delivery2 = (Delivery) controller.getDelivery(testDebby, 3);
         assertEquals(Repositories.getEndpointsRepo().getShortEndpoint(2), delivery2.getDestination());
         assertEquals(Repositories.getEndpointsRepo().getShortEndpoint(1), delivery2.getSource());
         assertEquals("Debby", delivery2.getSender());
