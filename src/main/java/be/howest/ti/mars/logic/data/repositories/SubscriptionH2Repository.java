@@ -178,7 +178,7 @@ public class SubscriptionH2Repository implements SubscriptionRepository {
 
     @Override
     public void setUserSubscription(UserAccount user, int subscriptionId) {
-        if (subscriptionExists(subscriptionId)){
+        if (userSubscriptionExists(subscriptionId)){
             try (Connection con = MarsConnection.getConnection();
                  PreparedStatement stmt = con.prepareStatement(SQL_UPDATE_USER_SUBSCRIPTION)) {
 
@@ -196,7 +196,7 @@ public class SubscriptionH2Repository implements SubscriptionRepository {
 
     @Override
     public void setBusinessSubscription(BusinessAccount business, int subscriptionId) {
-        if (subscriptionExists(subscriptionId)){
+        if (businessSubscriptionExists(subscriptionId)){
             try (Connection con = MarsConnection.getConnection();
                  PreparedStatement stmt = con.prepareStatement(SQL_UPDATE_BUSINESS_SUBSCRIPTION)) {
 
@@ -212,8 +212,12 @@ public class SubscriptionH2Repository implements SubscriptionRepository {
         }
     }
 
-    private boolean subscriptionExists(int id){
-        return getUserSubscriptions().stream().anyMatch(subscription -> subscription.getId() == id) || getBusinessSubscriptions().stream().anyMatch(subscription -> subscription.getId() == id);
+    private boolean businessSubscriptionExists(int id){
+        return getBusinessSubscriptions().stream().anyMatch(subscription -> subscription.getId() == id);
+    }
+
+    private boolean userSubscriptionExists(int id){
+        return getUserSubscriptions().stream().anyMatch(subscription -> subscription.getId() == id);
     }
 
 }

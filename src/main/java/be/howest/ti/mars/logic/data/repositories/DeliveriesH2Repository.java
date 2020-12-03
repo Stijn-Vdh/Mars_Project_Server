@@ -27,9 +27,20 @@ public class DeliveriesH2Repository implements DeliveriesRepository {
     public static final String DESTINATION = "destination";
     public static final String DATE_TIME = "dateTime";
 
+    private Delivery createDelivery(ResultSet rs) throws SQLException {
+        EndpointsRepository repo = Repositories.getEndpointsRepo();
+        int id = rs.getInt("id");
+        String type = rs.getString("deliveryType");
+        int source = rs.getInt("from");
+        int destination = rs.getInt(DESTINATION);
+        String date = rs.getString(DATE_TIME);
+        String sender = rs.getString("sender");
+        return new Delivery(id, DeliveryType.enumOf(type), repo.getShortEndpoint(source), repo.getShortEndpoint(destination), date, sender);
+    }
+
     @Override
     public List<Delivery> getDeliveries(BusinessAccount acc) {
-        EndpointsRepository repo = Repositories.getEndpointsRepo();
+
         List<Delivery> deliveries = new LinkedList<>();
 
         try (Connection con = MarsConnection.getConnection();
@@ -38,14 +49,7 @@ public class DeliveriesH2Repository implements DeliveriesRepository {
 
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-                    int id = rs.getInt("id");
-                    String type = rs.getString("deliveryType");
-                    int source = rs.getInt("from");
-                    int destination = rs.getInt(DESTINATION);
-                    String date = rs.getString(DATE_TIME);
-                    String sender = rs.getString("sender");
-                    Delivery delivery = new Delivery(id, DeliveryType.enumOf(type), repo.getShortEndpoint(source), repo.getShortEndpoint(destination), date, sender);
-                    deliveries.add(delivery);
+                    deliveries.add(createDelivery(rs));
                 }
             }
             return deliveries;
@@ -88,15 +92,7 @@ public class DeliveriesH2Repository implements DeliveriesRepository {
 
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-                    int deliveryId = rs.getInt("id");
-                    String type = rs.getString("deliveryType");
-                    int source = rs.getInt("from");
-                    int destination = rs.getInt(DESTINATION);
-                    String date = rs.getString(DATE_TIME);
-                    String sender = rs.getString("sender");
-
-
-                    delivery = new Delivery(deliveryId, DeliveryType.enumOf(type), repo.getShortEndpoint(source), repo.getShortEndpoint(destination), date, sender);
+                    delivery = createDelivery(rs);
                 }
             }
             return delivery;
