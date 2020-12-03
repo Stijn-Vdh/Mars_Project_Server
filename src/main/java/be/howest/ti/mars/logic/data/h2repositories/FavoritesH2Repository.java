@@ -1,4 +1,4 @@
-package be.howest.ti.mars.logic.data.repositories;
+package be.howest.ti.mars.logic.data.h2repositories;
 
 import be.howest.ti.mars.logic.controller.accounts.BaseAccount;
 import be.howest.ti.mars.logic.controller.converters.ShortEndpoint;
@@ -6,7 +6,7 @@ import be.howest.ti.mars.logic.controller.exceptions.DatabaseException;
 import be.howest.ti.mars.logic.controller.exceptions.MarsIllegalArgumentException;
 import be.howest.ti.mars.logic.data.Repositories;
 import be.howest.ti.mars.logic.data.util.MarsConnection;
-import be.howest.ti.mars.logic.data.repoInterfaces.FavoritesRepository;
+import be.howest.ti.mars.logic.data.repositories.FavoritesRepository;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

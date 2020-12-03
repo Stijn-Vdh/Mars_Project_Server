@@ -1,4 +1,4 @@
-package be.howest.ti.mars.logic.data.repositories;
+package be.howest.ti.mars.logic.data.h2repositories;
 
 import be.howest.ti.mars.logic.controller.Delivery;
 import be.howest.ti.mars.logic.controller.accounts.BaseAccount;
@@ -8,8 +8,8 @@ import be.howest.ti.mars.logic.controller.exceptions.DatabaseException;
 import be.howest.ti.mars.logic.controller.exceptions.EntityNotFoundException;
 import be.howest.ti.mars.logic.data.util.MarsConnection;
 import be.howest.ti.mars.logic.data.Repositories;
-import be.howest.ti.mars.logic.data.repoInterfaces.DeliveriesRepository;
-import be.howest.ti.mars.logic.data.repoInterfaces.EndpointsRepository;
+import be.howest.ti.mars.logic.data.repositories.DeliveriesRepository;
+import be.howest.ti.mars.logic.data.repositories.EndpointsRepository;
 
 import java.sql.*;
 import java.util.LinkedList;

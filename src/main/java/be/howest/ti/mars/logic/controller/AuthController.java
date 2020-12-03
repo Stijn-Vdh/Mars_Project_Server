@@ -7,7 +7,7 @@ import be.howest.ti.mars.logic.controller.exceptions.AuthenticationException;
 import be.howest.ti.mars.logic.controller.exceptions.UsernameException;
 import be.howest.ti.mars.logic.controller.security.AccountToken;
 import be.howest.ti.mars.logic.data.Repositories;
-import be.howest.ti.mars.logic.data.repoInterfaces.AccountsRepository;
+import be.howest.ti.mars.logic.data.repositories.AccountsRepository;
 
 import java.util.HashSet;
 import java.util.Set;

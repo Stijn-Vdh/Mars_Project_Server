@@ -1,9 +1,9 @@
 package be.howest.ti.mars.logic.controller.accounts;
 
 import be.howest.ti.mars.logic.data.Repositories;
-import be.howest.ti.mars.logic.data.repoInterfaces.AccountsRepository;
-import be.howest.ti.mars.logic.data.repoInterfaces.FavoritesRepository;
-import be.howest.ti.mars.logic.data.repoInterfaces.FriendsRepository;
+import be.howest.ti.mars.logic.data.repositories.AccountsRepository;
+import be.howest.ti.mars.logic.data.repositories.FavoritesRepository;
+import be.howest.ti.mars.logic.data.repositories.FriendsRepository;
 import be.howest.ti.mars.logic.data.util.MarsConnection;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -108,6 +108,15 @@ class UserAccountTest {
                 assertEquals(userAccount.getDisplayName(), "Den Danny");
             }
         });
+    }
+
+    @Test
+    void testEquals() {
+        UserAccount account2 = new UserAccount("Test");
+        UserAccount account1 = new UserAccount("Test");
+
+        assertEquals(account1, account2);
+
     }
 
 }

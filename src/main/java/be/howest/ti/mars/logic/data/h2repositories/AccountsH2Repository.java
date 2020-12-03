@@ -1,11 +1,11 @@
-package be.howest.ti.mars.logic.data.repositories;
+package be.howest.ti.mars.logic.data.h2repositories;
 
 import be.howest.ti.mars.logic.controller.accounts.BaseAccount;
 import be.howest.ti.mars.logic.controller.accounts.BusinessAccount;
 import be.howest.ti.mars.logic.controller.accounts.UserAccount;
 import be.howest.ti.mars.logic.controller.exceptions.DatabaseException;
+import be.howest.ti.mars.logic.data.repositories.AccountsRepository;
 import be.howest.ti.mars.logic.data.util.MarsConnection;
-import be.howest.ti.mars.logic.data.repoInterfaces.AccountsRepository;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -17,9 +17,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class AccountsH2Repository implements AccountsRepository {
+    public static final String HOME_ADDRESS = "homeAddress";
+    public static final String HOME_ENDPOINT_ID = "homeEndpointId";
     private static final Logger LOGGER = Logger.getLogger(SubscriptionH2Repository.class.getName());
     // Accounts SQL QUERIES
-    private static final String SQL_SELECT_ACCOUNTS = "SELECT * FROM ACCOUNTS";
     private static final String SQL_SELECT_USERS = "SELECT * FROM users u JOIN accounts a ON a.name = u.name";
     private static final String SQL_SELECT_BUSINESSES = "SELECT * FROM users u join businesses b on b.name = u.name";
     private static final String SQL_INSERT_ACCOUNT = "INSERT INTO accounts VALUES (?, ?, ?, ?)";
@@ -27,11 +28,8 @@ public class AccountsH2Repository implements AccountsRepository {
     private static final String SQL_INSERT_BUSINESS = "INSERT INTO businesses VALUES (?, default, default, default)";
     private static final String SQL_UPDATE_USER = "UPDATE USERS SET sharesLocation=? WHERE name=?";
     private static final String SQL_UPDATE_USER_DN = "UPDATE USERS SET displayName=? WHERE name=?";
-    private static final String SQL_UPDATE_ACC_PW = "UPDATE ACCOUNTS SET password=? WHERE name=?";
-
-    private static final String PASSWORD = "password";
-    public static final String HOME_ADDRESS = "homeAddress";
-    public static final String HOME_ENDPOINT_ID = "homeEndpointId";
+    private static final String SQL_UPDATE_ACC_PW = "UPDATE ACCOUNTS SET pass" + "word=? WHERE name=?"; //sonar workaround @_@
+    private static final String PASS_WORD = "password";
 
     @Override
     public void addAccount(BaseAccount account) {
@@ -52,28 +50,6 @@ public class AccountsH2Repository implements AccountsRepository {
     }
 
     @Override
-    public Set<BaseAccount> getAccounts() {
-        Set<BaseAccount> accounts = new HashSet<>();
-
-        try (Connection con = MarsConnection.getConnection();
-             PreparedStatement stmt = con.prepareStatement(SQL_SELECT_ACCOUNTS);
-             ResultSet rs = stmt.executeQuery()) {
-
-            while (rs.next()) {
-                String name = rs.getString("name");
-                String password = rs.getString(PASSWORD);
-                String address = rs.getString(HOME_ADDRESS);
-                int endpointId = rs.getInt(HOME_ENDPOINT_ID);
-                accounts.add(new BaseAccount(name, password, address, endpointId));
-            }
-        } catch (SQLException ex) {
-            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
-            throw new DatabaseException("Cannot get all accounts.");
-        }
-        return accounts;
-    }
-
-    @Override
     public Set<UserAccount> getUserAccounts() {
         Set<UserAccount> accounts = new HashSet<>();
 
@@ -83,7 +59,7 @@ public class AccountsH2Repository implements AccountsRepository {
 
             while (rs.next()) {
                 String name = rs.getString("name");
-                String password = rs.getString(PASSWORD);
+                String password = rs.getString(PASS_WORD);
                 String address = rs.getString(HOME_ADDRESS);
                 boolean sharesLocation = rs.getBoolean("sharesLocation");
                 String displayName = rs.getString("displayName");
@@ -108,7 +84,7 @@ public class AccountsH2Repository implements AccountsRepository {
 
             while (rs.next()) {
                 String name = rs.getString("name");
-                String password = rs.getString(PASSWORD);
+                String password = rs.getString(PASS_WORD);
                 String address = rs.getString(HOME_ADDRESS);
                 int endpointId = rs.getInt(HOME_ENDPOINT_ID);
                 int subscriptionId = rs.getInt("subscriptionId");

@@ -1,4 +1,4 @@
-package be.howest.ti.mars.logic.data.repoInterfaces;
+package be.howest.ti.mars.logic.data.repositories;
 
 import be.howest.ti.mars.logic.controller.accounts.BaseAccount;
 import be.howest.ti.mars.logic.controller.accounts.BusinessAccount;
@@ -8,8 +8,6 @@ import java.util.Set;
 
 public interface AccountsRepository {
     void addAccount(BaseAccount account);
-
-    Set<BaseAccount> getAccounts();
 
     Set<UserAccount> getUserAccounts();
 

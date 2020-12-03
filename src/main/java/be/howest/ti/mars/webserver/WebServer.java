@@ -34,7 +34,6 @@ public class WebServer extends AbstractVerticle {
     private static final Logger LOGGER = Logger.getLogger(WebServer.class.getName());
     private static final Integer DB_WEB_CONSOLE_FALLBACK = 9000;
     private static final String OPEN_API_SPEC = "openapi-group-15.yaml";
-    private static final String CHNL_ROOT_PATH = "/events/*";
     private final MarsOpenApiBridge bridge;
 
     public WebServer(MarsOpenApiBridge bridge) {
@@ -138,7 +137,7 @@ public class WebServer extends AbstractVerticle {
 
         // Build the router
         Router router = factory.getRouter();
-        router.route(CHNL_ROOT_PATH).handler(createSockJsHandler());
+        router.route("/events/*").handler(createSockJsHandler());
         router.route("/favicon.ico").handler(FaviconHandler.create());
 
         // Install general error handlers
@@ -148,7 +147,7 @@ public class WebServer extends AbstractVerticle {
     }
 
     private void addRoutes(OpenAPI3RouterFactory factory) {
-        addRouteWithCtxFunction(factory, "getMessage", bridge::getMessage);
+        addRouteWithCtxFunction(factory, "getMessage", arg -> bridge.getMessage());
         addRouteWithCtxFunction(factory, "createAccount", bridge::createAccount);
         addRouteWithCtxFunction(factory, "login", bridge::login);
         addRouteWithCtxFunction(factory, "viewSubscriptions", bridge::viewSubscriptions);
@@ -157,7 +156,7 @@ public class WebServer extends AbstractVerticle {
         addRouteWithCtxFunction(factory, "addFriend", bridge::addFriend);
         addRouteWithCtxFunction(factory, "removeFriend", bridge::removeFriend);
         addRouteWithCtxFunction(factory, "sendPackage", bridge::sendPackage);
-        addRouteWithCtxFunction(factory, "getEndpoints", bridge::getEndpoints);
+        addRouteWithCtxFunction(factory, "getEndpoints", arg -> bridge.getEndpoints());
         addRouteWithCtxFunction(factory, "buySubscription", bridge::buySubscription);
         addRouteWithCtxFunction(factory, "stopSubscription", bridge::stopSubscription);
         addRouteWithCtxFunction(factory, "viewSubscriptionInfo", bridge::viewSubscriptionInfo);
@@ -165,7 +164,7 @@ public class WebServer extends AbstractVerticle {
         addRouteWithCtxFunction(factory, "stopSharingLocation", bridge::stopSharingLocation);
         addRouteWithCtxFunction(factory, "getEndpoint", bridge::getEndpoint);
         addRouteWithCtxFunction(factory, "report", bridge::addReport);
-        addRouteWithCtxFunction(factory, "reportSections", bridge::getReportSections);
+        addRouteWithCtxFunction(factory, "reportSections", arg -> bridge.getReportSections());
         addRouteWithCtxFunction(factory, "favoriteEndpoint", bridge::favoriteEndpoint);
         addRouteWithCtxFunction(factory, "unfavoriteEndpoint", bridge::unFavoriteEndpoint);
         addRouteWithCtxFunction(factory, "getAccountInformation", bridge::getAccountInformation);
@@ -234,12 +233,12 @@ public class WebServer extends AbstractVerticle {
 
     private void onInternalServerError(RoutingContext ctx) {
         try {
-            throw ctx.failure();
+            throw (Exception) ctx.failure();
         } catch (UsernameException | AuthenticationException | EndpointException | MarsIllegalArgumentException ex) {
             replyWithFailure(ctx, 402, ex.getMessage(), ex.getMessage());
         } catch (EntityNotFoundException ex) {
-            replyWithFailure(ctx, 422, "Entity couldn't not be found", ex.getMessage());
-        } catch (Throwable ex) {
+            replyWithFailure(ctx, 422, "Entity couldn't be found", ex.getMessage());
+        } catch (Exception ex) {
             LOGGER.log(Level.SEVERE, () -> String.format("onInternalServerError at %s", ctx.request().absoluteURI()));
             LOGGER.log(Level.WARNING, ex.getMessage(), ex);
             replyWithFailure(ctx, 500, "Internal Server Error", null);

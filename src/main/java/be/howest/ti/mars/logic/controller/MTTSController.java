@@ -9,7 +9,6 @@ import be.howest.ti.mars.logic.controller.exceptions.EndpointException;
 import be.howest.ti.mars.logic.controller.exceptions.UsernameException;
 import be.howest.ti.mars.logic.data.Repositories;
 import io.vertx.core.json.JsonObject;
-
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -21,10 +20,10 @@ public class MTTSController extends AuthController {
     }
 
     public int sendPackage(DeliveryType deliveryType, int from, int destination, BaseAccount acc, boolean userAcc) {
-        if (!userAcc){
-            Repositories.getSubscriptionRepo().updateBusinessSubscription(deliveryType.equals(DeliveryType.LARGE),(BusinessAccount) acc);
+        if (!userAcc) {
+            Repositories.getSubscriptionRepo().updateBusinessSubscription(deliveryType.equals(DeliveryType.LARGE), (BusinessAccount) acc);
         }
-       return Repositories.getDeliveriesRepo().addDelivery(new Delivery(0,deliveryType, Repositories.getEndpointsRepo().getShortEndpoint(from), Repositories.getEndpointsRepo().getShortEndpoint(destination), "", acc.getUsername()));
+        return Repositories.getDeliveriesRepo().addDelivery(new Delivery(0, deliveryType, Repositories.getEndpointsRepo().getShortEndpoint(from), Repositories.getEndpointsRepo().getShortEndpoint(destination), "", acc.getUsername()));
     }
 
     public Object addFriend(UserAccount user, String friendName) {
@@ -86,7 +85,7 @@ public class MTTSController extends AuthController {
 
     public int travel(UserAccount acc, int from, int destination, String type) { // getShortEndpoint also validates if endpoint exists
         if (from == destination) throw new EndpointException("Destination and from are the same endpoint");
-        return Repositories.getTravelsRepo().travel(acc, new Travel(0,Repositories.getEndpointsRepo().getShortEndpoint(from), Repositories.getEndpointsRepo().getShortEndpoint(destination), PodType.enumOf(type), ""));
+        return Repositories.getTravelsRepo().travel(acc, new Travel(0, Repositories.getEndpointsRepo().getShortEndpoint(from), Repositories.getEndpointsRepo().getShortEndpoint(destination), PodType.enumOf(type), ""));
     }
 
     public Object getTravelHistory(UserAccount acc) {
@@ -99,8 +98,8 @@ public class MTTSController extends AuthController {
 
     public Object getCurrentRouteInfo(UserAccount acc) {
         List<Travel> travelList = new LinkedList<>(Repositories.getTravelsRepo().getTravelHistory(acc));
-        if (!travelList.isEmpty()){
-            return travelList.get(travelList.size()-1);
+        if (!travelList.isEmpty()) {
+            return travelList.get(travelList.size() - 1);
         }
         return "You have not requested any travel pods recently";
     }

@@ -1,7 +1,7 @@
 package be.howest.ti.mars.logic.data;
 
-import be.howest.ti.mars.logic.data.repoInterfaces.*;
 import be.howest.ti.mars.logic.data.repositories.*;
+import be.howest.ti.mars.logic.data.h2repositories.*;
 
 public class Repositories {
 

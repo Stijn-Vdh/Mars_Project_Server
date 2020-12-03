@@ -6,9 +6,9 @@ import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 
 public class UserAccount extends BaseAccount {
+    private static final String CHNL_TO_CLIENT_NOTIFICATION = "events.client.";
     private boolean sharesLocation;
     private String displayName;
-    private static final String CHNL_TO_CLIENT_NOTIFICATION = "events.client.";
 
     public UserAccount(String username, String password, int homeAddressEndpoint, String address) {
         super(username, password, address, homeAddressEndpoint);
@@ -33,23 +33,19 @@ public class UserAccount extends BaseAccount {
         return displayName;
     }
 
-    public void setSharesLocation(boolean sharesLocation) {
-        repo.setShareLocation(this, sharesLocation);
-        this.sharesLocation = sharesLocation;
+    public void setDisplayName(String displayName) {
+        repo.setDisplayName(this, displayName);
+        this.displayName = displayName;
     }
 
     public int getSubscriptionId() {
         return subscriptionId;
     }
 
+    @Override
     public void setSubscriptionId(int subscriptionId) {
         Repositories.getSubscriptionRepo().setUserSubscription(this, subscriptionId);
         this.subscriptionId = subscriptionId;
-    }
-
-    public void setDisplayName(String displayName) {
-        repo.setDisplayName(this, displayName);
-        this.displayName = displayName;
     }
 
     public void addFriend(String friendName) {
@@ -64,6 +60,11 @@ public class UserAccount extends BaseAccount {
         return sharesLocation;
     }
 
+    public void setSharesLocation(boolean sharesLocation) {
+        repo.setShareLocation(this, sharesLocation);
+        this.sharesLocation = sharesLocation;
+    }
+
     public void sendNotification(Vertx vertx, NotificationType type, int id) {
         if (accountToken != null) {
             JsonObject message = new JsonObject();
@@ -72,4 +73,16 @@ public class UserAccount extends BaseAccount {
             vertx.eventBus().send(CHNL_TO_CLIENT_NOTIFICATION + accountToken.getTokenBase64(), message);
         }
     }
+
+    @Override
+    public boolean equals(Object o) {  // sonar +__+
+        return super.equals(o);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
+
 }

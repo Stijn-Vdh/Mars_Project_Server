@@ -1,10 +1,10 @@
-package be.howest.ti.mars.logic.data.repositories;
+package be.howest.ti.mars.logic.data.h2repositories;
 
 import be.howest.ti.mars.logic.controller.accounts.UserAccount;
 import be.howest.ti.mars.logic.controller.exceptions.DatabaseException;
 import be.howest.ti.mars.logic.data.Repositories;
 import be.howest.ti.mars.logic.data.util.MarsConnection;
-import be.howest.ti.mars.logic.data.repoInterfaces.FriendsRepository;
+import be.howest.ti.mars.logic.data.repositories.FriendsRepository;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
