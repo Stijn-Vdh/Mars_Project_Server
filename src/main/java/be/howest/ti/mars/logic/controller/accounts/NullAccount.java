@@ -4,7 +4,7 @@ public class NullAccount extends BaseAccount {
 
     public NullAccount(String name) {
         super(name);
-        throw new RuntimeException();
+        throw new IllegalArgumentException(" not used");
     }
 
     @Override
@@ -14,6 +14,6 @@ public class NullAccount extends BaseAccount {
 
     @Override
     public void setSubscriptionId(int subscriptionId) {
-
+        //
     }
 }

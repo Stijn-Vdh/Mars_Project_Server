@@ -9,8 +9,6 @@ import java.util.Set;
 public interface AccountsRepository {
     void addAccount(BaseAccount account);
 
-    //Set<BaseAccount> getAccounts();
-
     Set<UserAccount> getUserAccounts();
 
     Set<BusinessAccount> getBusinessAccounts();

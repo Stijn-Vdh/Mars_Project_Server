@@ -46,4 +46,15 @@ public class BusinessAccount extends BaseAccount {
         Repositories.getSubscriptionRepo().setBusinessSubscription(this, subscriptionId);
         this.subscriptionId = subscriptionId;
     }
+
+    @Override
+    public boolean equals(Object o) {  // sonar +__+
+        return super.equals(o);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
 }

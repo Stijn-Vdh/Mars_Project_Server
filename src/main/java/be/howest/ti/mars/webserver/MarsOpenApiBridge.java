@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 
 class MarsOpenApiBridge {
     public static final String AUTHORIZATION_TOKEN_PREFIX = "Bearer ";
+    public static final String DESTINATION = "destination";
     private static final String TOKEN = "token";
     private static final Random rand = new Random();
     private static final Timer timer = new Timer();
@@ -72,15 +73,15 @@ class MarsOpenApiBridge {
     public Object sendPackage(RoutingContext ctx) {
         JsonObject json = ctx.getBodyAsJson();
         boolean isUser = isUserAccountToken(ctx);
-        if (isUser && DeliveryType.enumOf(json.getString("deliveryType")) == DeliveryType.LARGE){
+        if (isUser && DeliveryType.enumOf(json.getString("deliveryType")) == DeliveryType.LARGE) {
             throw new AuthenticationException("!Only businesses can send large package pods!");
         }
-        if (json.getInteger("from").equals(json.getInteger("destination"))){
+        if (json.getInteger("from").equals(json.getInteger(DESTINATION))) {
             throw new AuthenticationException("!You cannot use the same endpoint as destination and from!");
         }
         int id = controller.sendPackage(DeliveryType.enumOf(json.getString("deliveryType")),
                 json.getInteger("from"),
-                json.getInteger("destination"),
+                json.getInteger(DESTINATION),
                 getAccount(ctx),
                 isUser
         );
@@ -125,7 +126,6 @@ class MarsOpenApiBridge {
         String friendName = ctx.request().getParam("fName");
 
 
-
         return controller.addFriend(user, friendName);
     }
 
@@ -146,17 +146,11 @@ class MarsOpenApiBridge {
     public Object buySubscription(RoutingContext ctx) {
         int subscriptionId = ctx.getBodyAsJson().getInteger("subscriptionId");
         getAccount(ctx).setSubscriptionId(subscriptionId);
-
         return "Thank you for buying a subscription.";
     }
 
     public Object stopSubscription(RoutingContext ctx) {
-
-        if (isUserAccountToken(ctx)) {
-            getUserAccount(ctx).setSubscriptionId(0);
-        } else {
-            getBusinessAccount(ctx).setSubscriptionId(0);
-        }
+        getAccount(ctx).setSubscriptionId(0);
         return "We are sorry that you have discontinued your current subscription.";
     }
 
@@ -210,7 +204,7 @@ class MarsOpenApiBridge {
 
     public Object travel(RoutingContext ctx) {
         int from = ctx.getBodyAsJson().getInteger("from");
-        int destination = ctx.getBodyAsJson().getInteger("destination");
+        int destination = ctx.getBodyAsJson().getInteger(DESTINATION);
         String podType = ctx.getBodyAsJson().getString("podType");
         UserAccount user = getUserAccount(ctx);
         int id = controller.travel(user, from, destination, podType);
@@ -263,11 +257,6 @@ class MarsOpenApiBridge {
     private BaseAccount getAccount(RoutingContext ctx) {
         BaseAccount account = getUserAccount(ctx);
         return account != null ? account : getBusinessAccount(ctx);
-//        if (account != null) return account;
-//        account = getBusinessAccount(ctx);
-//        if (account != null) return account;
-//        return new NullAccount("");
-
     }
 
     private UserAccount getUserAccount(RoutingContext ctx) {

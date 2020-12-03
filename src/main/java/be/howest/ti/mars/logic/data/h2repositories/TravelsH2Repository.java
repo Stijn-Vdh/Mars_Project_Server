@@ -4,29 +4,26 @@ import be.howest.ti.mars.logic.controller.Travel;
 import be.howest.ti.mars.logic.controller.accounts.UserAccount;
 import be.howest.ti.mars.logic.controller.enums.PodType;
 import be.howest.ti.mars.logic.controller.exceptions.DatabaseException;
-import be.howest.ti.mars.logic.data.util.MarsConnection;
 import be.howest.ti.mars.logic.data.Repositories;
 import be.howest.ti.mars.logic.data.repositories.EndpointsRepository;
 import be.howest.ti.mars.logic.data.repositories.TravelsRepository;
+import be.howest.ti.mars.logic.data.util.MarsConnection;
 
 import java.sql.*;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 public class TravelsH2Repository implements TravelsRepository {
 
+    public static final String DESTINATION = "destination";
+    public static final String DATE_TIME = "dateTime";
     private static final Logger LOGGER = Logger.getLogger(SubscriptionH2Repository.class.getName());
-
     // Travels SQL QUERIES
     private static final String SQL_INSERT_TRAVEL = "INSERT INTO TRAVELS VALUES(default, ?, ?, ?, DEFAULT, ?, NULL)";
     private static final String SQL_SELECT_TRAVEL_HISTORY = "SELECT * FROM TRAVELS t WHERE userName=? ";
     private static final String SQL_DELETE_TRAVEL = "DELETE FROM TRAVELS WHERE userName=? AND ID=?";
-
-    public static final String DESTINATION = "destination";
-    public static final String DATE_TIME = "dateTime";
 
     @Override
     public List<Travel> getTravelHistory(UserAccount acc) {
@@ -76,7 +73,7 @@ public class TravelsH2Repository implements TravelsRepository {
 
     @Override
     public void cancelTravel(UserAccount user, int tripID) {
-        if (tripExists(user, tripID)){
+        if (tripExists(user, tripID)) {
             try (Connection con = MarsConnection.getConnection();
                  PreparedStatement stmt = con.prepareStatement(SQL_DELETE_TRAVEL)) {
                 stmt.setString(1, user.getUsername());
@@ -87,12 +84,12 @@ public class TravelsH2Repository implements TravelsRepository {
                 LOGGER.log(Level.WARNING, ex.getMessage(), ex);
                 throw new DatabaseException("Could not cancel travel/trip.");
             }
-        }else{
+        } else {
             throw new DatabaseException("This trip does not exist");
         }
     }
 
-    private boolean tripExists(UserAccount acc ,int id){
+    private boolean tripExists(UserAccount acc, int id) {
         return getTravelHistory(acc).stream().anyMatch(trip -> trip.getId() == id);
     }
 }
