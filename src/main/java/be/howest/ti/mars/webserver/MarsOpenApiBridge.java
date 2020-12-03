@@ -6,6 +6,7 @@ import be.howest.ti.mars.logic.controller.accounts.BusinessAccount;
 import be.howest.ti.mars.logic.controller.accounts.UserAccount;
 import be.howest.ti.mars.logic.controller.enums.DeliveryType;
 import be.howest.ti.mars.logic.controller.enums.NotificationType;
+import be.howest.ti.mars.logic.controller.exceptions.AuthenticationException;
 import be.howest.ti.mars.logic.controller.security.AccountToken;
 import be.howest.ti.mars.logic.controller.security.SecureHash;
 import be.howest.ti.mars.logic.data.Repositories;
@@ -69,9 +70,15 @@ class MarsOpenApiBridge {
         return rand.nextInt(5) * 1000L;
     }
 
-    public Object sendPackage(RoutingContext ctx) { // TODO: 21-11-2020 add missing validation: only business can send large packages, etc , from != dest
+    public Object sendPackage(RoutingContext ctx) {
         JsonObject json = ctx.getBodyAsJson();
         boolean isUser = isUserAccountToken(ctx);
+        if (isUser && DeliveryType.enumOf(json.getString("deliveryType")) == DeliveryType.LARGE){
+            throw new AuthenticationException("!Only businesses can send large package pods!");
+        }
+        if (json.getInteger("from").equals(json.getInteger("destination"))){
+            throw new AuthenticationException("!You cannot use the same endpoint as destination and from!");
+        }
         int id = controller.sendPackage(DeliveryType.enumOf(json.getString("deliveryType")),
                 json.getInteger("from"),
                 json.getInteger("destination"),
@@ -108,15 +115,18 @@ class MarsOpenApiBridge {
     }
 
     public Object viewFriends(RoutingContext ctx) {
-        return Repositories.getFriendsRepo().getFriends(getUserAccount(ctx), controller.getUserAccounts())
+        return Repositories.getFriendsRepo().getFriends(getUserAccount(ctx))
                 .stream()
                 .map(UserAccount::getUsername)
                 .collect(Collectors.toUnmodifiableList());
     }
 
-    public Object addFriend(RoutingContext ctx) { // TODO: 21-11-2020 cant friend businesses
+    public Object addFriend(RoutingContext ctx) {
         UserAccount user = getUserAccount(ctx);
         String friendName = ctx.request().getParam("fName");
+
+
+
         return controller.addFriend(user, friendName);
     }
 
@@ -163,7 +173,7 @@ class MarsOpenApiBridge {
         return "Now sharing location with friends.";
     }
 
-    public Object stopSharingLocation(RoutingContext ctx) { // TODO: 21-11-2020 should we care if someone tries stopping his location sharing when it is already stopped ?
+    public Object stopSharingLocation(RoutingContext ctx) {
         getUserAccount(ctx).setSharesLocation(false);
         return "Not sharing location anymore with friends.";
     }
@@ -223,7 +233,7 @@ class MarsOpenApiBridge {
         int id = Integer.parseInt(ctx.request().getParam("id"));
         controller.cancelTrip(getUserAccount(ctx), id);
 
-        return null;
+        return "Successfully canceled trip: " + id;
     }
 
     public Object setDisplayName(RoutingContext ctx) {
@@ -291,6 +301,5 @@ class MarsOpenApiBridge {
     public void startDailyResetCompanyPods() {
         timer.scheduleAtFixedRate(wrap(this::resetBusinessUsedPods), 0, RESET_PERIOD);
     }
-
 
 }
