@@ -26,15 +26,7 @@ public class FriendsH2Repository implements FriendsRepository {
 
     @Override
     public boolean friendExists(String name, UserAccount user){
-        Set<UserAccount> friends = new HashSet<>(Repositories.getFriendsRepo().getFriends(user));
-        boolean res = false;
-        for (UserAccount friend: friends) {
-            if (friend.getUsername().equals(name)){
-                res = true;
-                break;
-            }
-        }
-        return res;
+        return Repositories.getFriendsRepo().getFriends(user).contains(new UserAccount(name));
     }
 
 

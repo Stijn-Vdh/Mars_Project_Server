@@ -1,9 +1,6 @@
 package be.howest.ti.mars.webserver;
 
-import be.howest.ti.mars.logic.controller.exceptions.AuthenticationException;
-import be.howest.ti.mars.logic.controller.exceptions.EndpointException;
-import be.howest.ti.mars.logic.controller.exceptions.EntityNotFoundException;
-import be.howest.ti.mars.logic.controller.exceptions.UsernameException;
+import be.howest.ti.mars.logic.controller.exceptions.*;
 import be.howest.ti.mars.logic.data.util.MarsConnection;
 import io.vertx.config.ConfigRetriever;
 import io.vertx.core.AbstractVerticle;
@@ -238,7 +235,7 @@ public class WebServer extends AbstractVerticle {
     private void onInternalServerError(RoutingContext ctx) {
         try {
             throw ctx.failure();
-        } catch (UsernameException | AuthenticationException | EndpointException ex) {
+        } catch (UsernameException | AuthenticationException | EndpointException | MarsIllegalArgumentException ex) {
             replyWithFailure(ctx, 402, ex.getMessage(), ex.getMessage());
         } catch (EntityNotFoundException ex) {
             replyWithFailure(ctx, 422, "Entity couldn't not be found", ex.getMessage());

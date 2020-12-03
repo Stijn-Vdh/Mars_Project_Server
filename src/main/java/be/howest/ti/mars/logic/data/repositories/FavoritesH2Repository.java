@@ -3,6 +3,7 @@ package be.howest.ti.mars.logic.data.repositories;
 import be.howest.ti.mars.logic.controller.accounts.BaseAccount;
 import be.howest.ti.mars.logic.controller.converters.ShortEndpoint;
 import be.howest.ti.mars.logic.controller.exceptions.DatabaseException;
+import be.howest.ti.mars.logic.controller.exceptions.MarsIllegalArgumentException;
 import be.howest.ti.mars.logic.data.Repositories;
 import be.howest.ti.mars.logic.data.util.MarsConnection;
 import be.howest.ti.mars.logic.data.repoInterfaces.FavoritesRepository;
@@ -62,7 +63,7 @@ public class FavoritesH2Repository implements FavoritesRepository {
                 throw new DatabaseException(ERROR_MESSAGE_FAVOURITE);
             }
         }else{
-            throw new IllegalArgumentException(ERROR_MESSAGE_FAVOURITE);
+            throw new MarsIllegalArgumentException(ERROR_MESSAGE_FAVOURITE);
         }
     }
 
@@ -79,7 +80,7 @@ public class FavoritesH2Repository implements FavoritesRepository {
                 throw new DatabaseException(ERROR_MESSAGE_UNFAVORITE);
             }
         }else{
-            throw new IllegalArgumentException(ERROR_MESSAGE_UNFAVORITE);
+            throw new MarsIllegalArgumentException(ERROR_MESSAGE_UNFAVORITE);
         }
     }
 
