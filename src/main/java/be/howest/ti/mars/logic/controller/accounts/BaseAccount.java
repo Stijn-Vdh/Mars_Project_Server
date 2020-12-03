@@ -2,7 +2,7 @@ package be.howest.ti.mars.logic.controller.accounts;
 
 import be.howest.ti.mars.logic.controller.security.AccountToken;
 import be.howest.ti.mars.logic.data.Repositories;
-import be.howest.ti.mars.logic.data.repoInterfaces.AccountsRepository;
+import be.howest.ti.mars.logic.data.repositories.AccountsRepository;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.util.Objects;

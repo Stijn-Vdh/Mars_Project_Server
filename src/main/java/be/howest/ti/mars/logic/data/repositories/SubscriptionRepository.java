@@ -1,17 +1,11 @@
-package be.howest.ti.mars.logic.data.repoInterfaces;
+package be.howest.ti.mars.logic.data.repositories;
 
-import be.howest.ti.mars.logic.controller.Delivery;
-import be.howest.ti.mars.logic.controller.Endpoint;
-import be.howest.ti.mars.logic.controller.Travel;
-import be.howest.ti.mars.logic.controller.accounts.BaseAccount;
 import be.howest.ti.mars.logic.controller.accounts.BusinessAccount;
 import be.howest.ti.mars.logic.controller.accounts.UserAccount;
-import be.howest.ti.mars.logic.controller.converters.ShortEndpoint;
 import be.howest.ti.mars.logic.controller.subscription.BusinessSubscription;
 import be.howest.ti.mars.logic.controller.subscription.BusinessSubscriptionInfo;
 import be.howest.ti.mars.logic.controller.subscription.UserSubscription;
 
-import java.util.List;
 import java.util.Set;
 
 public interface SubscriptionRepository {

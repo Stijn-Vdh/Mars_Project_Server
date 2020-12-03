@@ -1,4 +1,4 @@
-package be.howest.ti.mars.logic.data.repositories;
+package be.howest.ti.mars.logic.data.h2repositories;
 
 import be.howest.ti.mars.logic.controller.accounts.BusinessAccount;
 import be.howest.ti.mars.logic.controller.accounts.UserAccount;
@@ -6,7 +6,7 @@ import be.howest.ti.mars.logic.controller.exceptions.DatabaseException;
 import be.howest.ti.mars.logic.controller.subscription.BusinessSubscription;
 import be.howest.ti.mars.logic.controller.subscription.BusinessSubscriptionInfo;
 import be.howest.ti.mars.logic.controller.subscription.UserSubscription;
-import be.howest.ti.mars.logic.data.repoInterfaces.SubscriptionRepository;
+import be.howest.ti.mars.logic.data.repositories.SubscriptionRepository;
 import be.howest.ti.mars.logic.data.util.MarsConnection;
 
 import java.sql.*;

@@ -151,7 +151,7 @@ public class WebServer extends AbstractVerticle {
     }
 
     private void addRoutes(OpenAPI3RouterFactory factory) {
-        addRouteWithCtxFunction(factory, "getMessage", bridge::getMessage);
+        addRouteWithCtxFunction(factory, "getMessage", arg -> bridge.getMessage());
         addRouteWithCtxFunction(factory, "createAccount", bridge::createAccount);
         addRouteWithCtxFunction(factory, "login", bridge::login);
         addRouteWithCtxFunction(factory, "viewSubscriptions", bridge::viewSubscriptions);
@@ -160,7 +160,7 @@ public class WebServer extends AbstractVerticle {
         addRouteWithCtxFunction(factory, "addFriend", bridge::addFriend);
         addRouteWithCtxFunction(factory, "removeFriend", bridge::removeFriend);
         addRouteWithCtxFunction(factory, "sendPackage", bridge::sendPackage);
-        addRouteWithCtxFunction(factory, "getEndpoints", bridge::getEndpoints);
+        addRouteWithCtxFunction(factory, "getEndpoints", arg -> bridge.getEndpoints());
         addRouteWithCtxFunction(factory, "buySubscription", bridge::buySubscription);
         addRouteWithCtxFunction(factory, "stopSubscription", bridge::stopSubscription);
         addRouteWithCtxFunction(factory, "viewSubscriptionInfo", bridge::viewSubscriptionInfo);
@@ -168,7 +168,7 @@ public class WebServer extends AbstractVerticle {
         addRouteWithCtxFunction(factory, "stopSharingLocation", bridge::stopSharingLocation);
         addRouteWithCtxFunction(factory, "getEndpoint", bridge::getEndpoint);
         addRouteWithCtxFunction(factory, "report", bridge::addReport);
-        addRouteWithCtxFunction(factory, "reportSections", bridge::getReportSections);
+        addRouteWithCtxFunction(factory, "reportSections", arg -> bridge.getReportSections());
         addRouteWithCtxFunction(factory, "favoriteEndpoint", bridge::favoriteEndpoint);
         addRouteWithCtxFunction(factory, "unfavoriteEndpoint", bridge::unFavoriteEndpoint);
         addRouteWithCtxFunction(factory, "getAccountInformation", bridge::getAccountInformation);

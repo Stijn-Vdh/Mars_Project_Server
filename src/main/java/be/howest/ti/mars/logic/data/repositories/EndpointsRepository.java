@@ -1,4 +1,4 @@
-package be.howest.ti.mars.logic.data.repoInterfaces;
+package be.howest.ti.mars.logic.data.repositories;
 
 import be.howest.ti.mars.logic.controller.Endpoint;
 import be.howest.ti.mars.logic.controller.converters.ShortEndpoint;

@@ -48,7 +48,7 @@ class MarsOpenApiBridge {
         };
     }
 
-    public Object getMessage(RoutingContext ctx) {
+    public Object getMessage() {
         return controller.getMessage();
     }
 
@@ -168,7 +168,7 @@ class MarsOpenApiBridge {
         return "Not sharing location anymore with friends.";
     }
 
-    public Object getEndpoints(RoutingContext ctx) {
+    public Object getEndpoints() {
         return Repositories.getEndpointsRepo().getEndpoints();
     }
 
@@ -198,7 +198,7 @@ class MarsOpenApiBridge {
         return "Report has been received.";
     }
 
-    public Object getReportSections(RoutingContext ctx) {
+    public Object getReportSections() {
         return Repositories.getReportsRepo().getReportSections();
     }
 

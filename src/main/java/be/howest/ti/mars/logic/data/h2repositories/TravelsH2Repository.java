@@ -1,4 +1,4 @@
-package be.howest.ti.mars.logic.data.repositories;
+package be.howest.ti.mars.logic.data.h2repositories;
 
 import be.howest.ti.mars.logic.controller.Travel;
 import be.howest.ti.mars.logic.controller.accounts.UserAccount;
@@ -6,8 +6,8 @@ import be.howest.ti.mars.logic.controller.enums.PodType;
 import be.howest.ti.mars.logic.controller.exceptions.DatabaseException;
 import be.howest.ti.mars.logic.data.util.MarsConnection;
 import be.howest.ti.mars.logic.data.Repositories;
-import be.howest.ti.mars.logic.data.repoInterfaces.EndpointsRepository;
-import be.howest.ti.mars.logic.data.repoInterfaces.TravelsRepository;
+import be.howest.ti.mars.logic.data.repositories.EndpointsRepository;
+import be.howest.ti.mars.logic.data.repositories.TravelsRepository;
 
 import java.sql.*;
 import java.util.LinkedList;

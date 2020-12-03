@@ -1,4 +1,4 @@
-package be.howest.ti.mars.logic.data.repositories;
+package be.howest.ti.mars.logic.data.h2repositories;
 
 import be.howest.ti.mars.logic.controller.Endpoint;
 import be.howest.ti.mars.logic.controller.converters.ShortEndpoint;
@@ -6,7 +6,7 @@ import be.howest.ti.mars.logic.controller.exceptions.DatabaseException;
 import be.howest.ti.mars.logic.controller.exceptions.EndpointException;
 import be.howest.ti.mars.logic.data.util.MarsConnection;
 import be.howest.ti.mars.logic.data.Repositories;
-import be.howest.ti.mars.logic.data.repoInterfaces.EndpointsRepository;
+import be.howest.ti.mars.logic.data.repositories.EndpointsRepository;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
