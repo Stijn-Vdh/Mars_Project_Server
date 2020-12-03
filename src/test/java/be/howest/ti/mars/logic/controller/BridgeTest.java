@@ -1,7 +1,5 @@
 package be.howest.ti.mars.logic.controller;
 
-import be.howest.ti.mars.logic.data.Repositories;
-import be.howest.ti.mars.logic.data.repositories.AccountsRepository;
 import be.howest.ti.mars.webserver.WebServer;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
@@ -32,11 +30,10 @@ public class BridgeTest {
     private static final int PORT = 8080;
     private static final String HOST = "localhost";
     // Parameters and headers
-    private static final String DEFAULT_PLAYER_NAME = "alice";
+    private static final String DEFAULT_USER_NAME = "alice";
+    private static final String DEFAULT_BUS_NAME = "comp b";
     private static final String DEFAULT_PASS_WORD = "test";
     private static final String AUTHORIZATION_TOKEN_PREFIX = "Bearer ";
-    private static final MTTSController controller = new MTTSController();
-    private static final AccountsRepository repo = Repositories.getAccountsRepo();
     private static final JsonObject createAccountJson = new JsonObject()
             .put("name", "henk")
             .put("password", "test")
@@ -44,19 +41,32 @@ public class BridgeTest {
             .put("homeAddress", " ")
             .put("homeEndpointId", 1);
 
-    private static final JsonObject loginAccountJson = new JsonObject()
-            .put("name", DEFAULT_PLAYER_NAME)
+    private static final JsonObject userAccountJson = new JsonObject()
+            .put("name", DEFAULT_USER_NAME)
             .put("password", DEFAULT_PASS_WORD)
             .put("businessAccount", false)
             .put("homeAddress", " ")
             .put("homeEndpointId", 1);
+
+    private static final JsonObject businessAccountJson = new JsonObject()
+            .put("name", DEFAULT_BUS_NAME)
+            .put("password", DEFAULT_PASS_WORD)
+            .put("businessAccount", true)
+            .put("homeAddress", " ")
+            .put("homeEndpointId", 2);
+
     private static final JsonObject loginBodyJson = new JsonObject()
-            .put("name", DEFAULT_PLAYER_NAME).put("password", DEFAULT_PASS_WORD);
+            .put("name", DEFAULT_USER_NAME).put("password", DEFAULT_PASS_WORD);
+
+    private static final JsonObject loginBusBodyJson = new JsonObject()
+            .put("name", DEFAULT_BUS_NAME).put("password", DEFAULT_PASS_WORD);
     // Response body validators
     private static final Predicate<String> IGNORE_BODY = body -> true;
     private static final JsonObject INVALID_BODY = new JsonObject().put("random", "data");
-    private static String token;
-
+    private static final Runnable NO_END = () -> {
+    };
+    private static String userToken;
+    private static String businessToken;
     // utils
     private Vertx vertx;
     private WebClient webClient;
@@ -75,7 +85,11 @@ public class BridgeTest {
         vertx.deployVerticle(new WebServer());
         webClient = WebClient.create(vertx);
 
-        createAccount(testContext, loginAccountJson, () -> login(testContext, testContext::completeNow));
+        //add user and login, add business and login
+        createAccount(testContext, userAccountJson,
+                () -> login(testContext,
+                        () -> createAccount(testContext, businessAccountJson,
+                                () -> loginBus(testContext, loginBusBodyJson, testContext::completeNow))));
     }
 
     @AfterEach
@@ -103,6 +117,7 @@ public class BridgeTest {
         // Do as expected:
         makeRequest(method, requestURI, authorizationHeader).sendJson(body, testContext.succeeding(response ->
                 testContext.verify(() -> {
+                    System.out.println(response.bodyAsString());
                     assertEquals(expectedStatusCode, response.statusCode());
                     assertTrue(isExpectedBody.test(response.bodyAsString()));
                     testContext.completeNow();
@@ -115,6 +130,7 @@ public class BridgeTest {
     ) {
         makeRequest(method, requestURI, authorizationHeader).send(testContext.succeeding(response ->
                 testContext.verify(() -> {
+                    System.out.println(response.bodyAsString());
                     assertEquals(expectedStatusCode, response.statusCode());
                     String body = response.bodyAsString();
                     assertTrue(
@@ -132,6 +148,7 @@ public class BridgeTest {
     ) {
         makeRequest(method, requestURI, authorizationHeader).send(testContext.succeeding(response ->
                 testContext.verify(() -> {
+                    System.out.println(response.bodyAsString());
                     assertEquals(expectedStatusCode, response.statusCode());
                     String body = response.bodyAsString();
                     assertTrue(
@@ -151,6 +168,7 @@ public class BridgeTest {
         // Do as expected:
         makeRequest(method, requestURI, authorizationHeader).sendJson(body, testContext.succeeding(response ->
                 testContext.verify(() -> {
+                    System.out.println(response.bodyAsString());
                     assertEquals(expectedStatusCode, response.statusCode());
                     assertTrue(isExpectedBody.test(response.bodyAsString()));
                     runnable.run();
@@ -195,7 +213,14 @@ public class BridgeTest {
 
     private void login(final VertxTestContext testContext, JsonObject loginBodyJson, Runnable runnable) {
         chain(testContext, HttpMethod.POST, "login", null, loginBodyJson, 200, body -> {
-            token = AUTHORIZATION_TOKEN_PREFIX + trimBody(body);
+            userToken = AUTHORIZATION_TOKEN_PREFIX + trimBody(body);
+            return true;
+        }, runnable);
+    }
+
+    private void loginBus(final VertxTestContext testContext, JsonObject loginBodyJson, Runnable runnable) {
+        chain(testContext, HttpMethod.POST, "login", null, loginBodyJson, 200, body -> {
+            businessToken = AUTHORIZATION_TOKEN_PREFIX + trimBody(body);
             return true;
         }, runnable);
     }
@@ -206,22 +231,26 @@ public class BridgeTest {
     }
 
     @Test
+    public void loginBus(final VertxTestContext testContext) {
+        loginBus(testContext, loginBusBodyJson, testContext::completeNow);
+    }
+
+    @Test
     public void logoutInvalidToken(final VertxTestContext testContext) {
         chainEnd(testContext, HttpMethod.DELETE, "login", null, 401, IGNORE_BODY);
     }
 
     @Test
     public void logout(final VertxTestContext testContext) {
-        chainEnd(testContext, HttpMethod.DELETE, "login", token, 200, IGNORE_BODY);
+        chainEnd(testContext, HttpMethod.DELETE, "login", userToken, 200, IGNORE_BODY);
     }
 
     private void shareLocation(final VertxTestContext testContext, HttpMethod method, int code, Runnable chain) {
-        chain(testContext, HttpMethod.POST, "shareLocation", token, code, IGNORE_BODY, chain);
+        chain(testContext, method, "shareLocation", userToken, code, IGNORE_BODY, chain);
     }
 
     @Test
     public void shareLocation(final VertxTestContext testContext) {
-        System.out.println("share loc: " + token);
         shareLocation(testContext, HttpMethod.POST, 200, testContext::completeNow);
     }
 
@@ -250,8 +279,8 @@ public class BridgeTest {
 
     @Test
     public void changePassword(final VertxTestContext testContext) {
-        chain(testContext, HttpMethod.POST, "changePassword", token, new JsonObject().put("newPassword", "jak"), 200, IGNORE_BODY,
-                () -> login(testContext, loginBodyJson.put("password", "jak"), testContext::completeNow)
+        chain(testContext, HttpMethod.POST, "changePassword", userToken, new JsonObject().put("newPassword", "jak"), 200, IGNORE_BODY,
+                () -> login(testContext, new JsonObject().put("name", DEFAULT_USER_NAME).put("password", "jak"), testContext::completeNow)
         );
     }
 
