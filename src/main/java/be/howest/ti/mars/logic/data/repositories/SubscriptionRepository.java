@@ -6,12 +6,13 @@ import be.howest.ti.mars.logic.controller.subscription.BusinessSubscription;
 import be.howest.ti.mars.logic.controller.subscription.BusinessSubscriptionInfo;
 import be.howest.ti.mars.logic.controller.subscription.UserSubscription;
 
+import java.util.List;
 import java.util.Set;
 
 public interface SubscriptionRepository {
-    Set<UserSubscription> getUserSubscriptions(); // TODO: 21-11-2020 add to spec and webserver
+    List<UserSubscription> getUserSubscriptions(); // TODO: 21-11-2020 add to spec and webserver
 
-    Set<BusinessSubscription> getBusinessSubscriptions(); // TODO: 21-11-2020 add to spec and webserver
+    List<BusinessSubscription> getBusinessSubscriptions(); // TODO: 21-11-2020 add to spec and webserver
 
     UserSubscription getUserSubscription(UserAccount user);
 
