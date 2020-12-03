@@ -234,7 +234,7 @@ public class WebServer extends AbstractVerticle {
     private void onInternalServerError(RoutingContext ctx) {
         try {
             throw (Exception) ctx.failure();
-        } catch (UsernameException | AuthenticationException | EndpointException ex) {
+        } catch (UsernameException | AuthenticationException | EndpointException | MarsIllegalArgumentException ex) {
             replyWithFailure(ctx, 402, ex.getMessage(), ex.getMessage());
         } catch (EntityNotFoundException ex) {
             replyWithFailure(ctx, 422, "Entity couldn't be found", ex.getMessage());
