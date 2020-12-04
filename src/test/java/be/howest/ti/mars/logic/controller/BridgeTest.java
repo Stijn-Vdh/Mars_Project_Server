@@ -188,7 +188,7 @@ public class BridgeTest {
     }
 
     private HttpRequest<Buffer> makeRequest(HttpMethod method, String requestURI, String authorizationHeader) {
-        io.vertx.ext.web.client.HttpRequest<io.vertx.core.buffer.Buffer> request = webClient.request(method, PORT, HOST, "/api/" + requestURI);
+        io.vertx.ext.web.client.HttpRequest<io.vertx.core.buffer.Buffer> request = webClient.request(method, WebServer.PORT, HOST, "/api/" + requestURI);
         if (authorizationHeader != null) {
             request.putHeader(
                     HttpHeaders.AUTHORIZATION.toString(),

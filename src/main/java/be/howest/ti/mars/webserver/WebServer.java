@@ -34,6 +34,7 @@ public class WebServer extends AbstractVerticle {
     private static final Logger LOGGER = Logger.getLogger(WebServer.class.getName());
     private static final Integer DB_WEB_CONSOLE_FALLBACK = 9000;
     private static final String OPEN_API_SPEC = "openapi-group-15.yaml";
+    public static int PORT = 8080;
     private final MarsOpenApiBridge bridge;
 
     public WebServer(MarsOpenApiBridge bridge) {
@@ -96,6 +97,7 @@ public class WebServer extends AbstractVerticle {
 
     private void configureOpenApiServer(Promise<Void> promise, String apiSpecification, int port) {
         LOGGER.info(() -> String.format("Starting webserver with spec %s", apiSpecification));
+        PORT = port;
         OpenAPI3RouterFactory.create(vertx,
                 apiSpecification,
                 ar -> {
