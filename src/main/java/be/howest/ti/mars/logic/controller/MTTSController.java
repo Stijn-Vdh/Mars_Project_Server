@@ -9,7 +9,9 @@ import be.howest.ti.mars.logic.controller.exceptions.EndpointException;
 import be.howest.ti.mars.logic.controller.exceptions.UsernameException;
 import be.howest.ti.mars.logic.data.Repositories;
 import io.vertx.core.json.JsonObject;
-import java.util.*;
+
+import java.util.LinkedList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class MTTSController extends AuthController {
@@ -27,7 +29,7 @@ public class MTTSController extends AuthController {
     }
 
     public Object addFriend(UserAccount user, String friendName) {
-        if (friendValidation(user,friendName)) {
+        if (friendValidation(user, friendName)) {
             user.addFriend(friendName);
         } else {
             throw new UsernameException("Could not add a friend with the given username");
@@ -35,9 +37,9 @@ public class MTTSController extends AuthController {
         return "You just added a friend called:" + friendName;
     }
 
-    private boolean friendValidation(UserAccount acc, String friendName){
+    private boolean friendValidation(UserAccount acc, String friendName) { // cant friend yourself or companies, or someone you already friended.
         UserAccount friend = new UserAccount(friendName);
-        return userAccounts.contains(friend) && ! acc.equals(friend);
+        return userAccounts.contains(friend) && !acc.equals(friend) && !Repositories.getFriendsRepo().getFriends(acc).contains(friend);
     }
 
     public Object removeFriend(UserAccount user, String friendName) {

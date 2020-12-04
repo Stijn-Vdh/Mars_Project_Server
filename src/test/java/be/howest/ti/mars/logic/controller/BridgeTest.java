@@ -1,6 +1,5 @@
 package be.howest.ti.mars.logic.controller;
 
-import be.howest.ti.mars.logic.data.h2repositories.SubscriptionH2Repository;
 import be.howest.ti.mars.webserver.WebServer;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -32,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @ExtendWith(VertxExtension.class)
 public class BridgeTest {
 
-    private static final  ObjectMapper objectMapper = new ObjectMapper();
+    private static final ObjectMapper objectMapper = new ObjectMapper();
     private static final Logger LOGGER = Logger.getLogger(BridgeTest.class.getName());
     // i wrote my own chain method so that i could launch requests sync using these async methods
     // keys
@@ -48,7 +47,7 @@ public class BridgeTest {
     private static final String HOST = "localhost";
     // Parameters and headers
     private static final String DEFAULT_USER_NAME = "alice";
-    private static final String DEFAULT_BUS_NAME = "comp b";
+    private static final String DEFAULT_BUSS_NAME = "compB";
     private static final String DEFAULT_PASS_WORD = "test";
     private static final String AUTHORIZATION_TOKEN_PREFIX = "Bearer ";
     private static final String HOME_ENDPOINT_ID = "homeEndpointId";
@@ -68,7 +67,7 @@ public class BridgeTest {
             .put(HOME_ENDPOINT_ID, 1);
 
     private static final JsonObject businessAccountJson = new JsonObject()
-            .put(NAME, DEFAULT_BUS_NAME)
+            .put(NAME, DEFAULT_BUSS_NAME)
             .put(PASS_WORD, DEFAULT_PASS_WORD)
             .put(BUSINESS_ACCOUNT, true)
             .put(HOME_ADDRESS, " ")
@@ -78,7 +77,7 @@ public class BridgeTest {
             .put(NAME, DEFAULT_USER_NAME).put(PASS_WORD, DEFAULT_PASS_WORD);
 
     private static final JsonObject loginBusBodyJson = new JsonObject()
-            .put(NAME, DEFAULT_BUS_NAME).put(PASS_WORD, DEFAULT_PASS_WORD);
+            .put(NAME, DEFAULT_BUSS_NAME).put(PASS_WORD, DEFAULT_PASS_WORD);
 
     private static final JsonObject validPackage = new JsonObject()
             .put(DELIVERY_TYPE, "small")
@@ -415,7 +414,29 @@ public class BridgeTest {
                 ));
     }
 
+    @Test
+    public void addFriendInvalidName(final VertxTestContext testContext) { //dont use friendName with space or non URL allowed char it will shutdown the server.
+        addFriend(testContext, 402, "NOT_EXIST", testContext::completeNow);
+    }
 
+    @Test
+    public void addFriendWhichIsYou(final VertxTestContext testContext) {
+        addFriend(testContext, 402, DEFAULT_USER_NAME, testContext::completeNow);
+    }
+
+    @Test
+
+    public void addFriendWhichIsCompany(final VertxTestContext testContext) {
+        addFriend(testContext, 402, DEFAULT_BUSS_NAME, testContext::completeNow);
+    }
+
+    @Test
+    public void addFriendWhichIsAlreadyFriend(final VertxTestContext testContext) {
+        createAccount(testContext, createAccountJson,
+                () -> addFriend(testContext, 200, createAccountJson.getString(NAME),
+                        () -> addFriend(testContext, 402, createAccountJson.getString(NAME), testContext::completeNow)
+                ));
+    }
 
 
 }
