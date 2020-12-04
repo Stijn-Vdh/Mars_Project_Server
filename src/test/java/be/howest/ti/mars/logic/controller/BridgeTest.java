@@ -402,8 +402,16 @@ public class BridgeTest {
         getFriends(testContext, FRIENDS_BODY_EMPTY, testContext::completeNow);
     }
 
+    private void removeFriend(final VertxTestContext testContext, HttpMethod httpMethod, int code, String friendName, Runnable chain) {
+        chain(testContext, httpMethod, "friend/" + friendName, userToken, code, IGNORE_BODY, chain);
+    }
+
+    private void removeFriend(final VertxTestContext testContext, int code, String friendName, Runnable chain) {
+        removeFriend(testContext, HttpMethod.DELETE, code, friendName, chain);
+    }
+
     private void addFriend(final VertxTestContext testContext, int code, String friendName, Runnable chain) {
-        chain(testContext, HttpMethod.POST, "friend/" + friendName, userToken, code, IGNORE_BODY, chain);
+        removeFriend(testContext, HttpMethod.POST, code, friendName, chain);
     }
 
     @Test
@@ -435,6 +443,14 @@ public class BridgeTest {
         createAccount(testContext, createAccountJson,
                 () -> addFriend(testContext, 200, createAccountJson.getString(NAME),
                         () -> addFriend(testContext, 402, createAccountJson.getString(NAME), testContext::completeNow)
+                ));
+    }
+
+    @Test
+    public void removeFriend(final VertxTestContext testContext) {
+        createAccount(testContext, createAccountJson,
+                () -> addFriend(testContext, 200, createAccountJson.getString(NAME),
+                        () -> removeFriend(testContext, 200, createAccountJson.getString(NAME), testContext::completeNow)
                 ));
     }
 

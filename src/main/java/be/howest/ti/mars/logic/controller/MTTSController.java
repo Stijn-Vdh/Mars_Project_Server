@@ -29,7 +29,7 @@ public class MTTSController extends AuthController {
     }
 
     public Object addFriend(UserAccount user, String friendName) {
-        if (friendValidation(user, friendName)) {
+        if (friendValidation(user, friendName, false)) {
             user.addFriend(friendName);
         } else {
             throw new UsernameException("Could not add a friend with the given username");
@@ -37,13 +37,13 @@ public class MTTSController extends AuthController {
         return "You just added a friend called:" + friendName;
     }
 
-    private boolean friendValidation(UserAccount acc, String friendName) { // cant friend yourself or companies, or someone you already friended.
+    private boolean friendValidation(UserAccount acc, String friendName, boolean notFriended) { // cant friend yourself or companies or someone that you already (un)friended
         UserAccount friend = new UserAccount(friendName);
-        return userAccounts.contains(friend) && !acc.equals(friend) && !Repositories.getFriendsRepo().getFriends(acc).contains(friend);
+        return userAccounts.contains(friend) && !acc.equals(friend) && notFriended == Repositories.getFriendsRepo().getFriends(acc).contains(friend);
     }
 
     public Object removeFriend(UserAccount user, String friendName) {
-        if (userAccounts.contains(new UserAccount(friendName)) && user.getUsername().equals(friendName) && Repositories.getFriendsRepo().friendExists(friendName, user)) {
+        if (friendValidation(user, friendName, true)) {
             user.removeFriend(friendName);
         } else {
             throw new UsernameException("Could not remove a friend with the given username");
