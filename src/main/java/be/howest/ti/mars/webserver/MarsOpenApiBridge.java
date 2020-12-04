@@ -6,7 +6,7 @@ import be.howest.ti.mars.logic.controller.accounts.BusinessAccount;
 import be.howest.ti.mars.logic.controller.accounts.UserAccount;
 import be.howest.ti.mars.logic.controller.enums.DeliveryType;
 import be.howest.ti.mars.logic.controller.enums.NotificationType;
-import be.howest.ti.mars.logic.controller.exceptions.AuthenticationException;
+import be.howest.ti.mars.logic.controller.exceptions.MarsIllegalArgumentException;
 import be.howest.ti.mars.logic.controller.security.AccountToken;
 import be.howest.ti.mars.logic.controller.security.SecureHash;
 import be.howest.ti.mars.logic.data.Repositories;
@@ -74,10 +74,10 @@ class MarsOpenApiBridge {
         JsonObject json = ctx.getBodyAsJson();
         boolean isUser = isUserAccountToken(ctx);
         if (isUser && DeliveryType.enumOf(json.getString("deliveryType")) == DeliveryType.LARGE) {
-            throw new AuthenticationException("!Only businesses can send large package pods!");
+            throw new MarsIllegalArgumentException("!Only businesses can send large package pods!");
         }
         if (json.getInteger("from").equals(json.getInteger(DESTINATION))) {
-            throw new AuthenticationException("!You cannot use the same endpoint as destination and from!");
+            throw new MarsIllegalArgumentException("!You cannot use the same endpoint as destination and from!");
         }
         int id = controller.sendPackage(DeliveryType.enumOf(json.getString("deliveryType")),
                 json.getInteger("from"),

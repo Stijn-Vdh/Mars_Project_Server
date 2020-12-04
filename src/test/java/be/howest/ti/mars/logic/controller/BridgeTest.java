@@ -26,6 +26,7 @@ public class BridgeTest {
 
     // i wrote my own chain method so that i could launch requests sync using these async methods
 
+    public static final String NAME = "name";
     // config
     private static final int PORT = 8080;
     private static final String HOST = "localhost";
@@ -34,32 +35,54 @@ public class BridgeTest {
     private static final String DEFAULT_BUS_NAME = "comp b";
     private static final String DEFAULT_PASS_WORD = "test";
     private static final String AUTHORIZATION_TOKEN_PREFIX = "Bearer ";
+    // BODIES
     private static final JsonObject createAccountJson = new JsonObject()
-            .put("name", "henk")
+            .put(NAME, "henk")
             .put("password", "test")
             .put("businessAccount", false)
             .put("homeAddress", " ")
             .put("homeEndpointId", 1);
 
     private static final JsonObject userAccountJson = new JsonObject()
-            .put("name", DEFAULT_USER_NAME)
+            .put(NAME, DEFAULT_USER_NAME)
             .put("password", DEFAULT_PASS_WORD)
             .put("businessAccount", false)
             .put("homeAddress", " ")
             .put("homeEndpointId", 1);
 
     private static final JsonObject businessAccountJson = new JsonObject()
-            .put("name", DEFAULT_BUS_NAME)
+            .put(NAME, DEFAULT_BUS_NAME)
             .put("password", DEFAULT_PASS_WORD)
             .put("businessAccount", true)
             .put("homeAddress", " ")
             .put("homeEndpointId", 2);
 
     private static final JsonObject loginBodyJson = new JsonObject()
-            .put("name", DEFAULT_USER_NAME).put("password", DEFAULT_PASS_WORD);
+            .put(NAME, DEFAULT_USER_NAME).put("password", DEFAULT_PASS_WORD);
 
     private static final JsonObject loginBusBodyJson = new JsonObject()
-            .put("name", DEFAULT_BUS_NAME).put("password", DEFAULT_PASS_WORD);
+            .put(NAME, DEFAULT_BUS_NAME).put("password", DEFAULT_PASS_WORD);
+
+    private static final JsonObject validPackage = new JsonObject()
+            .put("deliveryType", "small")
+            .put("from", 1)
+            .put("destination", 5);
+
+    private static final JsonObject invalidRoutePackage = new JsonObject()
+            .put("deliveryType", "small")
+            .put("from", 1)
+            .put("destination", 1);
+
+    private static final JsonObject invalidPrivilegePackage = new JsonObject()
+            .put("deliveryType", "large")
+            .put("from", 5)
+            .put("destination", 1);
+
+    private static final JsonObject invalidEndpointIdPackage = new JsonObject()
+            .put("deliveryType", "small")
+            .put("from", 0)
+            .put("destination", 1);
+
     // Response body validators
     private static final Predicate<String> IGNORE_BODY = body -> true;
     private static final JsonObject INVALID_BODY = new JsonObject().put("random", "data");
@@ -280,8 +303,37 @@ public class BridgeTest {
     @Test
     public void changePassword(final VertxTestContext testContext) {
         chain(testContext, HttpMethod.POST, "changePassword", userToken, new JsonObject().put("newPassword", "jak"), 200, IGNORE_BODY,
-                () -> login(testContext, new JsonObject().put("name", DEFAULT_USER_NAME).put("password", "jak"), testContext::completeNow)
+                () -> login(testContext, new JsonObject().put(NAME, DEFAULT_USER_NAME).put("password", "jak"), testContext::completeNow)
         );
+    }
+
+    private void sendPackage(final VertxTestContext testContext, JsonObject body, int code, String token, Runnable chain) {
+        chain(testContext, HttpMethod.POST, "sendPackage", token, body, code, IGNORE_BODY, chain);
+    }
+
+    @Test
+    public void sendPackageAsUser(final VertxTestContext testContext) {
+        sendPackage(testContext, validPackage, 200, userToken, testContext::completeNow);
+    }
+
+    @Test
+    public void sendPackageAsBuss(final VertxTestContext testContext) {
+        sendPackage(testContext, validPackage, 200, businessToken, testContext::completeNow);
+    }
+
+    @Test
+    public void sendInvalidRoutePackage(final VertxTestContext testContext) {
+        sendPackage(testContext, invalidRoutePackage, 402, userToken, testContext::completeNow);
+    }
+
+    @Test
+    public void sendInvalidPrivilegePackage(final VertxTestContext testContext) {
+        sendPackage(testContext, invalidPrivilegePackage, 402, userToken, testContext::completeNow);
+    }
+
+    @Test
+    public void sendInvalidEndpointIdPackage(final VertxTestContext testContext) {
+        sendPackage(testContext, invalidEndpointIdPackage, 402, businessToken, testContext::completeNow);
     }
 
 
