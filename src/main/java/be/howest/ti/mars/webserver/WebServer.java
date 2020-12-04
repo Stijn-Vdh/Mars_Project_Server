@@ -40,6 +40,11 @@ public class WebServer extends AbstractVerticle {
     public WebServer(MarsOpenApiBridge bridge) {
         this.bridge = bridge;
     }
+    public WebServer(int port){
+        this();
+        PORT = port;
+    }
+
 
     public WebServer() {
         this(new MarsOpenApiBridge());
@@ -64,9 +69,9 @@ public class WebServer extends AbstractVerticle {
                 JsonObject dbProperties = properties.getJsonObject("db");
                 configureDatabase(dbProperties);
                 int port = properties.getJsonObject("http").getInteger("port");
-                LOGGER.info(String.format("Starting web server on port %s ", port));
+                LOGGER.info(String.format("Starting web server on port %s ", PORT));
 
-                configureOpenApiServer(promise, OPEN_API_SPEC, port);
+                configureOpenApiServer(promise, OPEN_API_SPEC, PORT);
             }
         });
         try {
