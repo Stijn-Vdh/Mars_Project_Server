@@ -49,7 +49,15 @@ public class WebServer extends AbstractVerticle {
         MarsOpenApiBridge.setVertx(vertx); // there should be a better way
         ConfigRetriever.create(vertx).getConfig(ar -> {
             if (ar.failed()) {
-                LOGGER.warning("Config not available");
+                LOGGER.warning("Config not available, attempting hardcoded values");
+                try {
+                    MarsConnection.configure("jdbc:h2:~/mars-db", "", "", 9000);
+                    LOGGER.info(String.format("Starting web server on port %s ", 8080));
+                    configureOpenApiServer(promise, OPEN_API_SPEC, 8080);
+                } catch (SQLException ex) {
+                    LOGGER.warning("Config not available, hardcoded values failed");
+                    LOGGER.log(Level.SEVERE, ex.getMessage(), ex.getCause());
+                }
             } else {
                 JsonObject properties = ar.result();
                 JsonObject dbProperties = properties.getJsonObject("db");
@@ -60,7 +68,13 @@ public class WebServer extends AbstractVerticle {
                 configureOpenApiServer(promise, OPEN_API_SPEC, port);
             }
         });
-        bridge.startDailyResetCompanyPods();
+        try {
+            MarsConnection.getConnection();
+            bridge.startDailyResetCompanyPods();
+        } catch (SQLException ex) {
+            LOGGER.severe("connection not available");
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex.getCause());
+        }
     }
 
     @Override
