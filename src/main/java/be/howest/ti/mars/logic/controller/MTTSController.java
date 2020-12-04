@@ -59,27 +59,27 @@ public class MTTSController extends AuthController {
 
     private JsonObject getAccountInformation(BaseAccount acc) {
         JsonObject accInformation = new JsonObject();
-        accInformation.put("name:", acc.getUsername());
-        accInformation.put("homeAddress:", acc.getAddress());
-        accInformation.put("homeEndpoint:", acc.getHomeAddressEndpoint());
-        accInformation.put("favouriteEndpoints:", Repositories.getFavoritesRepo().getFavoriteEndpoints(acc));
+        accInformation.put("name", acc.getUsername());
+        accInformation.put("homeAddress", acc.getAddress());
+        accInformation.put("homeEndpoint", acc.getHomeAddressEndpoint());
+        accInformation.put("favouriteEndpoints", Repositories.getFavoritesRepo().getFavoriteEndpoints(acc));
         return accInformation;
     }
 
     public Object getUserAccountInformation(UserAccount account) {
         JsonObject accInformation = getAccountInformation(account);
-        accInformation.put("displayName:", account.getDisplayName());
-        accInformation.put("shareLocation:", account.isSharesLocation());
-        accInformation.put("subscription:", Repositories.getSubscriptionRepo().getUserSubscription(account));
-        accInformation.put("friends:", Repositories.getFriendsRepo().getFriends(account).stream().map(UserAccount::getUsername).collect(Collectors.toList()));
-        accInformation.put("travelHistory:", Repositories.getTravelsRepo().getTravelHistory(account));
+        accInformation.put("displayName", account.getDisplayName());
+        accInformation.put("shareLocation", account.isSharesLocation());
+        accInformation.put("subscription", Repositories.getSubscriptionRepo().getUserSubscription(account));
+        accInformation.put("friends", Repositories.getFriendsRepo().getFriends(account).stream().map(UserAccount::getUsername).collect(Collectors.toList()));
+        accInformation.put("travelHistory", Repositories.getTravelsRepo().getTravelHistory(account));
         return accInformation;
     }
 
     public Object getBusinessAccountInformation(BusinessAccount business) {
         JsonObject accInformation = getAccountInformation(business);
-        accInformation.put("subscription:", Repositories.getSubscriptionRepo().getBusinessSubscription(business));
-        accInformation.put("Current usage subscription:", Repositories.getSubscriptionRepo().getBusinessSubscriptionInfo(business));
+        accInformation.put("subscription", Repositories.getSubscriptionRepo().getBusinessSubscription(business));
+        accInformation.put("Current usage subscription", Repositories.getSubscriptionRepo().getBusinessSubscriptionInfo(business));
         return accInformation;
     }
 

@@ -16,6 +16,8 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.function.Predicate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -24,9 +26,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @ExtendWith(VertxExtension.class)
 public class BridgeTest {
 
+    public static final String PASS_WORD = "password";
+    public static final String BUSINESS_ACCOUNT = "businessAccount";
     // i wrote my own chain method so that i could launch requests sync using these async methods
-
-    public static final String NAME = "name";
+    // keys
+    private static final String NAME = "name";
+    private static final String DESTINATION = "destination";
+    private static final String FROM = "from";
+    private static final String DELIVERY_TYPE = "deliveryType";
+    private static final String HOME_ADDRESS = "homeAddress";
     // config
     private static final int PORT = 8080;
     private static final String HOST = "localhost";
@@ -35,59 +43,75 @@ public class BridgeTest {
     private static final String DEFAULT_BUS_NAME = "comp b";
     private static final String DEFAULT_PASS_WORD = "test";
     private static final String AUTHORIZATION_TOKEN_PREFIX = "Bearer ";
+    private static final String HOME_ENDPOINT_ID = "homeEndpointId";
     // BODIES
     private static final JsonObject createAccountJson = new JsonObject()
             .put(NAME, "henk")
-            .put("password", "test")
-            .put("businessAccount", false)
-            .put("homeAddress", " ")
-            .put("homeEndpointId", 1);
+            .put(PASS_WORD, "test")
+            .put(BUSINESS_ACCOUNT, false)
+            .put(HOME_ADDRESS, " ")
+            .put(HOME_ENDPOINT_ID, 1);
 
     private static final JsonObject userAccountJson = new JsonObject()
             .put(NAME, DEFAULT_USER_NAME)
-            .put("password", DEFAULT_PASS_WORD)
-            .put("businessAccount", false)
-            .put("homeAddress", " ")
-            .put("homeEndpointId", 1);
+            .put(PASS_WORD, DEFAULT_PASS_WORD)
+            .put(BUSINESS_ACCOUNT, false)
+            .put(HOME_ADDRESS, " ")
+            .put(HOME_ENDPOINT_ID, 1);
 
     private static final JsonObject businessAccountJson = new JsonObject()
             .put(NAME, DEFAULT_BUS_NAME)
-            .put("password", DEFAULT_PASS_WORD)
-            .put("businessAccount", true)
-            .put("homeAddress", " ")
-            .put("homeEndpointId", 2);
+            .put(PASS_WORD, DEFAULT_PASS_WORD)
+            .put(BUSINESS_ACCOUNT, true)
+            .put(HOME_ADDRESS, " ")
+            .put(HOME_ENDPOINT_ID, 2);
 
     private static final JsonObject loginBodyJson = new JsonObject()
-            .put(NAME, DEFAULT_USER_NAME).put("password", DEFAULT_PASS_WORD);
+            .put(NAME, DEFAULT_USER_NAME).put(PASS_WORD, DEFAULT_PASS_WORD);
 
     private static final JsonObject loginBusBodyJson = new JsonObject()
-            .put(NAME, DEFAULT_BUS_NAME).put("password", DEFAULT_PASS_WORD);
+            .put(NAME, DEFAULT_BUS_NAME).put(PASS_WORD, DEFAULT_PASS_WORD);
 
     private static final JsonObject validPackage = new JsonObject()
-            .put("deliveryType", "small")
-            .put("from", 1)
-            .put("destination", 5);
+            .put(DELIVERY_TYPE, "small")
+            .put(FROM, 1)
+            .put(DESTINATION, 5);
 
     private static final JsonObject invalidRoutePackage = new JsonObject()
-            .put("deliveryType", "small")
-            .put("from", 1)
-            .put("destination", 1);
+            .put(DELIVERY_TYPE, "small")
+            .put(FROM, 1)
+            .put(DESTINATION, 1);
 
     private static final JsonObject invalidPrivilegePackage = new JsonObject()
-            .put("deliveryType", "large")
-            .put("from", 5)
-            .put("destination", 1);
+            .put(DELIVERY_TYPE, "large")
+            .put(FROM, 5)
+            .put(DESTINATION, 1);
 
     private static final JsonObject invalidEndpointIdPackage = new JsonObject()
-            .put("deliveryType", "small")
-            .put("from", 0)
-            .put("destination", 1);
+            .put(DELIVERY_TYPE, "small")
+            .put(FROM, 0)
+            .put(DESTINATION, 1);
+
+    // key List userAccountInformation
+    private static final List<String> KEY_LIST_USER = Arrays.asList(NAME, HOME_ADDRESS, "homeEndpoint", "displayName", "shareLocation", "subscription", "friends", "travelHistory" , "favouriteEndpoints");
+    private static final List<String> KEY_LIST_BUSS = Arrays.asList(NAME, HOME_ADDRESS, "homeEndpoint", "subscription", "Current usage subscription", "favouriteEndpoints");
+
 
     // Response body validators
     private static final Predicate<String> IGNORE_BODY = body -> true;
+    private static final Predicate<String> USERINFO_BODY = body -> {
+        JsonObject jBody = new JsonObject(body);
+        return KEY_LIST_USER.stream().allMatch(jBody::containsKey);
+    };
+    private static final Predicate<String> BUSS_INFO_BODY = body -> {
+        JsonObject jBody = new JsonObject(body);
+        return KEY_LIST_BUSS.stream().allMatch(jBody::containsKey);
+    };
+    // Random
     private static final JsonObject INVALID_BODY = new JsonObject().put("random", "data");
     private static final Runnable NO_END = () -> {
     };
+    //tokens
     private static String userToken;
     private static String businessToken;
     // utils
@@ -303,7 +327,7 @@ public class BridgeTest {
     @Test
     public void changePassword(final VertxTestContext testContext) {
         chain(testContext, HttpMethod.POST, "changePassword", userToken, new JsonObject().put("newPassword", "jak"), 200, IGNORE_BODY,
-                () -> login(testContext, new JsonObject().put(NAME, DEFAULT_USER_NAME).put("password", "jak"), testContext::completeNow)
+                () -> login(testContext, new JsonObject().put(NAME, DEFAULT_USER_NAME).put(PASS_WORD, "jak"), testContext::completeNow)
         );
     }
 
@@ -336,6 +360,19 @@ public class BridgeTest {
         sendPackage(testContext, invalidEndpointIdPackage, 402, businessToken, testContext::completeNow);
     }
 
+    private void getAccountInformation(final VertxTestContext testContext, int code, String token, Predicate<String> isBody, Runnable chain) {
+        chain(testContext, HttpMethod.GET, "accountInformation", token, code, isBody, chain);
+    }
+
+    @Test
+    public void getUserAccountInformation(final VertxTestContext testContext) {
+        getAccountInformation(testContext, 200, userToken, USERINFO_BODY, testContext::completeNow);
+    }
+
+    @Test
+    public void getBusinessAccountInformation(final VertxTestContext testContext) {
+        getAccountInformation(testContext, 200, businessToken, BUSS_INFO_BODY, testContext::completeNow);
+    }
 
 }
 
