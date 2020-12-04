@@ -1,5 +1,8 @@
 package be.howest.ti.mars.logic.controller;
 
+import be.howest.ti.mars.logic.controller.subscription.BusinessSubscription;
+import be.howest.ti.mars.logic.controller.subscription.UserSubscription;
+import be.howest.ti.mars.logic.data.Repositories;
 import be.howest.ti.mars.webserver.WebServer;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -116,9 +119,9 @@ public class BridgeTest {
     };
     private static final Predicate<String> FRIENDS_BODY_EMPTY = body -> {
         try {
-            List<String> langList = objectMapper.readValue(body, new TypeReference<>() {
+            List<String> friendList = objectMapper.readValue(body, new TypeReference<>() {
             });
-            return langList.isEmpty();
+            return friendList.isEmpty();
         } catch (JsonProcessingException ex) {
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             throw new RuntimeException("Didnt receive an array of string");
@@ -126,6 +129,26 @@ public class BridgeTest {
     };
 
     private static final Predicate<String> FRIENDS_BODY_NOT_EMPTY = Predicate.not(FRIENDS_BODY_EMPTY);
+
+    private static final Predicate<String> USER_SUBSCRIPTIONS = body -> {
+        try {
+            List<UserSubscription> subscriptions = objectMapper.readValue(body, new TypeReference<>() {
+            });
+            return subscriptions.containsAll(Repositories.getSubscriptionRepo().getUserSubscriptions());
+        } catch (JsonProcessingException ex) {
+            return false;
+        }
+    };
+
+    private static final Predicate<String> BUSS_SUBSCRIPTIONS = body -> {
+        try {
+            List<BusinessSubscription> subscriptions = objectMapper.readValue(body, new TypeReference<>() {
+            });
+            return subscriptions.containsAll(Repositories.getSubscriptionRepo().getBusinessSubscriptions());
+        } catch (JsonProcessingException ex) {
+            return false;
+        }
+    };
     // Random
     private static final JsonObject INVALID_BODY = new JsonObject().put("random", "data");
     private static final Runnable NO_END = () -> {
@@ -452,6 +475,27 @@ public class BridgeTest {
                 () -> addFriend(testContext, 200, createAccountJson.getString(NAME),
                         () -> removeFriend(testContext, 200, createAccountJson.getString(NAME), testContext::completeNow)
                 ));
+    }
+
+    @Test
+        // other removeFriend exceptions is handled through the same validation as addFriend
+    void removeFriendWhoIsNotFriended(final VertxTestContext testContext) {
+        createAccount(testContext, createAccountJson,
+                () -> removeFriend(testContext, 402, createAccountJson.getString(NAME), testContext::completeNow));
+    }
+
+    private void getSubscriptions(final VertxTestContext testContext, String token, Predicate<String> isBody, Runnable chain) {
+        chain(testContext, HttpMethod.GET, "subscription", token, 200, isBody, chain);
+    }
+
+    @Test
+    public void getUserSubscriptions(final VertxTestContext testContext) {
+        getSubscriptions(testContext, userToken, USER_SUBSCRIPTIONS, testContext::completeNow);
+    }
+
+    @Test
+    public void getBusinessSubscriptions(final VertxTestContext testContext) {
+        getSubscriptions(testContext, businessToken, BUSS_SUBSCRIPTIONS, testContext::completeNow);
     }
 
 

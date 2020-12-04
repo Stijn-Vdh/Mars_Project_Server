@@ -1,5 +1,8 @@
 package be.howest.ti.mars.logic.controller.subscription;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class BusinessSubscription {
     private final int id;
     private final String name;
@@ -8,7 +11,12 @@ public class BusinessSubscription {
     private final int dedicatedPods;
     private final int priorityLevel;
 
-    public BusinessSubscription(int id, String name, int smallPodsDaily, int largePodsDaily, int dedicatedPods, int priorityLevel) {
+    @JsonCreator
+    public BusinessSubscription(@JsonProperty("id") int id, @JsonProperty("name") String name,
+                                @JsonProperty("smallPodsDaily") int smallPodsDaily,
+                                @JsonProperty("largePodsDaily") int largePodsDaily,
+                                @JsonProperty("dedicatedPods") int dedicatedPods,
+                                @JsonProperty("priorityLevel") int priorityLevel) {
         this.id = id;
         this.name = name;
         this.smallPodsDaily = smallPodsDaily;
@@ -39,5 +47,20 @@ public class BusinessSubscription {
 
     public int getPriorityLevel() {
         return priorityLevel;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        BusinessSubscription that = (BusinessSubscription) o;
+
+        return id == that.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return id;
     }
 }
