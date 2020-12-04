@@ -5,6 +5,7 @@ import be.howest.ti.mars.logic.data.repositories.AccountsRepository;
 import be.howest.ti.mars.logic.data.repositories.FavoritesRepository;
 import be.howest.ti.mars.logic.data.repositories.FriendsRepository;
 import be.howest.ti.mars.logic.data.util.MarsConnection;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -35,6 +36,11 @@ class UserAccountTest {
         repo.addUser(testDebby);
         repo.addUser(testPol);
 
+    }
+
+    @AfterAll
+    static void stop(){
+        MarsConnection.getInstance().cleanUp();
     }
 
 
