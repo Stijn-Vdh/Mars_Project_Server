@@ -1,6 +1,10 @@
 package be.howest.ti.mars.logic.controller;
 
+import be.howest.ti.mars.logic.controller.models.Friend;
 import be.howest.ti.mars.webserver.WebServer;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpHeaders;
@@ -26,8 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @ExtendWith(VertxExtension.class)
 public class BridgeTest {
 
-    public static final String PASS_WORD = "password";
-    public static final String BUSINESS_ACCOUNT = "businessAccount";
+    final static ObjectMapper objectMapper = new ObjectMapper();
     // i wrote my own chain method so that i could launch requests sync using these async methods
     // keys
     private static final String NAME = "name";
@@ -35,6 +38,8 @@ public class BridgeTest {
     private static final String FROM = "from";
     private static final String DELIVERY_TYPE = "deliveryType";
     private static final String HOME_ADDRESS = "homeAddress";
+    private static final String PASS_WORD = "password";
+    private static final String BUSINESS_ACCOUNT = "businessAccount";
     // config
     private static final int PORT = 8080;
     private static final String HOST = "localhost";
@@ -93,7 +98,7 @@ public class BridgeTest {
             .put(DESTINATION, 1);
 
     // key List userAccountInformation
-    private static final List<String> KEY_LIST_USER = Arrays.asList(NAME, HOME_ADDRESS, "homeEndpoint", "displayName", "shareLocation", "subscription", "friends", "travelHistory" , "favouriteEndpoints");
+    private static final List<String> KEY_LIST_USER = Arrays.asList(NAME, HOME_ADDRESS, "homeEndpoint", "displayName", "shareLocation", "subscription", "friends", "travelHistory", "favouriteEndpoints");
     private static final List<String> KEY_LIST_BUSS = Arrays.asList(NAME, HOME_ADDRESS, "homeEndpoint", "subscription", "Current usage subscription", "favouriteEndpoints");
 
 
@@ -106,6 +111,16 @@ public class BridgeTest {
     private static final Predicate<String> BUSS_INFO_BODY = body -> {
         JsonObject jBody = new JsonObject(body);
         return KEY_LIST_BUSS.stream().allMatch(jBody::containsKey);
+    };
+    private static final Predicate<String> FRIENDS_BODY_EMPTY = body -> {
+        try {
+            List<Friend> langList = objectMapper.readValue(body, new TypeReference<>() {
+            });
+            return langList.isEmpty();
+        } catch (JsonProcessingException e) {
+            return false;
+        }
+
     };
     // Random
     private static final JsonObject INVALID_BODY = new JsonObject().put("random", "data");
@@ -373,6 +388,17 @@ public class BridgeTest {
     public void getBusinessAccountInformation(final VertxTestContext testContext) {
         getAccountInformation(testContext, 200, businessToken, BUSS_INFO_BODY, testContext::completeNow);
     }
+
+    private void getFriends(final VertxTestContext testContext, Predicate<String> isBody, Runnable chain) {
+        chain(testContext, HttpMethod.GET, "friend", userToken, 200, isBody, chain);
+    }
+
+    @Test
+    public void getFriends(final VertxTestContext testContext) {
+        getFriends(testContext, FRIENDS_BODY_EMPTY, testContext::completeNow);
+    }
+
+
 
 }
 
