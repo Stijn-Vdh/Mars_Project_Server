@@ -46,7 +46,7 @@ public class BridgeTest {
     private static final String PASS_WORD = "password";
     private static final String BUSINESS_ACCOUNT = "businessAccount";
     // config
-    private static final int PORT = 8888;
+    private static final int PORT = 8080;
     private static final String HOST = "localhost";
     // Parameters and headers
     private static final String DEFAULT_USER_NAME = "alice";
@@ -171,7 +171,7 @@ public class BridgeTest {
     @BeforeEach
     void deploy(final VertxTestContext testContext) {
         vertx = Vertx.vertx();
-        vertx.deployVerticle(new WebServer( PORT));
+        vertx.deployVerticle(new WebServer());
         webClient = WebClient.create(vertx);
 
         //add user and login, add business and login

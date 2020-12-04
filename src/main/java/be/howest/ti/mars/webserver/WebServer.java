@@ -34,17 +34,11 @@ public class WebServer extends AbstractVerticle {
     private static final Logger LOGGER = Logger.getLogger(WebServer.class.getName());
     private static final Integer DB_WEB_CONSOLE_FALLBACK = 9000;
     private static final String OPEN_API_SPEC = "openapi-group-15.yaml";
-    public static int PORT = 8080;
     private final MarsOpenApiBridge bridge;
 
     public WebServer(MarsOpenApiBridge bridge) {
         this.bridge = bridge;
     }
-    public WebServer(int port){
-        this();
-        PORT = port;
-    }
-
 
     public WebServer() {
         this(new MarsOpenApiBridge());
@@ -55,32 +49,18 @@ public class WebServer extends AbstractVerticle {
         MarsOpenApiBridge.setVertx(vertx); // there should be a better way
         ConfigRetriever.create(vertx).getConfig(ar -> {
             if (ar.failed()) {
-                LOGGER.warning("Config not available, attempting hardcoded values");
-                try {
-                    MarsConnection.configure("jdbc:h2:~/mars-db", "", "", 9000);
-                    LOGGER.info(String.format("Starting web server on port %s ", 8080));
-                    configureOpenApiServer(promise, OPEN_API_SPEC, 8080);
-                } catch (SQLException ex) {
-                    LOGGER.warning("Config not available, hardcoded values failed");
-                    LOGGER.log(Level.SEVERE, ex.getMessage(), ex.getCause());
-                }
+                LOGGER.warning("Config not available");
             } else {
                 JsonObject properties = ar.result();
                 JsonObject dbProperties = properties.getJsonObject("db");
                 configureDatabase(dbProperties);
                 int port = properties.getJsonObject("http").getInteger("port");
-                LOGGER.info(String.format("Starting web server on port %s ", PORT));
+                LOGGER.info(String.format("Starting web server on port %s ", port));
 
-                configureOpenApiServer(promise, OPEN_API_SPEC, PORT);
+                configureOpenApiServer(promise, OPEN_API_SPEC, port);
             }
         });
-        try {
-            MarsConnection.getConnection();
-            bridge.startDailyResetCompanyPods();
-        } catch (SQLException ex) {
-            LOGGER.severe("connection not available");
-            LOGGER.log(Level.SEVERE, ex.getMessage(), ex.getCause());
-        }
+        bridge.startDailyResetCompanyPods();
     }
 
     @Override
@@ -102,7 +82,6 @@ public class WebServer extends AbstractVerticle {
 
     private void configureOpenApiServer(Promise<Void> promise, String apiSpecification, int port) {
         LOGGER.info(() -> String.format("Starting webserver with spec %s", apiSpecification));
-        PORT = port;
         OpenAPI3RouterFactory.create(vertx,
                 apiSpecification,
                 ar -> {
