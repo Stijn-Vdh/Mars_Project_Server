@@ -1,6 +1,6 @@
 package be.howest.ti.mars.logic.controller;
 
-import be.howest.ti.mars.logic.controller.models.Friend;
+import be.howest.ti.mars.logic.data.h2repositories.SubscriptionH2Repository;
 import be.howest.ti.mars.webserver.WebServer;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -23,6 +23,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -30,7 +32,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @ExtendWith(VertxExtension.class)
 public class BridgeTest {
 
-    final static ObjectMapper objectMapper = new ObjectMapper();
+    private static final  ObjectMapper objectMapper = new ObjectMapper();
+    private static final Logger LOGGER = Logger.getLogger(BridgeTest.class.getName());
     // i wrote my own chain method so that i could launch requests sync using these async methods
     // keys
     private static final String NAME = "name";
@@ -114,14 +117,16 @@ public class BridgeTest {
     };
     private static final Predicate<String> FRIENDS_BODY_EMPTY = body -> {
         try {
-            List<Friend> langList = objectMapper.readValue(body, new TypeReference<>() {
+            List<String> langList = objectMapper.readValue(body, new TypeReference<>() {
             });
             return langList.isEmpty();
-        } catch (JsonProcessingException e) {
-            return false;
+        } catch (JsonProcessingException ex) {
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+            throw new RuntimeException("Didnt receive an array of string");
         }
-
     };
+
+    private static final Predicate<String> FRIENDS_BODY_NOT_EMPTY = Predicate.not(FRIENDS_BODY_EMPTY);
     // Random
     private static final JsonObject INVALID_BODY = new JsonObject().put("random", "data");
     private static final Runnable NO_END = () -> {
@@ -397,6 +402,19 @@ public class BridgeTest {
     public void getFriends(final VertxTestContext testContext) {
         getFriends(testContext, FRIENDS_BODY_EMPTY, testContext::completeNow);
     }
+
+    private void addFriend(final VertxTestContext testContext, int code, String friendName, Runnable chain) {
+        chain(testContext, HttpMethod.POST, "friend/" + friendName, userToken, code, IGNORE_BODY, chain);
+    }
+
+    @Test
+    public void addFriend(final VertxTestContext testContext) {
+        createAccount(testContext, createAccountJson,
+                () -> addFriend(testContext, 200, createAccountJson.getString(NAME),
+                        () -> getFriends(testContext, FRIENDS_BODY_NOT_EMPTY, testContext::completeNow)
+                ));
+    }
+
 
 
 
