@@ -129,6 +129,9 @@ public class BridgeTest {
             .put("destination", 200)
             .put("from", 5)
             .put("podType", "standard");
+    private static final JsonObject DISPLAY_NAME_BODY = new JsonObject()
+            .put("newDisplayName", "henk");
+
 
     // key List userAccountInformation
     private static final List<String> KEY_LIST_USER = Arrays.asList(NAME, HOME_ADDRESS, "homeEndpoint", "displayName", "shareLocation", "subscription", "friends", "travelHistory", "favouriteEndpoints");
@@ -256,6 +259,11 @@ public class BridgeTest {
         } catch (JsonProcessingException e) {
             return false;
         }
+    };
+
+    private static final Predicate<String> CHECK_NEW_DISPLAY_NAME = body -> {
+        JsonObject jBody = new JsonObject(body);
+        return jBody.containsKey("displayName") && jBody.getString("displayName").equals(DISPLAY_NAME_BODY.getString("newDisplayName"));
     };
 
     // Random
@@ -801,19 +809,29 @@ public class BridgeTest {
     }
 
     private void cancelTravel(final VertxTestContext testContext, int id, int code, Runnable chain) {
-        chain(testContext, HttpMethod.DELETE, "travel/" + id, userToken, code, IGNORE_BODY, chain );
+        chain(testContext, HttpMethod.DELETE, "travel/" + id, userToken, code, IGNORE_BODY, chain);
     }
 
     @Test
-    public void cancelTravel(final VertxTestContext testContext){
+    public void cancelTravel(final VertxTestContext testContext) {
         travel(testContext, 200, TRAVEL_BODY, TRAVEL_RESPONSE,
-                () -> cancelTravel(testContext,1,200, testContext::completeNow));
+                () -> cancelTravel(testContext, 1, 200, testContext::completeNow));
     }
 
     @Test
-    public void cancelTravelInvalid(final VertxTestContext testContext){
+    public void cancelTravelInvalid(final VertxTestContext testContext) {
         travel(testContext, 200, TRAVEL_BODY, TRAVEL_RESPONSE,
-                () -> cancelTravel(testContext,100,422, testContext::completeNow));
+                () -> cancelTravel(testContext, 100, 422, testContext::completeNow));
+    }
+
+    private void setDisplayName(final VertxTestContext testContext, JsonObject body, Runnable chain) {
+        chain(testContext, HttpMethod.POST, "changeDisplayName", userToken, body, 200, IGNORE_BODY, chain);
+    }
+
+    @Test
+    public void setDisplayName(final VertxTestContext testContext) {
+        setDisplayName(testContext, DISPLAY_NAME_BODY,
+                ()-> getAccountInformation(testContext, 200, userToken, CHECK_NEW_DISPLAY_NAME, testContext::completeNow ));
     }
 }
 
