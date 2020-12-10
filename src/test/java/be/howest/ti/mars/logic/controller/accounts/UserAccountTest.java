@@ -45,20 +45,6 @@ class UserAccountTest {
 
 
     @Test
-    void testFriendsToDB() {
-        FriendsRepository friendRepo = Repositories.getFriendsRepo();
-
-
-        assertEquals(0, friendRepo.getFriends(testDanny).size());
-        testDanny.addFriend("Debby");
-        testDanny.addFriend("Pol");
-        assertEquals(2, friendRepo.getFriends(testDanny).size());
-        testDanny.removeFriend("Debby");
-        assertEquals(1, friendRepo.getFriends(testDanny).size());
-
-    }
-
-    @Test
     void testDBEndpoints() {
         FavoritesRepository favoRepo = Repositories.getFavoritesRepo();
         assertEquals(102, Repositories.getEndpointsRepo().getEndpoints().size());
