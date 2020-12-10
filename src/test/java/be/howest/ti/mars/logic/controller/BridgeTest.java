@@ -107,6 +107,12 @@ public class BridgeTest {
             .put("subscriptionId", 2);
     private static final JsonObject invalidSubscriptionBody = new JsonObject()
             .put("subscriptionId", 5);
+    private static final JsonObject REPORT_BODY = new JsonObject()
+            .put("section", "Other")
+            .put("description", "blah blah");
+    private static final JsonObject REPORT_INVALID_BODY = new JsonObject()
+            .put("section", "invalid")
+            .put("description", "blah blah");
 
     // key List userAccountInformation
     private static final List<String> KEY_LIST_USER = Arrays.asList(NAME, HOME_ADDRESS, "homeEndpoint", "displayName", "shareLocation", "subscription", "friends", "travelHistory", "favouriteEndpoints");
@@ -196,6 +202,16 @@ public class BridgeTest {
         try {
             Endpoint endpoint = objectMapper.readValue(body, Endpoint.class);
             return endpoint.getId() == 5;
+        } catch (JsonProcessingException e) {
+            return false;
+        }
+    };
+
+    private static final Predicate<String> REPORT_SECTIONS = body -> {
+        try {
+            List<String> sections = objectMapper.readValue(body, new TypeReference<>() {
+            });
+            return sections.size() > 0;
         } catch (JsonProcessingException e) {
             return false;
         }
@@ -404,7 +420,6 @@ public class BridgeTest {
         shareLocation(testContext, HttpMethod.POST, 200, () -> stopShareLocation(testContext, 200, testContext::completeNow));
     }
 
-
     @Test
     @Disabled
     // decided against validating these as they are harmless
@@ -564,12 +579,10 @@ public class BridgeTest {
         buySubscription(testContext, userToken, invalidSubscriptionBody, 422, testContext::completeNow);
     }
 
-
     @Test
     public void buyBusinessSubscription(final VertxTestContext testContext) {
         buySubscription(testContext, businessToken, validSubscriptionBody, 200, testContext::completeNow);
     }
-
 
     @Test
     public void buyInvalidBussSubscription(final VertxTestContext testContext) {
@@ -634,7 +647,6 @@ public class BridgeTest {
         chain(testContext, httpMethod, "endpoints/favorite/" + id, token, code, IGNORE_BODY, chain);
     }
 
-
     @Test
     public void setUserFavEndpoint(final VertxTestContext testContext) {
         setFavoriteEndpoint(testContext, HttpMethod.POST, 5, userToken, 200, testContext::completeNow);
@@ -643,14 +655,14 @@ public class BridgeTest {
     @Test
     public void setUserUnfavEndpoint(final VertxTestContext testContext) {
         setFavoriteEndpoint(testContext, HttpMethod.POST, 5, userToken, 200,
-                () ->  setFavoriteEndpoint(testContext, HttpMethod.DELETE, 5, userToken, 200, testContext::completeNow));
+                () -> setFavoriteEndpoint(testContext, HttpMethod.DELETE, 5, userToken, 200, testContext::completeNow));
 
     }
 
     @Test
     public void setUserFavEndpointInvalid(final VertxTestContext testContext) {
         setFavoriteEndpoint(testContext, HttpMethod.POST, 5, userToken, 200,
-                () ->  setFavoriteEndpoint(testContext, HttpMethod.POST, 5, userToken, 402, testContext::completeNow));
+                () -> setFavoriteEndpoint(testContext, HttpMethod.POST, 5, userToken, 402, testContext::completeNow));
 
     }
 
@@ -668,21 +680,48 @@ public class BridgeTest {
     @Test
     public void setUserBussEndpoint(final VertxTestContext testContext) {
         setFavoriteEndpoint(testContext, HttpMethod.POST, 5, businessToken, 200,
-                () ->  setFavoriteEndpoint(testContext, HttpMethod.DELETE, 5, businessToken, 200, testContext::completeNow));
+                () -> setFavoriteEndpoint(testContext, HttpMethod.DELETE, 5, businessToken, 200, testContext::completeNow));
     }
 
     @Test
     public void setBussFavEndpointInvalid(final VertxTestContext testContext) {
         setFavoriteEndpoint(testContext, HttpMethod.POST, 5, businessToken, 200,
-                () ->  setFavoriteEndpoint(testContext, HttpMethod.POST, 5, businessToken, 402, testContext::completeNow));
+                () -> setFavoriteEndpoint(testContext, HttpMethod.POST, 5, businessToken, 402, testContext::completeNow));
 
     }
 
     @Test
     public void setBussUnFavEndpointInvalid(final VertxTestContext testContext) {
-        setFavoriteEndpoint(testContext, HttpMethod.DELETE, 5,businessToken, 402, testContext::completeNow);
-
+        setFavoriteEndpoint(testContext, HttpMethod.DELETE, 5, businessToken, 402, testContext::completeNow);
     }
+
+
+    private void getReportSections(final VertxTestContext testContext, Predicate<String> isBody, Runnable chain) {
+        chain(testContext, HttpMethod.GET, "report/sections", null, 200, isBody, chain);
+    }
+
+    @Test
+    public void getReportSections(final VertxTestContext testContext) {
+        getReportSections(testContext, REPORT_SECTIONS, testContext::completeNow);
+    }
+
+    private void addReport(final VertxTestContext testContext, JsonObject body, int code, Runnable chain) {
+        chain(testContext, HttpMethod.POST, "report", userToken, body, code, IGNORE_BODY, chain);
+    }
+
+    @Test
+    public void addReportInvalid(final VertxTestContext testContext) {
+        addReport(testContext, REPORT_INVALID_BODY, 422, testContext::completeNow);
+    }
+
+    @Test
+    public void addReport(final VertxTestContext testContext) {
+        addReport(testContext, REPORT_BODY, 200, testContext::completeNow);
+    }
+
+
+
+
 
 }
 
