@@ -43,15 +43,6 @@ class UserAccountTest {
         MarsConnection.getInstance().cleanUp();
     }
 
-    @Test
-    void addUsersToDB() {
-        UserAccount accountTestDummy = new UserAccount("Dummy", "Dummy", 8, "Blastreet 23");
-
-        assertEquals(3, repo.getUserAccounts().size());
-        repo.addUser(accountTestDummy);
-        assertEquals(4, repo.getUserAccounts().size());
-
-    }
 
     @Test
     void testFriendsToDB() {
@@ -83,45 +74,4 @@ class UserAccountTest {
         assertEquals(1, favoRepo.getFavoriteEndpoints(testDanny).size());
 
     }
-
-    @Test
-    void testDBPassword() {
-        repo.changePassword(testDanny, "blabla");
-
-        repo.getUserAccounts().forEach(userAccount -> {
-            if (userAccount.equals(testDanny)) {
-                assertEquals("blabla", userAccount.getPassword());
-            }
-        });
-    }
-
-    @Test
-    void testDBSetShareLocation() {
-        repo.setShareLocation(testDanny, true);
-        repo.getUserAccounts().forEach(userAccount -> {
-            if (userAccount.equals(testDanny)) {
-                assertTrue(userAccount.isSharesLocation());
-            }
-        });
-    }
-
-    @Test
-    void testDBChangeDisplayName() {
-        repo.setDisplayName(testDanny, "Den Danny");
-        repo.getUserAccounts().forEach(userAccount -> {
-            if (userAccount.equals(testDanny)) {
-                assertEquals(userAccount.getDisplayName(), "Den Danny");
-            }
-        });
-    }
-
-    @Test
-    void testEquals() {
-        UserAccount account2 = new UserAccount("Test");
-        UserAccount account1 = new UserAccount("Test");
-
-        assertEquals(account1, account2);
-
-    }
-
 }
