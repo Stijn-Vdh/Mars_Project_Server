@@ -53,29 +53,39 @@ class AccountsRepoTest {
     @Test
     void changePassword() {
         UserAccount accountTestDummy = new UserAccount("Dummy", "Dummy", 8, "Blastreet 23");
-        String oldPWD = "Dummy";
         String newPWD = "NotADummy";
 
-        assertEquals(oldPWD,accountTestDummy.getPassword());
-        accountTestDummy.setPassword(newPWD);
-        assertEquals(newPWD, accountTestDummy.getPassword());
+        accountRepo.changePassword(accountTestDummy, newPWD);
+
+        accountRepo.getUserAccounts().forEach(userAccount -> {
+            if (userAccount.equals(accountTestDummy)) {
+                assertEquals(newPWD, userAccount.getPassword());
+            }
+        });
     }
 
     @Test
     void setShareLocation() {
         UserAccount accountTestDummy = new UserAccount("Dummy", "Dummy", 8, "Blastreet 23");
-        assertFalse(accountTestDummy.isSharesLocation());
-        accountTestDummy.setSharesLocation(true);
-        assertTrue(accountTestDummy.isSharesLocation());
+
+        accountRepo.setShareLocation(accountTestDummy, true);
+        accountRepo.getUserAccounts().forEach(userAccount -> {
+            if (userAccount.equals(accountTestDummy)) {
+                assertTrue(userAccount.isSharesLocation());
+            }
+        });
     }
 
     @Test
     void setDisplayName() {
         UserAccount accountTestDummy = new UserAccount("Dummy", "Dummy", 8, "Blastreet 23");
 
-        assertEquals(accountTestDummy.getDisplayName(),accountTestDummy.getDisplayName());
-        accountTestDummy.setDisplayName("NotADummy");
-        assertEquals("NotADummy", accountTestDummy.getDisplayName());
+        accountRepo.setDisplayName(accountTestDummy, "NotADummy");
+        accountRepo.getUserAccounts().forEach(userAccount -> {
+            if (userAccount.equals(accountTestDummy)) {
+                assertEquals(userAccount.getDisplayName(), "NotADummy");
+            }
+        });
     }
 
     @Test
