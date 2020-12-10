@@ -35,7 +35,7 @@ public class WebServer extends AbstractVerticle {
     private static final Integer DB_WEB_CONSOLE_FALLBACK = 9000;
     private static final String OPEN_API_SPEC = "openapi-group-15.yaml";
     private final MarsOpenApiBridge bridge;
-    private int PORT_TESTS = 0;
+    private int PORT_TESTS = 8080;
     private static final JsonObject FALLBACK_DB_PROP = new JsonObject()
             .put("username", "")
             .put("password", "")
@@ -68,7 +68,7 @@ public class WebServer extends AbstractVerticle {
                 JsonObject properties = ar.result();
                 JsonObject dbProperties = properties.getJsonObject("db", FALLBACK_DB_PROP);
                 configureDatabase(dbProperties);
-                int port = PORT_TESTS == 0 ? properties.getJsonObject("http", new JsonObject().put("port", PORT_TESTS)).getInteger("port") : PORT_TESTS;
+                int port = PORT_TESTS == 8080 ? properties.getJsonObject("http", new JsonObject().put("port", PORT_TESTS)).getInteger("port") : PORT_TESTS;
                 LOGGER.info(String.format("Starting web server on port %s ", port));
 
                 configureOpenApiServer(promise, OPEN_API_SPEC, port);

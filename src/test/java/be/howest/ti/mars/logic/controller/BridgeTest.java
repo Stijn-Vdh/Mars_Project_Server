@@ -48,7 +48,7 @@ public class BridgeTest {
     private static final String PASS_WORD = "password";
     private static final String BUSINESS_ACCOUNT = "businessAccount";
     // config
-    private static final int PORT = 8888;
+    private static final int PORT = 8765;
     private static final String HOST = "localhost";
     // Parameters and headers
     private static final String DEFAULT_USER_NAME = "alice";
