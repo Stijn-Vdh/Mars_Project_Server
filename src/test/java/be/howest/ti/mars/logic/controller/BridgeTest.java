@@ -101,7 +101,10 @@ public class BridgeTest {
             .put(DELIVERY_TYPE, "small")
             .put(FROM, 0)
             .put(DESTINATION, 1);
-
+    private static final JsonObject validSubscriptionBody = new JsonObject()
+            .put("subscriptionId", 2);
+    private static final JsonObject invalidSubscriptionBody = new JsonObject()
+            .put("subscriptionId", 5);
     // key List userAccountInformation
     private static final List<String> KEY_LIST_USER = Arrays.asList(NAME, HOME_ADDRESS, "homeEndpoint", "displayName", "shareLocation", "subscription", "friends", "travelHistory", "favouriteEndpoints");
     private static final List<String> KEY_LIST_BUSS = Arrays.asList(NAME, HOME_ADDRESS, "homeEndpoint", "subscription", "Current usage subscription", "favouriteEndpoints");
@@ -498,6 +501,30 @@ public class BridgeTest {
         getSubscriptions(testContext, businessToken, BUSS_SUBSCRIPTIONS, testContext::completeNow);
     }
 
+    private void buySubscription(final VertxTestContext testContext, String token, JsonObject body, int code, Runnable chain) {
+        chain(testContext, HttpMethod.POST, "subscription", token, body, code, IGNORE_BODY, chain);
+    }
 
+    @Test
+    public void buyUserSubscription(final VertxTestContext testContext) {
+        buySubscription(testContext, userToken, validSubscriptionBody, 200, testContext::completeNow);
+    }
+
+    @Test
+    public void buyInvalidUserSubscription(final VertxTestContext testContext) {
+        buySubscription(testContext, userToken, invalidSubscriptionBody, 422, testContext::completeNow);
+    }
+
+
+    @Test
+    public void buyBusinessSubscription(final VertxTestContext testContext) {
+        buySubscription(testContext, businessToken, validSubscriptionBody, 200, testContext::completeNow);
+    }
+
+
+    @Test
+    public void buyInvalidBussSubscription(final VertxTestContext testContext) {
+        buySubscription(testContext, businessToken, invalidSubscriptionBody, 422, testContext::completeNow);
+    }
 }
 
