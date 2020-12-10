@@ -1,6 +1,7 @@
 package be.howest.ti.mars.logic.controller;
 
 import be.howest.ti.mars.logic.controller.subscription.BusinessSubscription;
+import be.howest.ti.mars.logic.controller.subscription.BusinessSubscriptionInfo;
 import be.howest.ti.mars.logic.controller.subscription.UserSubscription;
 import be.howest.ti.mars.logic.data.Repositories;
 import be.howest.ti.mars.webserver.WebServer;
@@ -158,8 +159,27 @@ public class BridgeTest {
 
     private static final Predicate<String> STOP_SUBSCRIPTION = body -> {
         JsonObject jBody = new JsonObject(body);
-        System.out.println();
         return jBody.containsKey("subscription") && jBody.getJsonObject("subscription").containsKey("id") && jBody.getJsonObject("subscription").getInteger("id") == 0;
+    };
+
+    private static final Predicate<String> SUBSCRIPTION_INFO_EMPTY = body -> {
+        try {
+            BusinessSubscriptionInfo info = objectMapper.readValue(body, BusinessSubscriptionInfo.class);
+            return info.getLargePodsUsed() == 0 && info.getSmallPodsUsed() == 0;
+        } catch (JsonProcessingException e) {
+            System.out.println("warning");
+            return false;
+        }
+    };
+
+    private static final Predicate<String> SUBSCRIPTION_INFO_NOT_EMPTY = body -> {
+        try {
+            BusinessSubscriptionInfo info = objectMapper.readValue(body, BusinessSubscriptionInfo.class);
+            return info.getLargePodsUsed() > 0 || info.getSmallPodsUsed() > 0;
+        } catch (JsonProcessingException e) {
+            System.out.println("warning");
+            return false;
+        }
     };
 
     // Random
@@ -544,18 +564,33 @@ public class BridgeTest {
     @Test
     public void stopUserSubscription(final VertxTestContext testContext) {
         buySubscription(testContext, userToken, validSubscriptionBody, 200,
-                ()  -> stopSubscription(testContext, userToken,
-                       ()  -> getAccountInformation(testContext, 200, userToken, STOP_SUBSCRIPTION, testContext::completeNow)
+                () -> stopSubscription(testContext, userToken,
+                        () -> getAccountInformation(testContext, 200, userToken, STOP_SUBSCRIPTION, testContext::completeNow)
                 ));
     }
 
     @Test
     public void stopBussSubscription(final VertxTestContext testContext) {
         buySubscription(testContext, businessToken, validSubscriptionBody, 200,
-                ()  -> stopSubscription(testContext, businessToken,
-                        ()  -> getAccountInformation(testContext, 200, businessToken, STOP_SUBSCRIPTION, testContext::completeNow)
+                () -> stopSubscription(testContext, businessToken,
+                        () -> getAccountInformation(testContext, 200, businessToken, STOP_SUBSCRIPTION, testContext::completeNow)
                 ));
     }
 
+    private void viewSubscription(final VertxTestContext testContext, Predicate<String> body, Runnable chain) {
+        chain(testContext, HttpMethod.GET, "subscriptionInfo", businessToken, 200, body, chain);
+    }
+
+    @Test
+    public void viewSubscriptionInfoNotUsed(final VertxTestContext testContext) {
+        viewSubscription(testContext, SUBSCRIPTION_INFO_EMPTY, testContext::completeNow);
+    }
+
+    @Test
+    public void viewSubscriptionInfoUsed(final VertxTestContext testContext) {
+        sendPackage(testContext, validPackage, 200, businessToken,
+                () -> viewSubscription(testContext, SUBSCRIPTION_INFO_NOT_EMPTY, testContext::completeNow));
+
+    }
 }
 
