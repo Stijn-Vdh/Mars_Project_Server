@@ -227,7 +227,7 @@ public class BridgeTest {
         try {
             List<String> sections = objectMapper.readValue(body, new TypeReference<>() {
             });
-            return sections.size() > 0;
+            return !sections.isEmpty();
         } catch (JsonProcessingException e) {
             return false;
         }
@@ -236,6 +236,26 @@ public class BridgeTest {
     private static final Predicate<String> TRAVEL_RESPONSE = body -> {
         JsonObject resp = new JsonObject(body);
         return resp.containsKey("travelId");
+    };
+
+    private static final Predicate<String> TRAVEL_HISTORY_EMPTY = body -> {
+        try {
+            List<Travel> travels = objectMapper.readValue(body, new TypeReference<>() {
+            });
+            return travels.isEmpty();
+        } catch (JsonProcessingException e) {
+            return false;
+        }
+    };
+
+    private static final Predicate<String> TRAVEL_HISTORY_NOT_EMPTY = body -> {
+        try {
+            List<Travel> travels = objectMapper.readValue(body, new TypeReference<>() {
+            });
+            return !travels.isEmpty();
+        } catch (JsonProcessingException e) {
+            return false;
+        }
     };
 
     // Random
@@ -765,6 +785,19 @@ public class BridgeTest {
         travel(testContext, 402, TRAVEL_BODY_SAME_SRC_DEST, IGNORE_BODY, testContext::completeNow);
     }
 
+    private void getTravelHistory(final VertxTestContext testContext, Predicate<String> isBody, Runnable chain) {
+        chain(testContext, HttpMethod.GET, "travel", userToken, 200, isBody, chain);
+    }
 
+    @Test
+    public void getTravelHistory(final VertxTestContext testContext) {
+        getTravelHistory(testContext, TRAVEL_HISTORY_EMPTY, testContext::completeNow);
+    }
+
+    @Test
+    public void getTravelHistoryContent(final VertxTestContext testContext) {
+        travel(testContext, 200, TRAVEL_BODY, TRAVEL_RESPONSE,
+                () -> getTravelHistory(testContext, TRAVEL_HISTORY_NOT_EMPTY, testContext::completeNow));
+    }
 }
 
