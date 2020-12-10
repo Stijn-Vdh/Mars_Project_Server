@@ -6,13 +6,10 @@ import be.howest.ti.mars.logic.controller.accounts.UserAccount;
 import be.howest.ti.mars.logic.controller.enums.DeliveryType;
 import be.howest.ti.mars.logic.controller.enums.PodType;
 import be.howest.ti.mars.logic.controller.exceptions.AuthenticationException;
-import be.howest.ti.mars.logic.controller.exceptions.DatabaseException;
 import be.howest.ti.mars.logic.controller.exceptions.EndpointException;
 import be.howest.ti.mars.logic.controller.exceptions.UsernameException;
 import be.howest.ti.mars.logic.data.Repositories;
-import be.howest.ti.mars.logic.data.h2repositories.FriendsH2Repository;
 import io.vertx.core.json.JsonObject;
-import org.h2.engine.User;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -61,7 +58,7 @@ public class MTTSController extends AuthController {
     }
 
     public Object removeFriend(UserAccount user, String friendName) {
-        if (userAccounts.contains(new UserAccount(friendName)) && user.getUsername().equals(friendName) && Repositories.getFriendsRepo().friendExists(friendName, user)) {
+        if (friendValidation(user, friendName)) {
             user.removeFriend(friendName);
         } else {
             throw new UsernameException("Could not remove a friend with the given username");

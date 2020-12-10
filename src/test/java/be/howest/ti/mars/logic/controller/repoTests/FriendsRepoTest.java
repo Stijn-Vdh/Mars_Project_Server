@@ -8,14 +8,12 @@ import be.howest.ti.mars.logic.data.Repositories;
 import be.howest.ti.mars.logic.data.repositories.AccountsRepository;
 import be.howest.ti.mars.logic.data.repositories.FriendsRepository;
 import be.howest.ti.mars.logic.data.util.MarsConnection;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import java.sql.SQLException;
 
 import static org.junit.jupiter.api.Assertions.*;
-
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class FriendsRepoTest {
     private static final AccountsRepository accountRepo = Repositories.getAccountsRepo();
     private static final FriendsRepository friendRepo = Repositories.getFriendsRepo();
@@ -45,6 +43,7 @@ class FriendsRepoTest {
 
 
     @Test
+    @Order(1)
     void friendExists() {
         assertFalse(friendRepo.friendExists("Debby", testDanny));
         controller.addFriend(testDanny, "Debby");
@@ -52,14 +51,20 @@ class FriendsRepoTest {
     }
 
     @Test
+    @Order(2)
     void beFriend() {
-        assertEquals(1, friendRepo.getFriends(testDanny).size());
+        assertEquals(0, friendRepo.getFriends(testDebby).size());
         controller.addFriend(testDebby,"Danny");
+        assertEquals(1, friendRepo.getFriends(testDebby).size());
         assertThrows(DatabaseException.class, () -> controller.addFriend(testDanny, "Debby"));
     }
 
     @Test
+    @Order(3)
     void removeFriend() {
+        assertEquals(1, friendRepo.getFriends(testDebby).size());
+        controller.removeFriend(testDebby,"Danny");
+        assertEquals(0, friendRepo.getFriends(testDebby).size());
 
     }
 }
