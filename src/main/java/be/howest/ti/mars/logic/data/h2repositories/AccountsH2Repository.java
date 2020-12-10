@@ -19,10 +19,10 @@ import java.util.logging.Logger;
 public class AccountsH2Repository implements AccountsRepository {
     public static final String HOME_ADDRESS = "homeAddress";
     public static final String HOME_ENDPOINT_ID = "homeEndpointId";
-    private static final Logger LOGGER = Logger.getLogger(SubscriptionH2Repository.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(AccountsH2Repository.class.getName());
     // Accounts SQL QUERIES
     private static final String SQL_SELECT_USERS = "SELECT * FROM users u JOIN accounts a ON a.name = u.name";
-    private static final String SQL_SELECT_BUSINESSES = "SELECT * FROM users u join businesses b on b.name = u.name";
+    private static final String SQL_SELECT_BUSINESSES = "SELECT * FROM businesses b join ACCOUNTS a on a.name = b.name";
     private static final String SQL_INSERT_ACCOUNT = "INSERT INTO accounts VALUES (?, ?, ?, ?)";
     private static final String SQL_INSERT_USER = "INSERT INTO users VALUES (?, ?, default, default)";
     private static final String SQL_INSERT_BUSINESS = "INSERT INTO businesses VALUES (?, default, default, default)";
