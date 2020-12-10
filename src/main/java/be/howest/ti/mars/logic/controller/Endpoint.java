@@ -1,5 +1,7 @@
 package be.howest.ti.mars.logic.controller;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.Objects;
 
 public class Endpoint {
@@ -11,7 +13,7 @@ public class Endpoint {
     private final boolean privateEndpoint;
 
 
-    public Endpoint(int id, String name, boolean available, String location, boolean privateEndpoint) {
+    public Endpoint(@JsonProperty("id") int id, @JsonProperty("name") String name, @JsonProperty("available") boolean available, @JsonProperty("location") String location, @JsonProperty("privateEndpoint") boolean privateEndpoint) {
         this.id = id;
         this.name = name;
         this.available = available;

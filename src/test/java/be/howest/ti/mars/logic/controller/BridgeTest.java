@@ -1,5 +1,6 @@
 package be.howest.ti.mars.logic.controller;
 
+import be.howest.ti.mars.logic.controller.converters.ShortEndpoint;
 import be.howest.ti.mars.logic.controller.subscription.BusinessSubscription;
 import be.howest.ti.mars.logic.controller.subscription.BusinessSubscriptionInfo;
 import be.howest.ti.mars.logic.controller.subscription.UserSubscription;
@@ -134,7 +135,6 @@ public class BridgeTest {
         }
     };
 
-
     private static final Predicate<String> FRIENDS_BODY_NOT_EMPTY = Predicate.not(FRIENDS_BODY_EMPTY);
 
     private static final Predicate<String> USER_SUBSCRIPTIONS = body -> {
@@ -178,6 +178,25 @@ public class BridgeTest {
             return info.getLargePodsUsed() > 0 || info.getSmallPodsUsed() > 0;
         } catch (JsonProcessingException e) {
             System.out.println("warning");
+            return false;
+        }
+    };
+
+    private static final Predicate<String> DEFAULT_AMOUNT_ENDPOINTS = body -> {
+        try {
+            List<ShortEndpoint> endpoints = objectMapper.readValue(body, new TypeReference<>() {
+            });
+            return endpoints.size() == 102;
+        } catch (JsonProcessingException e) {
+            return false;
+        }
+    };
+
+    private static final Predicate<String> IS_ENDPOINT_5 = body -> {
+        try {
+            Endpoint endpoint = objectMapper.readValue(body, Endpoint.class);
+            return endpoint.getId() == 5;
+        } catch (JsonProcessingException e) {
             return false;
         }
     };
@@ -591,6 +610,24 @@ public class BridgeTest {
         sendPackage(testContext, validPackage, 200, businessToken,
                 () -> viewSubscription(testContext, SUBSCRIPTION_INFO_NOT_EMPTY, testContext::completeNow));
 
+    }
+
+    private void getEndpoints(final VertxTestContext testContext, Predicate<String> isBody, Runnable chain) {
+        chain(testContext, HttpMethod.GET, "endpoints", null, 200, isBody, chain);
+    }
+
+    @Test
+    public void getEndpoints(final VertxTestContext testContext) {
+        getEndpoints(testContext, DEFAULT_AMOUNT_ENDPOINTS, testContext::completeNow);
+    }
+
+    private void getEndpoint(final VertxTestContext testContext, int id, Predicate<String> isBody, Runnable chain) {
+        chain(testContext, HttpMethod.GET, "endpoints/" + id, null, 200, isBody, chain);
+    }
+
+    @Test
+    public void getEndpoint(final VertxTestContext testContext) {
+        getEndpoint(testContext, 5, IS_ENDPOINT_5, testContext::completeNow);
     }
 }
 
