@@ -10,6 +10,7 @@ import be.howest.ti.mars.logic.controller.exceptions.EndpointException;
 import be.howest.ti.mars.logic.controller.exceptions.UsernameException;
 import be.howest.ti.mars.logic.data.Repositories;
 import io.vertx.core.json.JsonObject;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -37,18 +38,27 @@ public class MTTSController extends AuthController {
         if (friendValidation(user,friendName)) {
             user.addFriend(friendName);
         } else {
-            throw new UsernameException("Could not add a friend with the given username");
+            throw new UsernameException("Could not add a friend with the given username or you are already friends with this person.");
         }
         return "You just added a friend called:" + friendName;
     }
 
     private boolean friendValidation(UserAccount acc, String friendName){
-        UserAccount friend = new UserAccount(friendName);
-        return userAccounts.contains(friend) && ! acc.equals(friend);
+        UserAccount friend = findUserByName(friendName);
+        return ! acc.equals(friend);
+    }
+
+    private UserAccount findUserByName(String name){
+        for (UserAccount user : Repositories.getAccountsRepo().getUserAccounts()){
+            if (user.getUsername().equals(name)){
+                return user;
+            }
+        }
+        throw new UsernameException("Could not find user with given name.");
     }
 
     public Object removeFriend(UserAccount user, String friendName) {
-        if (userAccounts.contains(new UserAccount(friendName)) && user.getUsername().equals(friendName) && Repositories.getFriendsRepo().friendExists(friendName, user)) {
+        if (friendValidation(user, friendName)) {
             user.removeFriend(friendName);
         } else {
             throw new UsernameException("Could not remove a friend with the given username");
