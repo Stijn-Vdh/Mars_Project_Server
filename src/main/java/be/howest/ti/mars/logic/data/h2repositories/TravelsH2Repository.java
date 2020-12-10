@@ -4,6 +4,7 @@ import be.howest.ti.mars.logic.controller.Travel;
 import be.howest.ti.mars.logic.controller.accounts.UserAccount;
 import be.howest.ti.mars.logic.controller.enums.PodType;
 import be.howest.ti.mars.logic.controller.exceptions.DatabaseException;
+import be.howest.ti.mars.logic.controller.exceptions.EntityNotFoundException;
 import be.howest.ti.mars.logic.data.Repositories;
 import be.howest.ti.mars.logic.data.repositories.EndpointsRepository;
 import be.howest.ti.mars.logic.data.repositories.TravelsRepository;
@@ -85,7 +86,7 @@ public class TravelsH2Repository implements TravelsRepository {
                 throw new DatabaseException("Could not cancel travel/trip.");
             }
         } else {
-            throw new DatabaseException("This trip does not exist");
+            throw new EntityNotFoundException("This trip does not exist");
         }
     }
 

@@ -799,5 +799,21 @@ public class BridgeTest {
         travel(testContext, 200, TRAVEL_BODY, TRAVEL_RESPONSE,
                 () -> getTravelHistory(testContext, TRAVEL_HISTORY_NOT_EMPTY, testContext::completeNow));
     }
+
+    private void cancelTravel(final VertxTestContext testContext, int id, int code, Runnable chain) {
+        chain(testContext, HttpMethod.DELETE, "travel/" + id, userToken, code, IGNORE_BODY, chain );
+    }
+
+    @Test
+    public void cancelTravel(final VertxTestContext testContext){
+        travel(testContext, 200, TRAVEL_BODY, TRAVEL_RESPONSE,
+                () -> cancelTravel(testContext,1,200, testContext::completeNow));
+    }
+
+    @Test
+    public void cancelTravelInvalid(final VertxTestContext testContext){
+        travel(testContext, 200, TRAVEL_BODY, TRAVEL_RESPONSE,
+                () -> cancelTravel(testContext,100,422, testContext::completeNow));
+    }
 }
 
