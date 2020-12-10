@@ -3,6 +3,7 @@ package be.howest.ti.mars.logic.controller.repoTests;
 import be.howest.ti.mars.logic.controller.MTTSController;
 import be.howest.ti.mars.logic.controller.accounts.BusinessAccount;
 import be.howest.ti.mars.logic.controller.accounts.UserAccount;
+import be.howest.ti.mars.logic.controller.exceptions.DatabaseException;
 import be.howest.ti.mars.logic.data.Repositories;
 import be.howest.ti.mars.logic.data.repositories.AccountsRepository;
 import be.howest.ti.mars.logic.data.repositories.FriendsRepository;
@@ -45,14 +46,16 @@ class FriendsRepoTest {
 
     @Test
     void friendExists() {
-        assertFalse(friendRepo.friendExists("Danny", testDebby));
-        friendRepo.beFriend("Danny", "Debby");
-        assertTrue(friendRepo.friendExists("Debby",testDanny));
+        assertFalse(friendRepo.friendExists("Debby", testDanny));
+        controller.addFriend(testDanny, "Debby");
+        assertTrue(friendRepo.friendExists("Debby", testDanny));
     }
 
     @Test
     void beFriend() {
-
+        assertEquals(1, friendRepo.getFriends(testDanny).size());
+        controller.addFriend(testDebby,"Danny");
+        assertThrows(DatabaseException.class, () -> controller.addFriend(testDanny, "Debby"));
     }
 
     @Test
