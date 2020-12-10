@@ -48,7 +48,7 @@ public class BridgeTest {
     private static final String PASS_WORD = "password";
     private static final String BUSINESS_ACCOUNT = "businessAccount";
     // config
-    private static final int PORT = 8080;
+    private static final int PORT = 8888;
     private static final String HOST = "localhost";
     // Parameters and headers
     private static final String DEFAULT_USER_NAME = "alice";
@@ -288,7 +288,7 @@ public class BridgeTest {
     @BeforeEach
     void deploy(final VertxTestContext testContext) {
         vertx = Vertx.vertx();
-        vertx.deployVerticle(new WebServer());
+        vertx.deployVerticle(new WebServer(PORT));
         webClient = WebClient.create(vertx);
 
         //add user and login, add business and login
@@ -371,7 +371,6 @@ public class BridgeTest {
             HttpMethod method, String requestURI, String authorizationHeader, Object body,
             int expectedStatusCode, Predicate<String> isExpectedBody, Runnable runnable
     ) {
-        // Do as expected:
         makeRequest(method, requestURI, authorizationHeader).sendJson(body, testContext.succeeding(response ->
                 testContext.verify(() -> {
                     System.out.println(response.bodyAsString());

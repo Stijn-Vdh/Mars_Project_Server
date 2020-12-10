@@ -18,5 +18,6 @@ public enum PodType { // SonarLint doesnt like lowercase enums, uppercase enums 
     public String toString() {
         return super.toString().toLowerCase();
     }
+
 }
 
