@@ -105,6 +105,7 @@ public class BridgeTest {
             .put("subscriptionId", 2);
     private static final JsonObject invalidSubscriptionBody = new JsonObject()
             .put("subscriptionId", 5);
+
     // key List userAccountInformation
     private static final List<String> KEY_LIST_USER = Arrays.asList(NAME, HOME_ADDRESS, "homeEndpoint", "displayName", "shareLocation", "subscription", "friends", "travelHistory", "favouriteEndpoints");
     private static final List<String> KEY_LIST_BUSS = Arrays.asList(NAME, HOME_ADDRESS, "homeEndpoint", "subscription", "Current usage subscription", "favouriteEndpoints");
@@ -120,6 +121,7 @@ public class BridgeTest {
         JsonObject jBody = new JsonObject(body);
         return KEY_LIST_BUSS.stream().allMatch(jBody::containsKey);
     };
+
     private static final Predicate<String> FRIENDS_BODY_EMPTY = body -> {
         try {
             List<String> friendList = objectMapper.readValue(body, new TypeReference<>() {
@@ -130,6 +132,7 @@ public class BridgeTest {
             throw new RuntimeException("Didnt receive an array of string");
         }
     };
+
 
     private static final Predicate<String> FRIENDS_BODY_NOT_EMPTY = Predicate.not(FRIENDS_BODY_EMPTY);
 
@@ -152,6 +155,13 @@ public class BridgeTest {
             return false;
         }
     };
+
+    private static final Predicate<String> STOP_SUBSCRIPTION = body -> {
+        JsonObject jBody = new JsonObject(body);
+        System.out.println();
+        return jBody.containsKey("subscription") && jBody.getJsonObject("subscription").containsKey("id") && jBody.getJsonObject("subscription").getInteger("id") == 0;
+    };
+
     // Random
     private static final JsonObject INVALID_BODY = new JsonObject().put("random", "data");
     private static final Runnable NO_END = () -> {
@@ -526,5 +536,26 @@ public class BridgeTest {
     public void buyInvalidBussSubscription(final VertxTestContext testContext) {
         buySubscription(testContext, businessToken, invalidSubscriptionBody, 422, testContext::completeNow);
     }
+
+    private void stopSubscription(final VertxTestContext testContext, String token, Runnable chain) {
+        chain(testContext, HttpMethod.DELETE, "subscription", token, 200, IGNORE_BODY, chain);
+    }
+
+    @Test
+    public void stopUserSubscription(final VertxTestContext testContext) {
+        buySubscription(testContext, userToken, validSubscriptionBody, 200,
+                ()  -> stopSubscription(testContext, userToken,
+                       ()  -> getAccountInformation(testContext, 200, userToken, STOP_SUBSCRIPTION, testContext::completeNow)
+                ));
+    }
+
+    @Test
+    public void stopBussSubscription(final VertxTestContext testContext) {
+        buySubscription(testContext, businessToken, validSubscriptionBody, 200,
+                ()  -> stopSubscription(testContext, businessToken,
+                        ()  -> getAccountInformation(testContext, 200, businessToken, STOP_SUBSCRIPTION, testContext::completeNow)
+                ));
+    }
+
 }
 
