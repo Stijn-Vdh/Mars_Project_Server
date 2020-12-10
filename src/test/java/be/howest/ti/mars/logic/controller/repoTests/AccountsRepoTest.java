@@ -21,7 +21,6 @@ import static org.junit.jupiter.api.Assertions.*;
 class AccountsRepoTest {
 
     private static final AccountsRepository accountRepo = Repositories.getAccountsRepo();
-    private static final MTTSController controller = new MTTSController();
     private static final UserAccount testDanny = new UserAccount("Danny", "Danny", 5, "MarsStreet 69");
     private static final UserAccount testDebby = new UserAccount("Debby", "Debby", 3, "WestStreet 420");
     private static final BusinessAccount testPol = new BusinessAccount("Pol", "Pol", 6, "Earthstreet 23");
