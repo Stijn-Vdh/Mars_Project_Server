@@ -3,13 +3,17 @@ package be.howest.ti.mars.logic.controller.repoTests;
 import be.howest.ti.mars.logic.controller.MTTSController;
 import be.howest.ti.mars.logic.controller.accounts.BusinessAccount;
 import be.howest.ti.mars.logic.controller.accounts.UserAccount;
+import be.howest.ti.mars.logic.controller.exceptions.DatabaseException;
 import be.howest.ti.mars.logic.data.Repositories;
 import be.howest.ti.mars.logic.data.repositories.AccountsRepository;
 import be.howest.ti.mars.logic.data.util.MarsConnection;
+import org.h2.message.DbException;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import javax.xml.bind.DataBindingException;
+import javax.xml.crypto.Data;
 import java.sql.SQLException;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -48,6 +52,8 @@ class AccountsRepoTest {
         assertEquals(2, accountRepo.getUserAccounts().size());
         accountRepo.addUser(accountTestDummy);
         assertEquals(3, accountRepo.getUserAccounts().size());
+
+        assertThrows(DatabaseException.class,()->accountRepo.addUser(accountTestDummy));
     }
 
     @Test
@@ -62,6 +68,7 @@ class AccountsRepoTest {
                 assertEquals(newPWD, userAccount.getPassword());
             }
         });
+        assertDoesNotThrow(()->accountRepo.changePassword(accountTestDummy, newPWD));
     }
 
     @Test
@@ -74,6 +81,8 @@ class AccountsRepoTest {
                 assertTrue(userAccount.isSharesLocation());
             }
         });
+
+        assertDoesNotThrow(()->accountRepo.setShareLocation(accountTestDummy, true));
     }
 
     @Test
@@ -86,6 +95,16 @@ class AccountsRepoTest {
                 assertEquals(userAccount.getDisplayName(), "NotADummy");
             }
         });
+
+        assertDoesNotThrow(() -> accountRepo.setDisplayName(accountTestDummy, ""));
+
+        accountRepo.getUserAccounts().forEach(userAccount -> {
+            if (userAccount.equals(accountTestDummy)) {
+                assertEquals(userAccount.getDisplayName(), "Dummy");
+            }
+        });
+
+
     }
 
     @Test
@@ -95,14 +114,14 @@ class AccountsRepoTest {
         assertEquals(1, accountRepo.getBusinessAccounts().size());
         accountRepo.addBusiness(accountTestDummy);
         assertEquals(2, accountRepo.getBusinessAccounts().size());
+
+        assertThrows(DatabaseException.class, ()->accountRepo.addBusiness(accountTestDummy));
     }
 
     @Test
     void testEquals() {
         UserAccount account2 = new UserAccount("Test");
         UserAccount account1 = new UserAccount("Test");
-
         assertEquals(account1, account2);
-
     }
 }
