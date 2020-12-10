@@ -629,5 +629,60 @@ public class BridgeTest {
     public void getEndpoint(final VertxTestContext testContext) {
         getEndpoint(testContext, 5, IS_ENDPOINT_5, testContext::completeNow);
     }
+
+    private void setFavoriteEndpoint(final VertxTestContext testContext, HttpMethod httpMethod, int id, String token, int code, Runnable chain) {
+        chain(testContext, httpMethod, "endpoints/favorite/" + id, token, code, IGNORE_BODY, chain);
+    }
+
+
+    @Test
+    public void setUserFavEndpoint(final VertxTestContext testContext) {
+        setFavoriteEndpoint(testContext, HttpMethod.POST, 5, userToken, 200, testContext::completeNow);
+    }
+
+    @Test
+    public void setUserUnfavEndpoint(final VertxTestContext testContext) {
+        setFavoriteEndpoint(testContext, HttpMethod.POST, 5, userToken, 200,
+                () ->  setFavoriteEndpoint(testContext, HttpMethod.DELETE, 5, userToken, 200, testContext::completeNow));
+
+    }
+
+    @Test
+    public void setUserFavEndpointInvalid(final VertxTestContext testContext) {
+        setFavoriteEndpoint(testContext, HttpMethod.POST, 5, userToken, 200,
+                () ->  setFavoriteEndpoint(testContext, HttpMethod.POST, 5, userToken, 402, testContext::completeNow));
+
+    }
+
+    @Test
+    public void setUserUnFavEndpointInvalid(final VertxTestContext testContext) {
+        setFavoriteEndpoint(testContext, HttpMethod.DELETE, 5, userToken, 402, testContext::completeNow);
+
+    }
+
+    @Test
+    public void setBussFavEndpoint(final VertxTestContext testContext) {
+        setFavoriteEndpoint(testContext, HttpMethod.POST, 5, businessToken, 200, testContext::completeNow);
+    }
+
+    @Test
+    public void setUserBussEndpoint(final VertxTestContext testContext) {
+        setFavoriteEndpoint(testContext, HttpMethod.POST, 5, businessToken, 200,
+                () ->  setFavoriteEndpoint(testContext, HttpMethod.DELETE, 5, businessToken, 200, testContext::completeNow));
+    }
+
+    @Test
+    public void setBussFavEndpointInvalid(final VertxTestContext testContext) {
+        setFavoriteEndpoint(testContext, HttpMethod.POST, 5, businessToken, 200,
+                () ->  setFavoriteEndpoint(testContext, HttpMethod.POST, 5, businessToken, 402, testContext::completeNow));
+
+    }
+
+    @Test
+    public void setBussUnFavEndpointInvalid(final VertxTestContext testContext) {
+        setFavoriteEndpoint(testContext, HttpMethod.DELETE, 5,businessToken, 402, testContext::completeNow);
+
+    }
+
 }
 
