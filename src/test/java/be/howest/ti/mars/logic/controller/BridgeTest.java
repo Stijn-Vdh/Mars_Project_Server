@@ -113,6 +113,22 @@ public class BridgeTest {
     private static final JsonObject REPORT_INVALID_BODY = new JsonObject()
             .put("section", "invalid")
             .put("description", "blah blah");
+    private static final JsonObject TRAVEL_BODY = new JsonObject()
+            .put("destination", 5)
+            .put("from", 1)
+            .put("podType", "standard");
+    private static final JsonObject TRAVEL_BODY_SAME_SRC_DEST = new JsonObject()
+            .put("destination", 1)
+            .put("from", 1)
+            .put("podType", "standard");
+    private static final JsonObject TRAVEL_BODY_UNKNOWN_POD_TYPE = new JsonObject()
+            .put("destination", 1)
+            .put("from", 5)
+            .put("podType", "blah");
+    private static final JsonObject TRAVEL_BODY_INVALID_DEST = new JsonObject()
+            .put("destination", 200)
+            .put("from", 5)
+            .put("podType", "standard");
 
     // key List userAccountInformation
     private static final List<String> KEY_LIST_USER = Arrays.asList(NAME, HOME_ADDRESS, "homeEndpoint", "displayName", "shareLocation", "subscription", "friends", "travelHistory", "favouriteEndpoints");
@@ -215,6 +231,11 @@ public class BridgeTest {
         } catch (JsonProcessingException e) {
             return false;
         }
+    };
+
+    private static final Predicate<String> TRAVEL_RESPONSE = body -> {
+        JsonObject resp = new JsonObject(body);
+        return resp.containsKey("travelId");
     };
 
     // Random
@@ -720,7 +741,29 @@ public class BridgeTest {
     }
 
 
+    private void travel(final VertxTestContext testContext, int code, JsonObject body, Predicate<String> isBody, Runnable chain) {
+        chain(testContext, HttpMethod.POST, "travel", userToken, body, code, isBody, chain);
+    }
 
+    @Test
+    public void travel(final VertxTestContext testContext) {
+        travel(testContext, 200, TRAVEL_BODY, TRAVEL_RESPONSE, testContext::completeNow);
+    }
+
+    @Test
+    public void travelInvalidDest(final VertxTestContext testContext) {
+        travel(testContext, 402, TRAVEL_BODY_INVALID_DEST, IGNORE_BODY, testContext::completeNow);
+    }
+
+    @Test
+    public void travelInvalidPodType(final VertxTestContext testContext) {
+        travel(testContext, 400, TRAVEL_BODY_UNKNOWN_POD_TYPE, IGNORE_BODY, testContext::completeNow);
+    }
+
+    @Test
+    public void travelInvalidSameSrcDest(final VertxTestContext testContext) {
+        travel(testContext, 402, TRAVEL_BODY_SAME_SRC_DEST, IGNORE_BODY, testContext::completeNow);
+    }
 
 
 }
