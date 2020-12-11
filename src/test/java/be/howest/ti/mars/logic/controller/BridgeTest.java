@@ -9,6 +9,8 @@ import be.howest.ti.mars.webserver.WebServer;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpHeaders;
@@ -277,108 +279,38 @@ public class BridgeTest {
     private Vertx vertx;
     private WebClient webClient;
 
-    private static String trimBody(String body) {
-        return body.substring(1, body.length() - 1);
-    }
-
-    private void login(final VertxTestContext testContext, Runnable runnable) {
-        login(testContext, loginBodyJson, runnable);
-    }
-
     @BeforeEach
     void deploy(final VertxTestContext testContext) {
         vertx = Vertx.vertx();
-        vertx.deployVerticle(new WebServer(PORT));
+        vertx.deployVerticle(new WebServer(PORT),
+
+                deployDummyData(testContext));
         webClient = WebClient.create(vertx);
 
         //add user and login, add business and login
-        createAccount(testContext, userAccountJson,
-                () -> login(testContext,
-                        () -> createAccount(testContext, businessAccountJson,
-                                () -> loginBus(testContext, loginBusBodyJson, testContext::completeNow))));
+
+    }
+
+    public <T> Handler<AsyncResult<T>> deployDummyData(VertxTestContext testContext) {
+        return ar -> {
+            if (ar.succeeded()) {
+                createAccount(testContext, userAccountJson,
+                        () -> login(testContext,
+                                () -> createAccount(testContext, businessAccountJson,
+                                        () -> loginBus(testContext, loginBusBodyJson, testContext::completeNow)
+                                )
+                        )
+                );
+            } else {
+                testContext.failNow(ar.cause());
+            }
+        };
     }
 
     @AfterEach
     void close(final VertxTestContext testContext) {
         vertx.close(testContext.succeedingThenComplete());
         webClient.close();
-    }
-
-    private HttpRequest<Buffer> makeRequest(HttpMethod method, String requestURI, String authorizationHeader) {
-        io.vertx.ext.web.client.HttpRequest<io.vertx.core.buffer.Buffer> request = webClient.request(method, PORT, HOST, "/api/" + requestURI);
-        if (authorizationHeader != null) {
-            request.putHeader(
-                    HttpHeaders.AUTHORIZATION.toString(),
-                    authorizationHeader
-            );
-        }
-        return request;
-    }
-
-    private void chainEnd(
-            final VertxTestContext testContext,
-            HttpMethod method, String requestURI, String authorizationHeader, Object body,
-            int expectedStatusCode, Predicate<String> isExpectedBody
-    ) {
-        // Do as expected:
-        makeRequest(method, requestURI, authorizationHeader).sendJson(body, testContext.succeeding(response ->
-                testContext.verify(() -> {
-                    System.out.println(response.bodyAsString());
-                    assertEquals(expectedStatusCode, response.statusCode());
-                    assertTrue(isExpectedBody.test(response.bodyAsString()));
-                    testContext.completeNow();
-                })
-        ));
-    }
-
-    private void chainEnd(final VertxTestContext testContext, HttpMethod method, String requestURI, String authorizationHeader,
-                          int expectedStatusCode, Predicate<String> isExpectedBody
-    ) {
-        makeRequest(method, requestURI, authorizationHeader).send(testContext.succeeding(response ->
-                testContext.verify(() -> {
-                    System.out.println(response.bodyAsString());
-                    assertEquals(expectedStatusCode, response.statusCode());
-                    String body = response.bodyAsString();
-                    assertTrue(
-                            isExpectedBody.test(body),
-                            () -> String.format("Unexpected body: %s", body)
-                    );
-                    testContext.completeNow();
-                })
-        ));
-
-    }
-
-    private void chain(final VertxTestContext testContext, HttpMethod method, String requestURI, String authorizationHeader,
-                       int expectedStatusCode, Predicate<String> isExpectedBody, Runnable runnable
-    ) {
-        makeRequest(method, requestURI, authorizationHeader).send(testContext.succeeding(response ->
-                testContext.verify(() -> {
-                    System.out.println(response.bodyAsString());
-                    assertEquals(expectedStatusCode, response.statusCode());
-                    String body = response.bodyAsString();
-                    assertTrue(
-                            isExpectedBody.test(body),
-                            () -> String.format("Unexpected body: %s", body)
-                    );
-                    runnable.run();
-                })
-        ));
-    }
-
-    private void chain(
-            final VertxTestContext testContext,
-            HttpMethod method, String requestURI, String authorizationHeader, Object body,
-            int expectedStatusCode, Predicate<String> isExpectedBody, Runnable runnable
-    ) {
-        makeRequest(method, requestURI, authorizationHeader).sendJson(body, testContext.succeeding(response ->
-                testContext.verify(() -> {
-                    System.out.println(response.bodyAsString());
-                    assertEquals(expectedStatusCode, response.statusCode());
-                    assertTrue(isExpectedBody.test(response.bodyAsString()));
-                    runnable.run();
-                })
-        ));
     }
 
     @Test
@@ -401,13 +333,60 @@ public class BridgeTest {
         System.out.println("after");
     }
 
-    private void createAccount(VertxTestContext testContext, JsonObject body, Runnable runnable) { // Reusability
-        chain(testContext, HttpMethod.POST, "createAccount", null, body, 200, IGNORE_BODY, runnable);
+    private void chain(final VertxTestContext testContext, HttpMethod method, String requestURI, String authorizationHeader,
+                       int expectedStatusCode, Predicate<String> isExpectedBody, Runnable runnable
+    ) {
+        makeRequest(method, requestURI, authorizationHeader).send(testContext.succeeding(response ->
+                testContext.verify(() -> {
+                    System.out.println(response.bodyAsString());
+                    assertEquals(expectedStatusCode, response.statusCode());
+                    String body = response.bodyAsString();
+                    assertTrue(
+                            isExpectedBody.test(body),
+                            () -> String.format("Unexpected body: %s", body)
+                    );
+                    runnable.run();
+                })
+        ));
+    }
+
+    private static String trimBody(String body) {
+        return body.substring(1, body.length() - 1);
+    }
+
+    private HttpRequest<Buffer> makeRequest(HttpMethod method, String requestURI, String authorizationHeader) {
+        io.vertx.ext.web.client.HttpRequest<io.vertx.core.buffer.Buffer> request = webClient.request(method, PORT, HOST, "/api/" + requestURI);
+        if (authorizationHeader != null) {
+            request.putHeader(
+                    HttpHeaders.AUTHORIZATION.toString(),
+                    authorizationHeader
+            );
+        }
+        return request;
     }
 
     @Test
     public void createAccount(final VertxTestContext testContext) {
         createAccount(testContext, createAccountJson, testContext::completeNow);
+    }
+
+    private void createAccount(VertxTestContext testContext, JsonObject body, Runnable runnable) { // Reusability
+        chain(testContext, HttpMethod.POST, "createAccount", null, body, 200, IGNORE_BODY, runnable);
+    }
+
+    private void chain(
+            final VertxTestContext testContext,
+            HttpMethod method, String requestURI, String authorizationHeader, Object body,
+            int expectedStatusCode, Predicate<String> isExpectedBody, Runnable runnable
+    ) {
+        makeRequest(method, requestURI, authorizationHeader).sendJson(body, testContext.succeeding(response ->
+                testContext.verify(() -> {
+                    System.out.println(response.bodyAsString());
+                    assertEquals(expectedStatusCode, response.statusCode());
+                    assertTrue(isExpectedBody.test(response.bodyAsString()));
+                    runnable.run();
+                })
+        ));
     }
 
     @Test
@@ -416,11 +395,41 @@ public class BridgeTest {
                 400, IGNORE_BODY);
     }
 
+    private void chainEnd(
+            final VertxTestContext testContext,
+            HttpMethod method, String requestURI, String authorizationHeader, Object body,
+            int expectedStatusCode, Predicate<String> isExpectedBody
+    ) {
+        // Do as expected:
+        makeRequest(method, requestURI, authorizationHeader).sendJson(body, testContext.succeeding(response ->
+                testContext.verify(() -> {
+                    System.out.println(response.bodyAsString());
+                    assertEquals(expectedStatusCode, response.statusCode());
+                    assertTrue(isExpectedBody.test(response.bodyAsString()));
+                    testContext.completeNow();
+                })
+        ));
+    }
+
+    @Test
+    public void login(final VertxTestContext testContext) {
+        login(testContext, testContext::completeNow);
+    }
+
+    private void login(final VertxTestContext testContext, Runnable runnable) {
+        login(testContext, loginBodyJson, runnable);
+    }
+
     private void login(final VertxTestContext testContext, JsonObject loginBodyJson, Runnable runnable) {
         chain(testContext, HttpMethod.POST, "login", null, loginBodyJson, 200, body -> {
             userToken = AUTHORIZATION_TOKEN_PREFIX + trimBody(body);
             return true;
         }, runnable);
+    }
+
+    @Test
+    public void loginBus(final VertxTestContext testContext) {
+        loginBus(testContext, loginBusBodyJson, testContext::completeNow);
     }
 
     private void loginBus(final VertxTestContext testContext, JsonObject loginBodyJson, Runnable runnable) {
@@ -431,18 +440,26 @@ public class BridgeTest {
     }
 
     @Test
-    public void login(final VertxTestContext testContext) {
-        login(testContext, testContext::completeNow);
-    }
-
-    @Test
-    public void loginBus(final VertxTestContext testContext) {
-        loginBus(testContext, loginBusBodyJson, testContext::completeNow);
-    }
-
-    @Test
     public void logoutInvalidToken(final VertxTestContext testContext) {
         chainEnd(testContext, HttpMethod.DELETE, "login", null, 401, IGNORE_BODY);
+    }
+
+    private void chainEnd(final VertxTestContext testContext, HttpMethod method, String requestURI, String authorizationHeader,
+                          int expectedStatusCode, Predicate<String> isExpectedBody
+    ) {
+        makeRequest(method, requestURI, authorizationHeader).send(testContext.succeeding(response ->
+                testContext.verify(() -> {
+                    System.out.println(response.bodyAsString());
+                    assertEquals(expectedStatusCode, response.statusCode());
+                    String body = response.bodyAsString();
+                    assertTrue(
+                            isExpectedBody.test(body),
+                            () -> String.format("Unexpected body: %s", body)
+                    );
+                    testContext.completeNow();
+                })
+        ));
+
     }
 
     @Test
@@ -450,17 +467,13 @@ public class BridgeTest {
         chainEnd(testContext, HttpMethod.DELETE, "login", userToken, 200, IGNORE_BODY);
     }
 
-    private void shareLocation(final VertxTestContext testContext, HttpMethod method, int code, Runnable chain) {
-        chain(testContext, method, "shareLocation", userToken, code, IGNORE_BODY, chain);
-    }
-
     @Test
     public void shareLocation(final VertxTestContext testContext) {
         shareLocation(testContext, HttpMethod.POST, 200, testContext::completeNow);
     }
 
-    private void stopShareLocation(final VertxTestContext testContext, int code, Runnable chain) {
-        shareLocation(testContext, HttpMethod.DELETE, code, chain);
+    private void shareLocation(final VertxTestContext testContext, HttpMethod method, int code, Runnable chain) {
+        chain(testContext, method, "shareLocation", userToken, code, IGNORE_BODY, chain);
     }
 
     @Test
@@ -473,6 +486,10 @@ public class BridgeTest {
     // decided against validating these as they are harmless
     public void stopShareLocationInvalid(final VertxTestContext testContext) {
         stopShareLocation(testContext, 402, testContext::completeNow);
+    }
+
+    private void stopShareLocation(final VertxTestContext testContext, int code, Runnable chain) {
+        shareLocation(testContext, HttpMethod.DELETE, code, chain);
     }
 
     @Test
@@ -488,13 +505,13 @@ public class BridgeTest {
         );
     }
 
-    private void sendPackage(final VertxTestContext testContext, JsonObject body, int code, String token, Runnable chain) {
-        chain(testContext, HttpMethod.POST, "sendPackage", token, body, code, IGNORE_BODY, chain);
-    }
-
     @Test
     public void sendPackageAsUser(final VertxTestContext testContext) {
         sendPackage(testContext, validPackage, 200, userToken, testContext::completeNow);
+    }
+
+    private void sendPackage(final VertxTestContext testContext, JsonObject body, int code, String token, Runnable chain) {
+        chain(testContext, HttpMethod.POST, "sendPackage", token, body, code, IGNORE_BODY, chain);
     }
 
     @Test
@@ -517,13 +534,13 @@ public class BridgeTest {
         sendPackage(testContext, invalidEndpointIdPackage, 402, businessToken, testContext::completeNow);
     }
 
-    private void getAccountInformation(final VertxTestContext testContext, int code, String token, Predicate<String> isBody, Runnable chain) {
-        chain(testContext, HttpMethod.GET, "accountInformation", token, code, isBody, chain);
-    }
-
     @Test
     public void getUserAccountInformation(final VertxTestContext testContext) {
         getAccountInformation(testContext, 200, userToken, USERINFO_BODY, testContext::completeNow);
+    }
+
+    private void getAccountInformation(final VertxTestContext testContext, int code, String token, Predicate<String> isBody, Runnable chain) {
+        chain(testContext, HttpMethod.GET, "accountInformation", token, code, isBody, chain);
     }
 
     @Test
@@ -531,25 +548,13 @@ public class BridgeTest {
         getAccountInformation(testContext, 200, businessToken, BUSS_INFO_BODY, testContext::completeNow);
     }
 
-    private void getFriends(final VertxTestContext testContext, Predicate<String> isBody, Runnable chain) {
-        chain(testContext, HttpMethod.GET, "friend", userToken, 200, isBody, chain);
-    }
-
     @Test
     public void getFriends(final VertxTestContext testContext) {
         getFriends(testContext, FRIENDS_BODY_EMPTY, testContext::completeNow);
     }
 
-    private void removeFriend(final VertxTestContext testContext, HttpMethod httpMethod, int code, String friendName, Runnable chain) {
-        chain(testContext, httpMethod, "friend/" + friendName, userToken, code, IGNORE_BODY, chain);
-    }
-
-    private void removeFriend(final VertxTestContext testContext, int code, String friendName, Runnable chain) {
-        removeFriend(testContext, HttpMethod.DELETE, code, friendName, chain);
-    }
-
-    private void addFriend(final VertxTestContext testContext, int code, String friendName, Runnable chain) {
-        removeFriend(testContext, HttpMethod.POST, code, friendName, chain);
+    private void getFriends(final VertxTestContext testContext, Predicate<String> isBody, Runnable chain) {
+        chain(testContext, HttpMethod.GET, "friend", userToken, 200, isBody, chain);
     }
 
     @Test
@@ -563,6 +568,14 @@ public class BridgeTest {
     @Test
     public void addFriendInvalidName(final VertxTestContext testContext) { //dont use friendName with space or non URL allowed char it will shutdown the server.
         addFriend(testContext, 402, "NOT_EXIST", testContext::completeNow);
+    }
+
+    private void addFriend(final VertxTestContext testContext, int code, String friendName, Runnable chain) {
+        removeFriend(testContext, HttpMethod.POST, code, friendName, chain);
+    }
+
+    private void removeFriend(final VertxTestContext testContext, HttpMethod httpMethod, int code, String friendName, Runnable chain) {
+        chain(testContext, httpMethod, "friend/" + friendName, userToken, code, IGNORE_BODY, chain);
     }
 
     @Test
@@ -599,8 +612,8 @@ public class BridgeTest {
                 () -> removeFriend(testContext, 402, createAccountJson.getString(NAME), testContext::completeNow));
     }
 
-    private void getSubscriptions(final VertxTestContext testContext, String token, Predicate<String> isBody, Runnable chain) {
-        chain(testContext, HttpMethod.GET, "subscription", token, 200, isBody, chain);
+    private void removeFriend(final VertxTestContext testContext, int code, String friendName, Runnable chain) {
+        removeFriend(testContext, HttpMethod.DELETE, code, friendName, chain);
     }
 
     @Test
@@ -608,18 +621,22 @@ public class BridgeTest {
         getSubscriptions(testContext, userToken, USER_SUBSCRIPTIONS, testContext::completeNow);
     }
 
+    private void getSubscriptions(final VertxTestContext testContext, String token, Predicate<String> isBody, Runnable chain) {
+        chain(testContext, HttpMethod.GET, "subscription", token, 200, isBody, chain);
+    }
+
     @Test
     public void getBusinessSubscriptions(final VertxTestContext testContext) {
         getSubscriptions(testContext, businessToken, BUSS_SUBSCRIPTIONS, testContext::completeNow);
     }
 
-    private void buySubscription(final VertxTestContext testContext, String token, JsonObject body, int code, Runnable chain) {
-        chain(testContext, HttpMethod.POST, "subscription", token, body, code, IGNORE_BODY, chain);
-    }
-
     @Test
     public void buyUserSubscription(final VertxTestContext testContext) {
         buySubscription(testContext, userToken, validSubscriptionBody, 200, testContext::completeNow);
+    }
+
+    private void buySubscription(final VertxTestContext testContext, String token, JsonObject body, int code, Runnable chain) {
+        chain(testContext, HttpMethod.POST, "subscription", token, body, code, IGNORE_BODY, chain);
     }
 
     @Test
@@ -657,13 +674,13 @@ public class BridgeTest {
                 ));
     }
 
-    private void viewSubscription(final VertxTestContext testContext, Predicate<String> body, Runnable chain) {
-        chain(testContext, HttpMethod.GET, "subscriptionInfo", businessToken, 200, body, chain);
-    }
-
     @Test
     public void viewSubscriptionInfoNotUsed(final VertxTestContext testContext) {
         viewSubscription(testContext, SUBSCRIPTION_INFO_EMPTY, testContext::completeNow);
+    }
+
+    private void viewSubscription(final VertxTestContext testContext, Predicate<String> body, Runnable chain) {
+        chain(testContext, HttpMethod.GET, "subscriptionInfo", businessToken, 200, body, chain);
     }
 
     @Test
@@ -673,17 +690,13 @@ public class BridgeTest {
 
     }
 
-    private void getEndpoints(final VertxTestContext testContext, Predicate<String> isBody, Runnable chain) {
-        chain(testContext, HttpMethod.GET, "endpoints", null, 200, isBody, chain);
-    }
-
     @Test
     public void getEndpoints(final VertxTestContext testContext) {
         getEndpoints(testContext, DEFAULT_AMOUNT_ENDPOINTS, testContext::completeNow);
     }
 
-    private void getEndpoint(final VertxTestContext testContext, int id, Predicate<String> isBody, Runnable chain) {
-        chain(testContext, HttpMethod.GET, "endpoints/" + id, null, 200, isBody, chain);
+    private void getEndpoints(final VertxTestContext testContext, Predicate<String> isBody, Runnable chain) {
+        chain(testContext, HttpMethod.GET, "endpoints", null, 200, isBody, chain);
     }
 
     @Test
@@ -691,13 +704,17 @@ public class BridgeTest {
         getEndpoint(testContext, 5, IS_ENDPOINT_5, testContext::completeNow);
     }
 
-    private void setFavoriteEndpoint(final VertxTestContext testContext, HttpMethod httpMethod, int id, String token, int code, Runnable chain) {
-        chain(testContext, httpMethod, "endpoints/favorite/" + id, token, code, IGNORE_BODY, chain);
+    private void getEndpoint(final VertxTestContext testContext, int id, Predicate<String> isBody, Runnable chain) {
+        chain(testContext, HttpMethod.GET, "endpoints/" + id, null, 200, isBody, chain);
     }
 
     @Test
     public void setUserFavEndpoint(final VertxTestContext testContext) {
         setFavoriteEndpoint(testContext, HttpMethod.POST, 5, userToken, 200, testContext::completeNow);
+    }
+
+    private void setFavoriteEndpoint(final VertxTestContext testContext, HttpMethod httpMethod, int id, String token, int code, Runnable chain) {
+        chain(testContext, httpMethod, "endpoints/favorite/" + id, token, code, IGNORE_BODY, chain);
     }
 
     @Test
@@ -743,18 +760,13 @@ public class BridgeTest {
         setFavoriteEndpoint(testContext, HttpMethod.DELETE, 5, businessToken, 402, testContext::completeNow);
     }
 
-
-    private void getReportSections(final VertxTestContext testContext, Predicate<String> isBody, Runnable chain) {
-        chain(testContext, HttpMethod.GET, "report/sections", null, 200, isBody, chain);
-    }
-
     @Test
     public void getReportSections(final VertxTestContext testContext) {
         getReportSections(testContext, REPORT_SECTIONS, testContext::completeNow);
     }
 
-    private void addReport(final VertxTestContext testContext, JsonObject body, int code, Runnable chain) {
-        chain(testContext, HttpMethod.POST, "report", userToken, body, code, IGNORE_BODY, chain);
+    private void getReportSections(final VertxTestContext testContext, Predicate<String> isBody, Runnable chain) {
+        chain(testContext, HttpMethod.GET, "report/sections", null, 200, isBody, chain);
     }
 
     @Test
@@ -762,19 +774,22 @@ public class BridgeTest {
         addReport(testContext, REPORT_INVALID_BODY, 422, testContext::completeNow);
     }
 
+    private void addReport(final VertxTestContext testContext, JsonObject body, int code, Runnable chain) {
+        chain(testContext, HttpMethod.POST, "report", userToken, body, code, IGNORE_BODY, chain);
+    }
+
     @Test
     public void addReport(final VertxTestContext testContext) {
         addReport(testContext, REPORT_BODY, 200, testContext::completeNow);
     }
 
-
-    private void travel(final VertxTestContext testContext, int code, JsonObject body, Predicate<String> isBody, Runnable chain) {
-        chain(testContext, HttpMethod.POST, "travel", userToken, body, code, isBody, chain);
-    }
-
     @Test
     public void travel(final VertxTestContext testContext) {
         travel(testContext, 200, TRAVEL_BODY, TRAVEL_RESPONSE, testContext::completeNow);
+    }
+
+    private void travel(final VertxTestContext testContext, int code, JsonObject body, Predicate<String> isBody, Runnable chain) {
+        chain(testContext, HttpMethod.POST, "travel", userToken, body, code, isBody, chain);
     }
 
     @Test
@@ -792,13 +807,13 @@ public class BridgeTest {
         travel(testContext, 402, TRAVEL_BODY_SAME_SRC_DEST, IGNORE_BODY, testContext::completeNow);
     }
 
-    private void getTravelHistory(final VertxTestContext testContext, Predicate<String> isBody, Runnable chain) {
-        chain(testContext, HttpMethod.GET, "travel", userToken, 200, isBody, chain);
-    }
-
     @Test
     public void getTravelHistory(final VertxTestContext testContext) {
         getTravelHistory(testContext, TRAVEL_HISTORY_EMPTY, testContext::completeNow);
+    }
+
+    private void getTravelHistory(final VertxTestContext testContext, Predicate<String> isBody, Runnable chain) {
+        chain(testContext, HttpMethod.GET, "travel", userToken, 200, isBody, chain);
     }
 
     @Test
@@ -807,14 +822,14 @@ public class BridgeTest {
                 () -> getTravelHistory(testContext, TRAVEL_HISTORY_NOT_EMPTY, testContext::completeNow));
     }
 
-    private void cancelTravel(final VertxTestContext testContext, int id, int code, Runnable chain) {
-        chain(testContext, HttpMethod.DELETE, "travel/" + id, userToken, code, IGNORE_BODY, chain);
-    }
-
     @Test
     public void cancelTravel(final VertxTestContext testContext) {
         travel(testContext, 200, TRAVEL_BODY, TRAVEL_RESPONSE,
                 () -> cancelTravel(testContext, 1, 200, testContext::completeNow));
+    }
+
+    private void cancelTravel(final VertxTestContext testContext, int id, int code, Runnable chain) {
+        chain(testContext, HttpMethod.DELETE, "travel/" + id, userToken, code, IGNORE_BODY, chain);
     }
 
     @Test
@@ -823,14 +838,14 @@ public class BridgeTest {
                 () -> cancelTravel(testContext, 100, 422, testContext::completeNow));
     }
 
-    private void setDisplayName(final VertxTestContext testContext, JsonObject body, Runnable chain) {
-        chain(testContext, HttpMethod.POST, "changeDisplayName", userToken, body, 200, IGNORE_BODY, chain);
-    }
-
     @Test
     public void setDisplayName(final VertxTestContext testContext) {
         setDisplayName(testContext, DISPLAY_NAME_BODY,
-                ()-> getAccountInformation(testContext, 200, userToken, CHECK_NEW_DISPLAY_NAME, testContext::completeNow ));
+                () -> getAccountInformation(testContext, 200, userToken, CHECK_NEW_DISPLAY_NAME, testContext::completeNow));
+    }
+
+    private void setDisplayName(final VertxTestContext testContext, JsonObject body, Runnable chain) {
+        chain(testContext, HttpMethod.POST, "changeDisplayName", userToken, body, 200, IGNORE_BODY, chain);
     }
 }
 
