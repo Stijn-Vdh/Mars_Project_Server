@@ -48,12 +48,8 @@ public class MTTSController extends AuthController {
         UserAccount friend = new UserAccount(friendName);
         boolean exists = userAccounts.contains(friend);
         boolean notYourself = !acc.equals(friend);
-        boolean notFriendedAlready = notFriended == Repositories.getFriendsRepo().getFriends(acc).contains(friend);
-        System.out.println(userAccounts);
-        System.out.println(exists);
-        System.out.println(notYourself);
-        System.out.println(notFriendedAlready);
-        return exists && notYourself && notFriendedAlready;
+        boolean isFriend = Repositories.getFriendsRepo().getFriends(acc).contains(friend);
+        return exists && notYourself && notFriended == isFriend;
     }
 
     public Object removeFriend(UserAccount user, String friendName) {

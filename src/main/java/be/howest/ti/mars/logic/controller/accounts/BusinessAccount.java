@@ -2,7 +2,6 @@ package be.howest.ti.mars.logic.controller.accounts;
 
 import be.howest.ti.mars.logic.controller.MTTSController;
 import be.howest.ti.mars.logic.data.Repositories;
-import io.vertx.core.json.JsonObject;
 
 public class BusinessAccount extends BaseAccount {
     private int largePodsUsed;

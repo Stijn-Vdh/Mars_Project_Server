@@ -317,21 +317,6 @@ public class BridgeTest {
         testContext.completeNow();
     }
 
-    @Test
-    @Disabled
-    //example of why it was needed, it goes before -> after -> middle -> actually after, chaining allows me to execute methods when the previous async completes instead of firing at same time
-    public void getMessageReturnsAWelcomeMessage(final VertxTestContext testContext) {
-        System.out.println("before");
-        chain(testContext, HttpMethod.GET, "message", null, 200, body -> trimBody(body).equals("SmellyEllie"), () -> {
-            System.out.println("middle");
-            chain(testContext, HttpMethod.GET, "message", null, 200, body -> trimBody(body).equals("SmellyEllie"), () -> {
-                System.out.println("actually after");
-                testContext.completeNow();
-            });
-        });
-        System.out.println("after");
-    }
-
     private void chain(final VertxTestContext testContext, HttpMethod method, String requestURI, String authorizationHeader,
                        int expectedStatusCode, Predicate<String> isExpectedBody, Runnable runnable
     ) {
@@ -476,21 +461,8 @@ public class BridgeTest {
         shareLocation(testContext, HttpMethod.POST, 200, () -> stopShareLocation(testContext, 200, testContext::completeNow));
     }
 
-    @Test
-    @Disabled
-    // decided against validating these as they are harmless
-    public void stopShareLocationInvalid(final VertxTestContext testContext) {
-        stopShareLocation(testContext, 402, testContext::completeNow);
-    }
-
     private void stopShareLocation(final VertxTestContext testContext, int code, Runnable chain) {
         shareLocation(testContext, HttpMethod.DELETE, code, chain);
-    }
-
-    @Test
-    @Disabled
-    public void shareLocationInvalid(final VertxTestContext testContext) {
-        shareLocation(testContext, HttpMethod.POST, 200, () -> shareLocation(testContext, HttpMethod.POST, 402, testContext::completeNow));
     }
 
     @Test
