@@ -11,7 +11,8 @@ import be.howest.ti.mars.logic.controller.exceptions.UsernameException;
 import be.howest.ti.mars.logic.data.Repositories;
 import io.vertx.core.json.JsonObject;
 
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class MTTSController extends AuthController {
@@ -22,10 +23,10 @@ public class MTTSController extends AuthController {
     }
 
     public int sendPackage(DeliveryType deliveryType, int from, int destination, BaseAccount acc, boolean userAcc) {
-        if (from == destination){
+        if (from == destination) {
             throw new AuthenticationException("!You cannot use the same endpoint as destination and from!");
         }
-        if (deliveryType == DeliveryType.LARGE && userAcc){
+        if (deliveryType == DeliveryType.LARGE && userAcc) {
             throw new AuthenticationException("!Only businesses can send large package pods!");
         }
         if (!userAcc) {
@@ -35,7 +36,7 @@ public class MTTSController extends AuthController {
     }
 
     public Object addFriend(UserAccount user, String friendName) {
-        if (friendValidation(user,friendName)) {
+        if (friendValidation(user, friendName, false)) {
             user.addFriend(friendName);
         } else {
             throw new UsernameException("Could not add a friend with the given username or you are already friends with this person.");
@@ -43,22 +44,20 @@ public class MTTSController extends AuthController {
         return "You just added a friend called:" + friendName;
     }
 
-    private boolean friendValidation(UserAccount acc, String friendName){
-        UserAccount friend = findUserByName(friendName);
-        return ! acc.equals(friend);
-    }
-
-    private UserAccount findUserByName(String name){
-        for (UserAccount user : Repositories.getAccountsRepo().getUserAccounts()){
-            if (user.getUsername().equals(name)){
-                return user;
-            }
-        }
-        throw new UsernameException("Could not find user with given name.");
+    private boolean friendValidation(UserAccount acc, String friendName, boolean notFriended) { // cant friend yourself or companies or someone that you already (un)friended
+        UserAccount friend = new UserAccount(friendName);
+        boolean exists = userAccounts.contains(friend);
+        boolean notYourself = !acc.equals(friend);
+        boolean notFriendedAlready = notFriended == Repositories.getFriendsRepo().getFriends(acc).contains(friend);
+        System.out.println(userAccounts);
+        System.out.println(exists);
+        System.out.println(notYourself);
+        System.out.println(notFriendedAlready);
+        return exists && notYourself && notFriendedAlready;
     }
 
     public Object removeFriend(UserAccount user, String friendName) {
-        if (friendValidation(user, friendName)) {
+        if (friendValidation(user, friendName, true)) {
             user.removeFriend(friendName);
         } else {
             throw new UsernameException("Could not remove a friend with the given username");
@@ -76,27 +75,27 @@ public class MTTSController extends AuthController {
 
     private JsonObject getAccountInformation(BaseAccount acc) {
         JsonObject accInformation = new JsonObject();
-        accInformation.put("name:", acc.getUsername());
-        accInformation.put("homeAddress:", acc.getAddress());
-        accInformation.put("homeEndpoint:", acc.getHomeAddressEndpoint());
-        accInformation.put("favouriteEndpoints:", Repositories.getFavoritesRepo().getFavoriteEndpoints(acc));
+        accInformation.put("name", acc.getUsername());
+        accInformation.put("homeAddress", acc.getAddress());
+        accInformation.put("homeEndpoint", acc.getHomeAddressEndpoint());
+        accInformation.put("favouriteEndpoints", Repositories.getFavoritesRepo().getFavoriteEndpoints(acc));
         return accInformation;
     }
 
     public Object getUserAccountInformation(UserAccount account) {
         JsonObject accInformation = getAccountInformation(account);
-        accInformation.put("displayName:", account.getDisplayName());
-        accInformation.put("shareLocation:", account.isSharesLocation());
-        accInformation.put("subscription:", Repositories.getSubscriptionRepo().getUserSubscription(account));
-        accInformation.put("friends:", Repositories.getFriendsRepo().getFriends(account).stream().map(UserAccount::getUsername).collect(Collectors.toList()));
-        accInformation.put("travelHistory:", Repositories.getTravelsRepo().getTravelHistory(account));
+        accInformation.put("displayName", account.getDisplayName());
+        accInformation.put("shareLocation", account.isSharesLocation());
+        accInformation.put("subscription", Repositories.getSubscriptionRepo().getUserSubscription(account));
+        accInformation.put("friends", Repositories.getFriendsRepo().getFriends(account).stream().map(UserAccount::getUsername).collect(Collectors.toList()));
+        accInformation.put("travelHistory", Repositories.getTravelsRepo().getTravelHistory(account));
         return accInformation;
     }
 
     public Object getBusinessAccountInformation(BusinessAccount business) {
         JsonObject accInformation = getAccountInformation(business);
-        accInformation.put("subscription:", Repositories.getSubscriptionRepo().getBusinessSubscription(business));
-        accInformation.put("Current usage subscription:", Repositories.getSubscriptionRepo().getBusinessSubscriptionInfo(business));
+        accInformation.put("subscription", Repositories.getSubscriptionRepo().getBusinessSubscription(business));
+        accInformation.put("Current usage subscription", Repositories.getSubscriptionRepo().getBusinessSubscriptionInfo(business));
         return accInformation;
     }
 

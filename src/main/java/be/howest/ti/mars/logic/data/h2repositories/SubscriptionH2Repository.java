@@ -3,6 +3,7 @@ package be.howest.ti.mars.logic.data.h2repositories;
 import be.howest.ti.mars.logic.controller.accounts.BusinessAccount;
 import be.howest.ti.mars.logic.controller.accounts.UserAccount;
 import be.howest.ti.mars.logic.controller.exceptions.DatabaseException;
+import be.howest.ti.mars.logic.controller.exceptions.EntityNotFoundException;
 import be.howest.ti.mars.logic.controller.subscription.BusinessSubscription;
 import be.howest.ti.mars.logic.controller.subscription.BusinessSubscriptionInfo;
 import be.howest.ti.mars.logic.controller.subscription.UserSubscription;
@@ -159,7 +160,7 @@ public class SubscriptionH2Repository implements SubscriptionRepository {
                 throw new DatabaseException("Can't buy user subscription");
             }
         } else {
-            throw new DatabaseException("Could not find a subscription with given id");
+            throw new EntityNotFoundException("Could not find a subscription with given id");
         }
     }
 
@@ -177,7 +178,7 @@ public class SubscriptionH2Repository implements SubscriptionRepository {
                 throw new DatabaseException("Can't buy business subscription");
             }
         } else {
-            throw new DatabaseException("Could not find a subscription with given id");
+            throw new EntityNotFoundException("Could not find a subscription with given id");
         }
     }
 

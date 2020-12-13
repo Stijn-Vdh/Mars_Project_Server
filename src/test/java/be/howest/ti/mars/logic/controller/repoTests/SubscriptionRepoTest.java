@@ -4,6 +4,7 @@ import be.howest.ti.mars.logic.controller.MTTSController;
 import be.howest.ti.mars.logic.controller.accounts.BusinessAccount;
 import be.howest.ti.mars.logic.controller.accounts.UserAccount;
 import be.howest.ti.mars.logic.controller.exceptions.DatabaseException;
+import be.howest.ti.mars.logic.controller.exceptions.EntityNotFoundException;
 import be.howest.ti.mars.logic.controller.subscription.BusinessSubscription;
 import be.howest.ti.mars.logic.controller.subscription.UserSubscription;
 import be.howest.ti.mars.logic.data.Repositories;
@@ -61,7 +62,7 @@ public class SubscriptionRepoTest {
         Repositories.getSubscriptionRepo().setUserSubscription(testDanny, 1);
         assertEquals(1, Repositories.getSubscriptionRepo().getUserSubscription(testDanny).getId());
 
-        assertThrows(DatabaseException.class, ()-> Repositories.getSubscriptionRepo().setUserSubscription(testDebby, 6));
+        assertThrows(EntityNotFoundException.class, ()-> Repositories.getSubscriptionRepo().setUserSubscription(testDebby, 6));
     }
 
     @Test
@@ -69,7 +70,7 @@ public class SubscriptionRepoTest {
         Repositories.getSubscriptionRepo().setBusinessSubscription(testPol, 1);
         assertEquals(1, Repositories.getSubscriptionRepo().getBusinessSubscription(testPol).getId());
 
-        assertThrows(DatabaseException.class, ()-> Repositories.getSubscriptionRepo().setBusinessSubscription(testPol, -1));
+        assertThrows(EntityNotFoundException.class, ()-> Repositories.getSubscriptionRepo().setBusinessSubscription(testPol, -1));
     }
 
     @Test

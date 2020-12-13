@@ -35,6 +35,11 @@ public class WebServer extends AbstractVerticle {
     private static final Integer DB_WEB_CONSOLE_FALLBACK = 9000;
     private static final String OPEN_API_SPEC = "openapi-group-15.yaml";
     private final MarsOpenApiBridge bridge;
+    private int PORT_TESTS = 8080;
+    private static final JsonObject FALLBACK_DB_PROP = new JsonObject()
+            .put("username", "")
+            .put("password", "")
+            .put("url", "jdbc:h2:~/mars-db");
 
     public WebServer(MarsOpenApiBridge bridge) {
         this.bridge = bridge;
@@ -44,17 +49,26 @@ public class WebServer extends AbstractVerticle {
         this(new MarsOpenApiBridge());
     }
 
+    public WebServer(int port) {
+        this(new MarsOpenApiBridge());
+        PORT_TESTS = port;
+    }
+
     @Override
     public void start(Promise<Void> promise) {
         MarsOpenApiBridge.setVertx(vertx); // there should be a better way
         ConfigRetriever.create(vertx).getConfig(ar -> {
             if (ar.failed()) {
-                LOGGER.warning("Config not available");
+                LOGGER.severe("Config not available");
+
+                LOGGER.info(String.format("Starting web server on port %s ", PORT_TESTS));
+                configureDatabase(FALLBACK_DB_PROP);
+                configureOpenApiServer(promise, OPEN_API_SPEC, PORT_TESTS);
             } else {
                 JsonObject properties = ar.result();
-                JsonObject dbProperties = properties.getJsonObject("db");
+                JsonObject dbProperties = properties.getJsonObject("db", FALLBACK_DB_PROP);
                 configureDatabase(dbProperties);
-                int port = properties.getJsonObject("http").getInteger("port");
+                int port = PORT_TESTS == 8080 ? properties.getJsonObject("http", new JsonObject().put("port", PORT_TESTS)).getInteger("port") : PORT_TESTS;
                 LOGGER.info(String.format("Starting web server on port %s ", port));
 
                 configureOpenApiServer(promise, OPEN_API_SPEC, port);
@@ -74,7 +88,7 @@ public class WebServer extends AbstractVerticle {
                     dbProps.getString("username"),
                     dbProps.getString("password"),
                     dbProps.getInteger("webconsole.port", DB_WEB_CONSOLE_FALLBACK));
-            LOGGER.info("Database webconsole started on port: " + dbProps.getInteger("webconsole.port"));
+            LOGGER.info("Database webconsole started on port: " + dbProps.getInteger("webconsole.port", DB_WEB_CONSOLE_FALLBACK));
         } catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, "DB web console is unavailable", ex);
         }
@@ -100,7 +114,7 @@ public class WebServer extends AbstractVerticle {
 
     private void listen(Promise<Void> promise, AsyncResult<HttpServer> result) {
         if (result.succeeded()) {
-            LOGGER.info(() -> String.format("Listening at port %d", result.result().actualPort()));
+            LOGGER.severe(() -> String.format("Listening at port %d", result.result().actualPort()));
             promise.complete();
         } else {
             LOGGER.log(Level.SEVERE, "Web server failed to start listening", result.cause());
