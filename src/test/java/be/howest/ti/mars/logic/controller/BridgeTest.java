@@ -279,19 +279,11 @@ public class BridgeTest {
     private Vertx vertx;
     private WebClient webClient;
 
-    @BeforeEach
-    void deploy(final VertxTestContext testContext) {
-        vertx = Vertx.vertx();
-        vertx.deployVerticle(new WebServer(PORT),
-
-                deployDummyData(testContext));
-        webClient = WebClient.create(vertx);
-
-        //add user and login, add business and login
-
+    private static String trimBody(String body) {
+        return body.substring(1, body.length() - 1);
     }
 
-    public <T> Handler<AsyncResult<T>> deployDummyData(VertxTestContext testContext) {
+    private <T> Handler<AsyncResult<T>> deployDummyData(VertxTestContext testContext) {
         return ar -> {
             if (ar.succeeded()) {
                 createAccount(testContext, userAccountJson,
@@ -305,6 +297,13 @@ public class BridgeTest {
                 testContext.failNow(ar.cause());
             }
         };
+    }
+
+    @BeforeEach
+    void deploy(final VertxTestContext testContext) {
+        vertx = Vertx.vertx();
+        vertx.deployVerticle(new WebServer(PORT), deployDummyData(testContext));
+        webClient = WebClient.create(vertx);
     }
 
     @AfterEach
@@ -348,10 +347,6 @@ public class BridgeTest {
                     runnable.run();
                 })
         ));
-    }
-
-    private static String trimBody(String body) {
-        return body.substring(1, body.length() - 1);
     }
 
     private HttpRequest<Buffer> makeRequest(HttpMethod method, String requestURI, String authorizationHeader) {
