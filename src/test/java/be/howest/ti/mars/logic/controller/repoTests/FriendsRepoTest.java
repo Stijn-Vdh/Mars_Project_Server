@@ -4,6 +4,8 @@ import be.howest.ti.mars.logic.controller.MTTSController;
 import be.howest.ti.mars.logic.controller.accounts.BusinessAccount;
 import be.howest.ti.mars.logic.controller.accounts.UserAccount;
 import be.howest.ti.mars.logic.controller.exceptions.DatabaseException;
+import be.howest.ti.mars.logic.controller.exceptions.EntityNotFoundException;
+import be.howest.ti.mars.logic.controller.exceptions.UsernameException;
 import be.howest.ti.mars.logic.data.Repositories;
 import be.howest.ti.mars.logic.data.repositories.AccountsRepository;
 import be.howest.ti.mars.logic.data.repositories.FriendsRepository;
@@ -46,7 +48,7 @@ class FriendsRepoTest {
     @Order(1)
     void friendExists() {
         assertFalse(friendRepo.friendExists("Debby", testDanny));
-        controller.addFriend(testDanny, "Debby");
+        friendRepo.beFriend(testDanny.getUsername(),"Debby");
         assertTrue(friendRepo.friendExists("Debby", testDanny));
     }
 
@@ -54,16 +56,16 @@ class FriendsRepoTest {
     @Order(2)
     void beFriend() {
         assertEquals(0, friendRepo.getFriends(testDebby).size());
-        controller.addFriend(testDebby,"Danny");
+        friendRepo.beFriend(testDebby.getUsername(),"Danny");
         assertEquals(1, friendRepo.getFriends(testDebby).size());
-        assertThrows(DatabaseException.class, () -> controller.addFriend(testDanny, "Debby"));
+        assertThrows(UsernameException.class, () -> controller.addFriend(testDanny, "Debby"));
     }
 
     @Test
     @Order(3)
     void removeFriend() {
         assertEquals(1, friendRepo.getFriends(testDebby).size());
-        controller.removeFriend(testDebby,"Danny");
+        friendRepo.removeFriend(testDebby.getUsername(),"Danny");
         assertEquals(0, friendRepo.getFriends(testDebby).size());
 
     }

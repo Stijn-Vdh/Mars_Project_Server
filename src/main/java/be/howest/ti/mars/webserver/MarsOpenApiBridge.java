@@ -6,7 +6,7 @@ import be.howest.ti.mars.logic.controller.accounts.BusinessAccount;
 import be.howest.ti.mars.logic.controller.accounts.UserAccount;
 import be.howest.ti.mars.logic.controller.enums.DeliveryType;
 import be.howest.ti.mars.logic.controller.enums.NotificationType;
-import be.howest.ti.mars.logic.controller.exceptions.AuthenticationException;
+import be.howest.ti.mars.logic.controller.exceptions.MarsIllegalArgumentException;
 import be.howest.ti.mars.logic.controller.security.AccountToken;
 import be.howest.ti.mars.logic.controller.security.SecureHash;
 import be.howest.ti.mars.logic.data.Repositories;
@@ -73,6 +73,12 @@ class MarsOpenApiBridge {
     public Object sendPackage(RoutingContext ctx) {
         JsonObject json = ctx.getBodyAsJson();
         boolean isUser = isUserAccountToken(ctx);
+        if (isUser && DeliveryType.enumOf(json.getString("deliveryType")) == DeliveryType.LARGE) {
+            throw new MarsIllegalArgumentException("!Only businesses can send large package pods!");
+        }
+        if (json.getInteger("from").equals(json.getInteger(DESTINATION))) {
+            throw new MarsIllegalArgumentException("!You cannot use the same endpoint as destination and from!");
+        }
         int id = controller.sendPackage(DeliveryType.enumOf(json.getString("deliveryType")),
                 json.getInteger("from"),
                 json.getInteger(DESTINATION),
@@ -101,11 +107,7 @@ class MarsOpenApiBridge {
     }
 
     public Object getAccountInformation(RoutingContext ctx) {
-        if (isUserAccountToken(ctx)) {
-            return controller.getUserAccountInformation(getUserAccount(ctx));
-        } else {
-            return controller.getBusinessAccountInformation(getBusinessAccount(ctx));
-        }
+        return getAccount(ctx).getAccountInformation();
     }
 
     public Object viewFriends(RoutingContext ctx) {

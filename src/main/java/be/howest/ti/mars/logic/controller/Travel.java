@@ -2,6 +2,8 @@ package be.howest.ti.mars.logic.controller;
 
 import be.howest.ti.mars.logic.controller.converters.ShortEndpoint;
 import be.howest.ti.mars.logic.controller.enums.PodType;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Travel {
     private final int id;
@@ -10,7 +12,9 @@ public class Travel {
     private final PodType podType;
     private final String dateTime;
 
-    public Travel(int id,ShortEndpoint from, ShortEndpoint destination, PodType podType, String dateTime) {
+    @JsonCreator
+    public Travel(@JsonProperty("id") int id, @JsonProperty("from") ShortEndpoint from, @JsonProperty("destination") ShortEndpoint destination,
+                  @JsonProperty("podType") PodType podType, @JsonProperty("dateTime") String dateTime) {
         this.id = id;
         this.from = from;
         this.destination = destination;
@@ -18,7 +22,9 @@ public class Travel {
         this.dateTime = dateTime;
     }
 
-    public int getId(){return id;}
+    public int getId() {
+        return id;
+    }
 
     public ShortEndpoint getFrom() {
         return from;

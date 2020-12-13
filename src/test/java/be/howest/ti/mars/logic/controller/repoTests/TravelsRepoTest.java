@@ -5,6 +5,7 @@ import be.howest.ti.mars.logic.controller.accounts.BusinessAccount;
 import be.howest.ti.mars.logic.controller.accounts.UserAccount;
 import be.howest.ti.mars.logic.controller.exceptions.DatabaseException;
 import be.howest.ti.mars.logic.controller.exceptions.EndpointException;
+import be.howest.ti.mars.logic.controller.exceptions.EntityNotFoundException;
 import be.howest.ti.mars.logic.data.Repositories;
 import be.howest.ti.mars.logic.data.repositories.AccountsRepository;
 import be.howest.ti.mars.logic.data.util.MarsConnection;
@@ -59,7 +60,7 @@ class TravelsRepoTest {
     @Test
     @Order(3)
     void cancelTravel() {
-        assertThrows(DatabaseException.class, ()-> controller.cancelTrip(testDanny,2));
+        assertThrows(EntityNotFoundException.class, ()-> controller.cancelTrip(testDanny,2));
         controller.cancelTrip(testDanny, 1);
         assertEquals(0,Repositories.getTravelsRepo().getTravelHistory(testDanny).size());
     }
