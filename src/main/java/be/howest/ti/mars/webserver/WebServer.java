@@ -34,12 +34,12 @@ public class WebServer extends AbstractVerticle {
     private static final Logger LOGGER = Logger.getLogger(WebServer.class.getName());
     private static final Integer DB_WEB_CONSOLE_FALLBACK = 9000;
     private static final String OPEN_API_SPEC = "openapi-group-15.yaml";
-    private final MarsOpenApiBridge bridge;
-    private int PORT_TESTS = 8080;
     private static final JsonObject FALLBACK_DB_PROP = new JsonObject()
             .put("username", "")
             .put("password", "")
             .put("url", "jdbc:h2:~/mars-db");
+    private final MarsOpenApiBridge bridge;
+    private int portTests = 8080;
 
     public WebServer(MarsOpenApiBridge bridge) {
         this.bridge = bridge;
@@ -51,7 +51,7 @@ public class WebServer extends AbstractVerticle {
 
     public WebServer(int port) {
         this(new MarsOpenApiBridge());
-        PORT_TESTS = port;
+        this.portTests = port;
     }
 
     @Override
@@ -61,14 +61,14 @@ public class WebServer extends AbstractVerticle {
             if (ar.failed()) {
                 LOGGER.severe("Config not available");
 
-                LOGGER.info(String.format("Starting web server on port %s ", PORT_TESTS));
+                LOGGER.info(String.format("Starting web server on port %s ", portTests));
                 configureDatabase(FALLBACK_DB_PROP);
-                configureOpenApiServer(promise, OPEN_API_SPEC, PORT_TESTS);
+                configureOpenApiServer(promise, OPEN_API_SPEC, portTests);
             } else {
                 JsonObject properties = ar.result();
                 JsonObject dbProperties = properties.getJsonObject("db", FALLBACK_DB_PROP);
                 configureDatabase(dbProperties);
-                int port = PORT_TESTS == 8080 ? properties.getJsonObject("http", new JsonObject().put("port", PORT_TESTS)).getInteger("port") : PORT_TESTS;
+                int port = portTests == 8080 ? properties.getJsonObject("http", new JsonObject().put("port", portTests)).getInteger("port") : portTests;
                 LOGGER.info(String.format("Starting web server on port %s ", port));
 
                 configureOpenApiServer(promise, OPEN_API_SPEC, port);

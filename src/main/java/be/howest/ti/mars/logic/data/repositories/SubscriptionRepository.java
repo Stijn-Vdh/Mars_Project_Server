@@ -7,7 +7,6 @@ import be.howest.ti.mars.logic.controller.subscription.BusinessSubscriptionInfo;
 import be.howest.ti.mars.logic.controller.subscription.UserSubscription;
 
 import java.util.List;
-import java.util.Set;
 
 public interface SubscriptionRepository {
     List<UserSubscription> getUserSubscriptions(); // TODO: 21-11-2020 add to spec and webserver
