@@ -251,6 +251,15 @@ class MarsOpenApiBridge {
         return controller.getDelivery(getAccount(ctx), Integer.parseInt(ctx.request().getParam("id")));
     }
 
+    public Object getTravelEndpoints(RoutingContext ctx) {
+        return Repositories.getEndpointsRepo().getTravelEndpoints(getUserAccount(ctx));
+    }
+
+    public Object getPackageEndpoints(){
+        return Repositories.getEndpointsRepo().getPackageEndpoints();
+    }
+
+
     //------------------------------------------------------------------------------------------------------------------
 
     public boolean isUserAccountToken(RoutingContext ctx) {

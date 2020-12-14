@@ -1,7 +1,6 @@
 package be.howest.ti.mars.logic.data.repositories;
 
 import be.howest.ti.mars.logic.controller.Endpoint;
-import be.howest.ti.mars.logic.controller.accounts.BaseAccount;
 import be.howest.ti.mars.logic.controller.accounts.UserAccount;
 import be.howest.ti.mars.logic.controller.converters.ShortEndpoint;
 
@@ -22,7 +21,7 @@ public interface EndpointsRepository {
 
     Set<ShortEndpoint> getTravelEndpoints(UserAccount user);
 
-    Set<ShortEndpoint> getPackageEndpoints(BaseAccount account);
+    Set<ShortEndpoint> getPackageEndpoints();
 
 
 }

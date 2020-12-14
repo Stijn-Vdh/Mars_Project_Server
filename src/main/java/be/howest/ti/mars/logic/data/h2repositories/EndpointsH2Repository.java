@@ -140,7 +140,7 @@ public class EndpointsH2Repository implements EndpointsRepository {
     }
 
     @Override
-    public Set<ShortEndpoint> getPackageEndpoints(BaseAccount acc) {
+    public Set<ShortEndpoint> getPackageEndpoints() {
         return getEndpoints(SQL_GET_PACKAGE_ENDPOINTS);
     }
 }
