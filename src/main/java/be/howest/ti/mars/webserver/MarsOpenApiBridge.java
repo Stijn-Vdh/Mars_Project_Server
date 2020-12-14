@@ -87,16 +87,16 @@ class MarsOpenApiBridge {
                 isUser
         );
         if (isUser) {
-            long travelDuration = getETA() * 3;
             timer.schedule(wrap(() -> getUserAccount(ctx).sendNotification(vertx, "PACKAGE_POD_ARRIVAL", new JsonObject().put("id", id))), getETA());
-            timer.schedule(wrap(() -> controller.getUsersWhoLiveAt(dest).forEach(acc -> acc.sendNotification(vertx, "PACKAGE_POD_RECEIVED", new JsonObject()
-                    .put("duration", travelDuration)
-                    .put("sender", getUserAccount(ctx).getDisplayName())
-                    .put("deliveryAddress", dest)
-            ))), travelDuration);
-            ;
-
         }
+
+        long travelDuration = getETA() * 3;
+        timer.schedule(wrap(() -> controller.getUsersWhoLiveAt(dest).forEach(acc -> acc.sendNotification(vertx, "PACKAGE_POD_RECEIVED", new JsonObject()
+                .put("duration", travelDuration)
+                .put("sender", isUser ? getUserAccount(ctx).getDisplayName() : getBusinessAccount(ctx).getUsername())
+                .put("deliveryAddress", dest)
+        ))), travelDuration);
+
         JsonObject delivery = new JsonObject();
         delivery.put("deliveryId", id);
         return delivery;
