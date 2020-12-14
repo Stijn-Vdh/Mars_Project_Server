@@ -66,7 +66,7 @@ class MarsOpenApiBridge {
     }
 
     private Long getETA() { // randomized delay
-        return rand.nextInt(5) * 1000L;
+        return 1000L + rand.nextInt(5) * 1000L;
     }
 
     public Object sendPackage(RoutingContext ctx) {

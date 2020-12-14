@@ -126,7 +126,7 @@ public class MTTSController extends AuthController {
     }
 
     public Set<UserAccount> getUsersWhoLiveAt(int id) {
-        return Repositories.getAccountsRepo().getUserAccounts().stream()
+        return userAccounts.stream()
                 .filter(acc -> acc.getHomeAddressEndpoint() == id)
                 .collect(Collectors.toSet());
     }
