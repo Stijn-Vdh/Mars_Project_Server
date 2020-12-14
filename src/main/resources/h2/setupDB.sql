@@ -2,8 +2,10 @@ DROP ALL OBJECTS;
 
 CREATE TABLE endpoints
 (
-	id   int AUTO_INCREMENT PRIMARY KEY,
-	name varchar(50)
+	id        int AUTO_INCREMENT PRIMARY KEY,
+	name      varchar(50),
+	available boolean DEFAULT TRUE,
+	private   boolean DEFAULT FALSE
 );
 
 CREATE TABLE user_subscriptions
