@@ -143,10 +143,10 @@ class MarsOpenApiBridge {
     }
 
     public Object viewSubscriptions(RoutingContext ctx) {
-        if (isUserAccountToken(ctx)) {
-            return Repositories.getSubscriptionRepo().getUserSubscriptions();
-        } else {
+        if (isBusinessAccountToken(ctx)) {
             return Repositories.getSubscriptionRepo().getBusinessSubscriptions();
+        } else {
+            return Repositories.getSubscriptionRepo().getUserSubscriptions();
         }
     }
 
@@ -255,7 +255,7 @@ class MarsOpenApiBridge {
         return Repositories.getEndpointsRepo().getTravelEndpoints(getUserAccount(ctx));
     }
 
-    public Object getPackageEndpoints(){
+    public Object getPackageEndpoints() {
         return Repositories.getEndpointsRepo().getPackageEndpoints();
     }
 
@@ -266,7 +266,7 @@ class MarsOpenApiBridge {
         return getUserAccount(ctx) != null;
     }
 
-    public boolean verifyBusinessAccountToken(RoutingContext ctx) {
+    public boolean isBusinessAccountToken(RoutingContext ctx) {
         return getBusinessAccount(ctx) != null;
     }
 

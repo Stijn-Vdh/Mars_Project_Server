@@ -287,7 +287,7 @@ public class WebServer extends AbstractVerticle {
     }
 
     private void verifyBusinessAccountToken(RoutingContext ctx) {
-        verifyToken(ctx, bridge::verifyBusinessAccountToken);
+        verifyToken(ctx, bridge::isBusinessAccountToken);
     }
 
     private void verifyToken(RoutingContext ctx, Predicate<RoutingContext> check) {
@@ -305,7 +305,7 @@ public class WebServer extends AbstractVerticle {
 
         if (bridge.getBearerToken(ctx) == null) {
             ctx.fail(401); // Unauthorized  due to wrong or absent header format
-        } else if (bridge.isUserAccountToken(ctx) || bridge.verifyBusinessAccountToken(ctx)) {
+        } else if (bridge.isUserAccountToken(ctx) || bridge.isBusinessAccountToken(ctx)) {
             ctx.next();
         } else {
             ctx.fail(403); // forbidden
