@@ -99,6 +99,15 @@ CREATE TABLE friends
 	FOREIGN KEY (friendName) REFERENCES users (name),
 	CHECK (userName <> friendName)                  -- prevent befriending yourself
 );
+CREATE TABLE potential_friends
+(
+    userName   varchar(50),
+    friendName varchar(50),
+    PRIMARY KEY (userName, friendName),
+    FOREIGN KEY (userName) REFERENCES users (name), --notice users here and not accounts
+    FOREIGN KEY (friendName) REFERENCES users (name),
+    CHECK (userName <> friendName)                  -- prevent befriending yourself
+);
 
 CREATE TABLE favorite_endpoints
 (

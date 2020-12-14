@@ -7,10 +7,10 @@ import be.howest.ti.mars.logic.controller.enums.DeliveryType;
 import be.howest.ti.mars.logic.controller.enums.PodType;
 import be.howest.ti.mars.logic.controller.exceptions.AuthenticationException;
 import be.howest.ti.mars.logic.controller.exceptions.EndpointException;
+import be.howest.ti.mars.logic.controller.exceptions.MarsIllegalArgumentException;
 import be.howest.ti.mars.logic.controller.exceptions.UsernameException;
 import be.howest.ti.mars.logic.data.Repositories;
 import io.vertx.core.json.JsonObject;
-
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -37,7 +37,13 @@ public class MTTSController extends AuthController {
     }
 
     public Object addFriend(UserAccount user, String friendName) {
+        UserAccount potentialFriend = findUserByName(friendName);
         if (friendValidation(user, friendName, false)) {
+            if (Repositories.getFriendsRepo().getFriends(user,true).contains(potentialFriend)){
+                user.removePotentialFriend(potentialFriend);
+            }else{
+                potentialFriend.addPotentialFriend(user);
+            }
             user.addFriend(friendName);
         } else {
             throw new UsernameException("Could not add a friend with the given username or you are already friends with this person.");
@@ -45,17 +51,33 @@ public class MTTSController extends AuthController {
         return "You just added a friend called:" + friendName;
     }
 
+    private UserAccount findUserByName(String friendName) {
+        List<UserAccount> resultUserList  =  Repositories.getAccountsRepo().getUserAccounts().stream().filter(user -> user.getUsername().equals(friendName)).collect(Collectors.toList());
+        if (resultUserList.size() != 1) {
+            throw new MarsIllegalArgumentException("Something went wrong trying to find user by name.");
+        }
+        return resultUserList.get(0);
+    }
+
     private boolean friendValidation(UserAccount acc, String friendName, boolean notFriended) { // cant friend yourself or companies or someone that you already (un)friended
-        UserAccount friend = new UserAccount(friendName);
-        boolean exists = userAccounts.contains(friend);
+        UserAccount friend = findUserByName(friendName);
+        boolean exists = Repositories.getAccountsRepo().getUserAccounts().contains(friend);
         boolean notYourself = !acc.equals(friend);
-        boolean isFriend = Repositories.getFriendsRepo().getFriends(acc).contains(friend);
-        return exists && notYourself && notFriended == isFriend;
+        boolean isFriend = Repositories.getFriendsRepo().getFriends(acc, false).contains(friend);
+        boolean isPotentialFriend = Repositories.getFriendsRepo().getFriends(acc, true).contains(friend);
+        return exists && notYourself && notFriended == isFriend || isPotentialFriend;
     }
 
     public Object removeFriend(UserAccount user, String friendName) {
+        UserAccount friend = findUserByName(friendName);
         if (friendValidation(user, friendName, true)) {
-            user.removeFriend(friendName);
+            if (Repositories.getFriendsRepo().getFriends(user,true).contains(friend)){
+                user.removePotentialFriend(friend);
+            }else{
+                user.removeFriend(friendName);
+            }
+            friend.removeFriend(user.getUsername());
+
         } else {
             throw new UsernameException("Could not remove a friend with the given username");
         }
@@ -84,7 +106,8 @@ public class MTTSController extends AuthController {
         accInformation.put("displayName", account.getDisplayName());
         accInformation.put("shareLocation", account.isSharesLocation());
         accInformation.put("subscription", Repositories.getSubscriptionRepo().getUserSubscription(account));
-        accInformation.put("friends", Repositories.getFriendsRepo().getFriends(account).stream().map(UserAccount::getUsername).collect(Collectors.toList()));
+        accInformation.put("friends", Repositories.getFriendsRepo().getFriends(account, false).stream().map(UserAccount::getUsername).collect(Collectors.toList()));
+        accInformation.put("potentialFriends", Repositories.getFriendsRepo().getFriends(account, true).stream().map(UserAccount::getUsername).collect(Collectors.toList()));
         accInformation.put("travelHistory", Repositories.getTravelsRepo().getTravelHistory(account));
         return accInformation;
     }

@@ -28,6 +28,13 @@ public class UserAccount extends BaseAccount {
         super(name);
     }
 
+   public void addPotentialFriend(UserAccount friend){
+        Repositories.getFriendsRepo().beFriend(getUsername(), friend.getUsername(), true);
+   }
+   public void removePotentialFriend(UserAccount friend){
+       Repositories.getFriendsRepo().removeFriend(getUsername(), friend.getUsername(), true);
+
+   }
 
     public String getDisplayName() {
         return displayName;
@@ -49,11 +56,11 @@ public class UserAccount extends BaseAccount {
     }
 
     public void addFriend(String friendName) {
-        Repositories.getFriendsRepo().beFriend(getUsername(), friendName);
+        Repositories.getFriendsRepo().beFriend(getUsername(), friendName, false);
     }
 
     public void removeFriend(String friendName) {
-        Repositories.getFriendsRepo().removeFriend(getUsername(), friendName);
+        Repositories.getFriendsRepo().removeFriend(getUsername(), friendName, false);
     }
 
     public boolean isSharesLocation() {

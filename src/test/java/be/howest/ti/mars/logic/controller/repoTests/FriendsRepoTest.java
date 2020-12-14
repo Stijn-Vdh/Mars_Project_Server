@@ -46,27 +46,35 @@ class FriendsRepoTest {
 
     @Test
     @Order(1)
-    void friendExists() {
-        assertFalse(friendRepo.friendExists("Debby", testDanny));
-        friendRepo.beFriend(testDanny.getUsername(),"Debby");
-        assertTrue(friendRepo.friendExists("Debby", testDanny));
-    }
-
-    @Test
-    @Order(2)
     void beFriend() {
-        assertEquals(0, friendRepo.getFriends(testDebby).size());
-        friendRepo.beFriend(testDebby.getUsername(),"Danny");
-        assertEquals(1, friendRepo.getFriends(testDebby).size());
+        assertEquals(0, friendRepo.getFriends(testDebby, false).size());
+        controller.addFriend(testDebby,"Danny");
+        assertEquals(1, friendRepo.getFriends(testDanny, true).size());
+        assertEquals(1, friendRepo.getFriends(testDebby, false).size());
+
+        controller.addFriend(testDanny, "Debby");
+        assertEquals(0, friendRepo.getFriends(testDanny, true).size());
+        assertEquals(1, friendRepo.getFriends(testDanny, false).size());
+        assertEquals(0, friendRepo.getFriends(testDebby, true).size());
+
         assertThrows(UsernameException.class, () -> controller.addFriend(testDanny, "Debby"));
     }
 
     @Test
-    @Order(3)
+    @Order(2)
     void removeFriend() {
-        assertEquals(1, friendRepo.getFriends(testDebby).size());
-        friendRepo.removeFriend(testDebby.getUsername(),"Danny");
-        assertEquals(0, friendRepo.getFriends(testDebby).size());
+        assertEquals(1, friendRepo.getFriends(testDebby, false).size());
+        assertEquals(1, friendRepo.getFriends(testDanny, false).size());
+        controller.removeFriend(testDebby,"Danny");
+        assertEquals(0, friendRepo.getFriends(testDebby, false).size());
+        assertEquals(0, friendRepo.getFriends(testDanny, false).size());
+
+        controller.addFriend(testDanny, "Debby");
+        assertEquals(1, friendRepo.getFriends(testDanny, false).size());
+        assertEquals(1, friendRepo.getFriends(testDebby, true).size());
+        controller.removeFriend(testDebby, "Danny");
+
+        assertThrows(UsernameException.class, ()->controller.removeFriend(testDanny, "Debby"));
 
     }
 }
