@@ -4,6 +4,7 @@ import be.howest.ti.mars.logic.controller.accounts.BaseAccount;
 import be.howest.ti.mars.logic.controller.accounts.BusinessAccount;
 import be.howest.ti.mars.logic.controller.accounts.UserAccount;
 import be.howest.ti.mars.logic.controller.exceptions.DatabaseException;
+import be.howest.ti.mars.logic.data.Repositories;
 import be.howest.ti.mars.logic.data.repositories.AccountsRepository;
 import be.howest.ti.mars.logic.data.util.MarsConnection;
 
@@ -40,13 +41,12 @@ public class AccountsH2Repository implements AccountsRepository {
             stmt.setString(2, account.getPassword());
             stmt.setString(3, account.getAddress());
             stmt.setInt(4, account.getHomeAddressEndpoint());
-
-
             stmt.executeUpdate();
         } catch (SQLException ex) {
             LOGGER.log(Level.WARNING, ex.getMessage(), ex);
             throw new DatabaseException("Cannot add account!");
         }
+        Repositories.getEndpointsRepo().turnEndpointPrivate(account.getHomeAddressEndpoint());
     }
 
     @Override

@@ -190,6 +190,8 @@ public class WebServer extends AbstractVerticle {
         addRouteWithCtxFunction(factory, "getCurrentRouteInfo", bridge::getCurrentRouteInfo);
         addRouteWithCtxFunction(factory, "getDeliveries", bridge::getDeliveries);
         addRouteWithCtxFunction(factory, "getDeliveryInformation", bridge::getDeliveryInformation);
+        addRouteWithCtxFunction(factory, "getTravelEndpoints", bridge::getTravelEndpoints);
+        addRouteWithCtxFunction(factory, "getPackageEndpoints", arg -> bridge.getPackageEndpoints());
     }
 
     private void addRouteWithCtxFunction(OpenAPI3RouterFactory factory, String operationId, Function<RoutingContext, Object> bridgeFunction) {
