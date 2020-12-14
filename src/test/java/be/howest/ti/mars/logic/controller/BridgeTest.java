@@ -660,7 +660,7 @@ public class BridgeTest {
     }
 
     private void getEndpoints(final VertxTestContext testContext, Predicate<String> isBody, Runnable chain) {
-        chain(testContext, HttpMethod.GET, "endpoints", null, 200, isBody, chain);
+        chain(testContext, HttpMethod.GET, "endpoint", null, 200, isBody, chain);
     }
 
     @Test
@@ -669,7 +669,7 @@ public class BridgeTest {
     }
 
     private void getEndpoint(final VertxTestContext testContext, int id, Predicate<String> isBody, Runnable chain) {
-        chain(testContext, HttpMethod.GET, "endpoints/" + id, null, 200, isBody, chain);
+        chain(testContext, HttpMethod.GET, "endpoint/" + id, null, 200, isBody, chain);
     }
 
     @Test
@@ -678,7 +678,7 @@ public class BridgeTest {
     }
 
     private void setFavoriteEndpoint(final VertxTestContext testContext, HttpMethod httpMethod, int id, String token, int code, Runnable chain) {
-        chain(testContext, httpMethod, "endpoints/favorite/" + id, token, code, IGNORE_BODY, chain);
+        chain(testContext, httpMethod, "endpoint/favorite/" + id, token, code, IGNORE_BODY, chain);
     }
 
     @Test

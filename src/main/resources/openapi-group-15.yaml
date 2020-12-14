@@ -555,8 +555,6 @@ paths:
                 } ]
         '500':
           description: Unexpected error.
-      security:
-        - Token: [ User ]
   /api/endpoint/{id}: #view endpoint information
     summary: get endpoint information
     description: get endpoint information from ID
