@@ -5,7 +5,6 @@ import be.howest.ti.mars.logic.controller.accounts.BaseAccount;
 import be.howest.ti.mars.logic.controller.accounts.BusinessAccount;
 import be.howest.ti.mars.logic.controller.accounts.UserAccount;
 import be.howest.ti.mars.logic.controller.enums.DeliveryType;
-import be.howest.ti.mars.logic.controller.enums.NotificationType;
 import be.howest.ti.mars.logic.controller.exceptions.MarsIllegalArgumentException;
 import be.howest.ti.mars.logic.controller.security.AccountToken;
 import be.howest.ti.mars.logic.controller.security.SecureHash;
@@ -73,6 +72,8 @@ class MarsOpenApiBridge {
     public Object sendPackage(RoutingContext ctx) {
         JsonObject json = ctx.getBodyAsJson();
         boolean isUser = isUserAccountToken(ctx);
+        int dest = json.getInteger(DESTINATION);
+
         if (isUser && DeliveryType.enumOf(json.getString("deliveryType")) == DeliveryType.LARGE) {
             throw new MarsIllegalArgumentException("!Only businesses can send large package pods!");
         }
@@ -81,11 +82,21 @@ class MarsOpenApiBridge {
         }
         int id = controller.sendPackage(DeliveryType.enumOf(json.getString("deliveryType")),
                 json.getInteger("from"),
-                json.getInteger(DESTINATION),
+                dest,
                 getAccount(ctx),
                 isUser
         );
-        if (isUser) timer.schedule(wrap(() -> getUserAccount(ctx).sendNotification(vertx, "PACKAGE_POD_ARRIVAL", id)), getETA());
+        if (isUser) {
+            long travelDuration = getETA() * 3;
+            timer.schedule(wrap(() -> getUserAccount(ctx).sendNotification(vertx, "PACKAGE_POD_ARRIVAL", new JsonObject().put("id", id))), getETA());
+            timer.schedule(wrap(() -> controller.getUsersWhoLiveAt(dest).forEach(acc -> acc.sendNotification(vertx, "PACKAGE_POD_RECEIVED", new JsonObject()
+                    .put("duration", travelDuration)
+                    .put("sender", getUserAccount(ctx).getDisplayName())
+                    .put("deliveryAddress", dest)
+            ))), travelDuration);
+            ;
+
+        }
         JsonObject delivery = new JsonObject();
         delivery.put("deliveryId", id);
         return delivery;
@@ -204,7 +215,7 @@ class MarsOpenApiBridge {
         String podType = ctx.getBodyAsJson().getString("podType");
         UserAccount user = getUserAccount(ctx);
         int id = controller.travel(user, from, destination, podType);
-        timer.schedule(wrap(() -> user.sendNotification(vertx, "TRAVEL_POD_ARRIVAL", id)), getETA());
+        timer.schedule(wrap(() -> user.sendNotification(vertx, "TRAVEL_POD_ARRIVAL", new JsonObject().put("id", id))), getETA());
 
         JsonObject travel = new JsonObject();
         travel.put("travelId", id);

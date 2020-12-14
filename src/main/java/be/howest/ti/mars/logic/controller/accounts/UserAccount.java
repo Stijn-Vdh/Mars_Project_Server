@@ -65,10 +65,8 @@ public class UserAccount extends BaseAccount {
         this.sharesLocation = sharesLocation;
     }
 
-    public void sendNotification(Vertx vertx, String subDomain, int id) {
+    public void sendNotification(Vertx vertx, String subDomain, JsonObject message) {
         if (accountToken != null) {
-            JsonObject message = new JsonObject();
-            message.put("id", id);
             vertx.eventBus().send(CHNL_TO_CLIENT_NOTIFICATION + accountToken.getTokenBase64() + '.' + subDomain, message);
         }
     }

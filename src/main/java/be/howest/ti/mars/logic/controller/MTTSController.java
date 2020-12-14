@@ -13,6 +13,7 @@ import io.vertx.core.json.JsonObject;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class MTTSController extends AuthController {
@@ -122,5 +123,11 @@ public class MTTSController extends AuthController {
 
     public Object getDelivery(BaseAccount acc, int id) {
         return Repositories.getDeliveriesRepo().getDeliveryInformation(acc, id);
+    }
+
+    public Set<UserAccount> getUsersWhoLiveAt(int id) {
+        return Repositories.getAccountsRepo().getUserAccounts().stream()
+                .filter(acc -> acc.getHomeAddressEndpoint() == id)
+                .collect(Collectors.toSet());
     }
 }
