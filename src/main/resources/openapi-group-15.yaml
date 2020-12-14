@@ -463,7 +463,7 @@ paths:
                 type: object
                 properties:
                   subscriptionId:
-                    type: id
+                    type: integer
                   name:
                     type: string
                   smallPodsUsed:
@@ -479,7 +479,53 @@ paths:
       security:
         - Token: [ Business ]
 
-  /api/endpoints:
+  /api/endpoint/travel:
+    description: returns all the endpoints the user can travel to
+    get:
+      operationId: getTravelEndpoints
+      tags:
+        - endpoint
+      responses:
+        '200':
+          description: list of available travel endpoints
+          content:
+            text/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/shortEndpoint'
+                example: [ {
+                  id: '1',
+                  name: 'Endpoint home'
+                } ]
+        '500':
+          description: Unexpected error.
+      security:
+        - Token: [ User ]
+  /api/endpoint/package:
+    description: returns all the endpoints that the accounts can send packages too
+    get:
+      operationId: getPackageEndpoints
+      tags:
+        - endpoint
+      responses:
+        '200':
+          description: list of available  package endpoints
+          content:
+            text/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/shortEndpoint'
+                example: [ {
+                  id: '1',
+                  name: 'Endpoint home'
+                } ]
+        '500':
+          description: Unexpected error.
+      security:
+        - Token: [ User ]
+  /api/endpoint:
     summary: get all endpoints
     description: returns endpoint name and id
     get:
@@ -501,7 +547,9 @@ paths:
                 } ]
         '500':
           description: Unexpected error.
-  /api/endpoints/{id}: #view endpoint information
+      security:
+        - Token: [ User ]
+  /api/endpoint/{id}: #view endpoint information
     summary: get endpoint information
     description: get endpoint information from ID
     get:
@@ -537,7 +585,7 @@ paths:
           description: There is no endpoint matching that id.
         '500':
           description: Unexpected error.
-  /api/endpoints/favorite/{id}:
+  /api/endpoint/favorite/{id}:
     summary: add / remove endpoint to favorites
     post:
       tags:
