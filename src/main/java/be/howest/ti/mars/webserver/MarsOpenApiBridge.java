@@ -85,7 +85,7 @@ class MarsOpenApiBridge {
                 getAccount(ctx),
                 isUser
         );
-        if (isUser) timer.schedule(wrap(() -> getUserAccount(ctx).sendNotification(vertx, NotificationType.PACKAGE, id)), getETA());
+        if (isUser) timer.schedule(wrap(() -> getUserAccount(ctx).sendNotification(vertx, "PACKAGE_POD_ARRIVAL", id)), getETA());
         JsonObject delivery = new JsonObject();
         delivery.put("deliveryId", id);
         return delivery;
@@ -204,7 +204,7 @@ class MarsOpenApiBridge {
         String podType = ctx.getBodyAsJson().getString("podType");
         UserAccount user = getUserAccount(ctx);
         int id = controller.travel(user, from, destination, podType);
-        timer.schedule(wrap(() -> user.sendNotification(vertx, NotificationType.TRAVEL, id)), getETA());
+        timer.schedule(wrap(() -> user.sendNotification(vertx, "TRAVEL_POD_ARRIVAL", id)), getETA());
 
         JsonObject travel = new JsonObject();
         travel.put("travelId", id);

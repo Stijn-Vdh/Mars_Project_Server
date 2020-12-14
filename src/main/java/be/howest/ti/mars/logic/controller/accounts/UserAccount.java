@@ -1,7 +1,6 @@
 package be.howest.ti.mars.logic.controller.accounts;
 
 import be.howest.ti.mars.logic.controller.MTTSController;
-import be.howest.ti.mars.logic.controller.enums.NotificationType;
 import be.howest.ti.mars.logic.data.Repositories;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
@@ -66,12 +65,11 @@ public class UserAccount extends BaseAccount {
         this.sharesLocation = sharesLocation;
     }
 
-    public void sendNotification(Vertx vertx, NotificationType type, int id) {
+    public void sendNotification(Vertx vertx, String subDomain, int id) {
         if (accountToken != null) {
             JsonObject message = new JsonObject();
             message.put("id", id);
-            message.put("type", type);
-            vertx.eventBus().send(CHNL_TO_CLIENT_NOTIFICATION + accountToken.getTokenBase64(), message);
+            vertx.eventBus().send(CHNL_TO_CLIENT_NOTIFICATION + accountToken.getTokenBase64() + '.' + subDomain, message);
         }
     }
 
