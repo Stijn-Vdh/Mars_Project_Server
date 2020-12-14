@@ -5,9 +5,9 @@ import be.howest.ti.mars.logic.controller.converters.ShortEndpoint;
 import be.howest.ti.mars.logic.controller.exceptions.DatabaseException;
 import be.howest.ti.mars.logic.controller.exceptions.EndpointException;
 import be.howest.ti.mars.logic.controller.exceptions.MarsIllegalArgumentException;
+import be.howest.ti.mars.logic.data.Repositories;
 import be.howest.ti.mars.logic.data.repositories.EndpointsRepository;
 import be.howest.ti.mars.logic.data.util.MarsConnection;
-import be.howest.ti.mars.logic.data.Repositories;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -25,8 +25,9 @@ public class EndpointsH2Repository implements EndpointsRepository {
     private static final String SQL_GET_ENDPOINT = "SELECT * FROM ENDPOINTS WHERE ID = ?";
     private static final String SQL_GET_ENDPOINTS = "SELECT * FROM ENDPOINTS";
     private static final String SQL_INSERT_ENDPOINT = "INSERT INTO ENDPOINTS(name) VALUES(?)";
+    private static final String SQL_UPDATE_ENDPOINT_PRIVATE = "UPDATE ENDPOINTS set private = true where id = ?";
 
-    private boolean endpointExistsByName(String name){
+    private boolean endpointExistsByName(String name) {
         return getEndpoints().stream().anyMatch(endpoint -> endpoint.getName().equals(name));
     }
 
@@ -63,7 +64,7 @@ public class EndpointsH2Repository implements EndpointsRepository {
 
     @Override
     public void addEndpoint(String endpoint) {
-        if (!endpointExistsByName(endpoint)){
+        if (!endpointExistsByName(endpoint)) {
             try (Connection con = MarsConnection.getConnection();
                  PreparedStatement stmt = con.prepareStatement(SQL_INSERT_ENDPOINT)) {
                 stmt.setString(1, endpoint);
@@ -71,10 +72,9 @@ public class EndpointsH2Repository implements EndpointsRepository {
             } catch (SQLException ex) {
                 throw new DatabaseException("Can't add endpoint!");
             }
-        }else{
+        } else {
             throw new MarsIllegalArgumentException("Endpoint already exists!");
         }
-
     }
 
     @Override
@@ -94,5 +94,18 @@ public class EndpointsH2Repository implements EndpointsRepository {
             LOGGER.log(Level.WARNING, ex.getMessage(), ex);
             throw new DatabaseException("Cannot retrieve endpoint with id: " + id + "!");
         }
+    }
+
+
+    @Override
+    public void turnEndpointPrivate(int id) {
+        try (Connection con = MarsConnection.getConnection();
+             PreparedStatement stmt = con.prepareStatement(SQL_UPDATE_ENDPOINT_PRIVATE)) {
+            stmt.setInt(1, id);
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            throw new DatabaseException("Can't add endpoint!");
+        }
+
     }
 }

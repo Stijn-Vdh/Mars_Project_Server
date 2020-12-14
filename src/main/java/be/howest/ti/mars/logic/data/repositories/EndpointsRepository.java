@@ -15,4 +15,6 @@ public interface EndpointsRepository {
     ShortEndpoint getShortEndpoint(int id);
 
     boolean endpointExists(int id);
+
+    void turnEndpointPrivate(int id);
 }

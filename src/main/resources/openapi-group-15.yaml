@@ -498,6 +498,10 @@ paths:
                   id: '1',
                   name: 'Endpoint home'
                 } ]
+        '401':
+          description: Authorization information is missing or invalid.
+        '403':
+          description: Forbidden!
         '500':
           description: Unexpected error.
       security:
@@ -521,6 +525,10 @@ paths:
                   id: '1',
                   name: 'Endpoint home'
                 } ]
+        '401':
+          description: Authorization information is missing or invalid.
+        '403':
+          description: Forbidden!
         '500':
           description: Unexpected error.
       security:
