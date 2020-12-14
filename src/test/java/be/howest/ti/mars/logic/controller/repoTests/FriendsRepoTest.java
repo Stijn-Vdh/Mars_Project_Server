@@ -55,6 +55,7 @@ class FriendsRepoTest {
         controller.addFriend(testDanny, "Debby");
         assertEquals(0, friendRepo.getFriends(testDanny, true).size());
         assertEquals(1, friendRepo.getFriends(testDanny, false).size());
+        assertEquals(0, friendRepo.getFriends(testDebby, true).size());
 
         assertThrows(UsernameException.class, () -> controller.addFriend(testDanny, "Debby"));
     }
@@ -63,9 +64,17 @@ class FriendsRepoTest {
     @Order(2)
     void removeFriend() {
         assertEquals(1, friendRepo.getFriends(testDebby, false).size());
+        assertEquals(1, friendRepo.getFriends(testDanny, false).size());
         controller.removeFriend(testDebby,"Danny");
-        //friendRepo.removeFriend(testDebby.getUsername(),"Danny", false);
         assertEquals(0, friendRepo.getFriends(testDebby, false).size());
+        assertEquals(0, friendRepo.getFriends(testDanny, false).size());
+
+        controller.addFriend(testDanny, "Debby");
+        assertEquals(1, friendRepo.getFriends(testDanny, false).size());
+        assertEquals(1, friendRepo.getFriends(testDebby, true).size());
+        controller.removeFriend(testDebby, "Danny");
+
+        assertThrows(UsernameException.class, ()->controller.removeFriend(testDanny, "Debby"));
 
     }
 }

@@ -11,8 +11,6 @@ import be.howest.ti.mars.logic.controller.exceptions.MarsIllegalArgumentExceptio
 import be.howest.ti.mars.logic.controller.exceptions.UsernameException;
 import be.howest.ti.mars.logic.data.Repositories;
 import io.vertx.core.json.JsonObject;
-
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -65,12 +63,20 @@ public class MTTSController extends AuthController {
         boolean exists = Repositories.getAccountsRepo().getUserAccounts().contains(friend);
         boolean notYourself = !acc.equals(friend);
         boolean isFriend = Repositories.getFriendsRepo().getFriends(acc, false).contains(friend);
-        return exists && notYourself && notFriended == isFriend;
+        boolean isPotentialFriend = Repositories.getFriendsRepo().getFriends(acc, true).contains(friend);
+        return exists && notYourself && notFriended == isFriend || isPotentialFriend;
     }
 
     public Object removeFriend(UserAccount user, String friendName) {
+        UserAccount friend = findUserByName(friendName);
         if (friendValidation(user, friendName, true)) {
-            user.removeFriend(friendName);
+            if (Repositories.getFriendsRepo().getFriends(user,true).contains(friend)){
+                user.removePotentialFriend(friend);
+            }else{
+                user.removeFriend(friendName);
+            }
+            friend.removeFriend(user.getUsername());
+
         } else {
             throw new UsernameException("Could not remove a friend with the given username");
         }
