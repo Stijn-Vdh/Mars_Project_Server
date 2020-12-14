@@ -24,4 +24,5 @@ public interface AccountsRepository {
 
     // Business
     void addBusiness(BusinessAccount business);
+
 }
