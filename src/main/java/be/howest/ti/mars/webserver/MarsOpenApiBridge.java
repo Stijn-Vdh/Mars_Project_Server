@@ -122,7 +122,7 @@ class MarsOpenApiBridge {
     }
 
     public Object viewFriends(RoutingContext ctx) {
-        return Repositories.getFriendsRepo().getFriends(getUserAccount(ctx))
+        return Repositories.getFriendsRepo().getFriends(getUserAccount(ctx), false)
                 .stream()
                 .map(UserAccount::getUsername)
                 .collect(Collectors.toUnmodifiableList());

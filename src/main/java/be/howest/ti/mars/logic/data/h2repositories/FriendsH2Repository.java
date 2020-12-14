@@ -20,21 +20,30 @@ public class FriendsH2Repository implements FriendsRepository {
 
     // Friends SQL QUERIES
     private static final String SQL_SELECT_ALL_FRIENDS = "SELECT * FROM friends f LEFT JOIN users u ON u.name = f.friendName WHERE f.userName=?";
+    private static final String SQL_SELECT_ALL_POTENTIAL_FRIENDS = "SELECT * FROM potential_friends f LEFT JOIN users u ON u.name = f.friendName WHERE f.userName=?";
     private static final String SQL_INSERT_FRIEND = "INSERT INTO friends(friendName, userName) VALUES(?,?)";
+    private static final String SQL_INSERT_POTENTIAL_FRIEND = "INSERT INTO potential_friends(friendName, userName) VALUES(?,?)";
     private static final String SQL_DELETE_FRIEND = "DELETE FROM friends WHERE friendName=? AND userName=?";
+    private static final String SQL_DELETE_POTENTIAL_FRIEND = "DELETE FROM potential_friends WHERE friendName=? AND userName=?";
 
 
     @Override
     public boolean friendExists(String name, UserAccount user){
-        return Repositories.getFriendsRepo().getFriends(user).contains(new UserAccount(name));
+        return Repositories.getFriendsRepo().getFriends(user, false).contains(new UserAccount(name));
     }
 
 
     @Override
-    public Set<UserAccount> getFriends(UserAccount user) {
+    public Set<UserAccount> getFriends(UserAccount user, boolean potentialFriends) {
+        String query;
+        if (potentialFriends){
+            query = SQL_SELECT_ALL_POTENTIAL_FRIENDS;
+        }else{
+            query = SQL_SELECT_ALL_FRIENDS;
+        }
         Set<UserAccount> friends = new HashSet<>();
         try (Connection con = MarsConnection.getConnection();
-             PreparedStatement stmt = con.prepareStatement(SQL_SELECT_ALL_FRIENDS)) {
+             PreparedStatement stmt = con.prepareStatement(query)) {
             stmt.setString(1, user.getUsername());
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
@@ -56,9 +65,15 @@ public class FriendsH2Repository implements FriendsRepository {
     }
 
     @Override
-    public void beFriend(String name, String friendName) {
+    public void beFriend(String name, String friendName, boolean potentialFriends) {
+        String query;
+        if (potentialFriends){
+            query = SQL_INSERT_POTENTIAL_FRIEND;
+        }else{
+            query = SQL_INSERT_FRIEND;
+        }
         try (Connection con = MarsConnection.getConnection();
-             PreparedStatement stmt = con.prepareStatement(SQL_INSERT_FRIEND)) {
+             PreparedStatement stmt = con.prepareStatement(query)) {
 
             stmt.setString(1, friendName);
             stmt.setString(2, name);
@@ -70,9 +85,15 @@ public class FriendsH2Repository implements FriendsRepository {
     }
 
     @Override
-    public void removeFriend(String name, String friendName) {
+    public void removeFriend(String name, String friendName, boolean potentialFriends) {
+        String query;
+        if (potentialFriends){
+            query = SQL_DELETE_POTENTIAL_FRIEND;
+        }else{
+            query=SQL_DELETE_FRIEND;
+        }
         try (Connection con = MarsConnection.getConnection();
-             PreparedStatement stmt = con.prepareStatement(SQL_DELETE_FRIEND)) {
+             PreparedStatement stmt = con.prepareStatement(query)) {
 
             stmt.setString(1, friendName);
             stmt.setString(2, name);
