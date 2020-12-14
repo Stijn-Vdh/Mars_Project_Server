@@ -66,8 +66,14 @@ public class FriendsH2Repository implements FriendsRepository {
 
     @Override
     public void beFriend(String name, String friendName, boolean potentialFriends) {
+        String query;
+        if (potentialFriends){
+            query = SQL_INSERT_POTENTIAL_FRIEND;
+        }else{
+            query = SQL_INSERT_FRIEND;
+        }
         try (Connection con = MarsConnection.getConnection();
-             PreparedStatement stmt = con.prepareStatement(SQL_INSERT_FRIEND)) {
+             PreparedStatement stmt = con.prepareStatement(query)) {
 
             stmt.setString(1, friendName);
             stmt.setString(2, name);
@@ -80,8 +86,14 @@ public class FriendsH2Repository implements FriendsRepository {
 
     @Override
     public void removeFriend(String name, String friendName, boolean potentialFriends) {
+        String query;
+        if (potentialFriends){
+            query = SQL_DELETE_POTENTIAL_FRIEND;
+        }else{
+            query=SQL_DELETE_FRIEND;
+        }
         try (Connection con = MarsConnection.getConnection();
-             PreparedStatement stmt = con.prepareStatement(SQL_DELETE_FRIEND)) {
+             PreparedStatement stmt = con.prepareStatement(query)) {
 
             stmt.setString(1, friendName);
             stmt.setString(2, name);

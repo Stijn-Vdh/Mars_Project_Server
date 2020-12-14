@@ -6,14 +6,10 @@ import be.howest.ti.mars.logic.data.Repositories;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 
-import java.util.LinkedList;
-import java.util.List;
-
 public class UserAccount extends BaseAccount {
     private static final String CHNL_TO_CLIENT_NOTIFICATION = "events.client.";
     private boolean sharesLocation;
     private String displayName;
-    private List<UserAccount> pendingFriendsList = new LinkedList<>();
 
     public UserAccount(String username, String password, int homeAddressEndpoint, String address) {
         super(username, password, address, homeAddressEndpoint);
@@ -33,15 +29,12 @@ public class UserAccount extends BaseAccount {
         super(name);
     }
 
-    public List<UserAccount> getPendingFriendsList() {
-        return pendingFriendsList;
-    }
-
    public void addPotentialFriend(UserAccount friend){
-        pendingFriendsList.add(friend);
+        Repositories.getFriendsRepo().beFriend(getUsername(), friend.getUsername(), true);
    }
    public void removePotentialFriend(UserAccount friend){
-        pendingFriendsList.remove(friend);
+       Repositories.getFriendsRepo().removeFriend(getUsername(), friend.getUsername(), true);
+
    }
 
     public String getDisplayName() {

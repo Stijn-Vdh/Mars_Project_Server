@@ -40,7 +40,7 @@ public class MTTSController extends AuthController {
     public Object addFriend(UserAccount user, String friendName) {
         UserAccount potentialFriend = findUserByName(friendName);
         if (friendValidation(user, friendName, false)) {
-            if (user.getPendingFriendsList().contains(potentialFriend)){
+            if (Repositories.getFriendsRepo().getFriends(user,true).contains(potentialFriend)){
                 user.removePotentialFriend(potentialFriend);
             }else{
                 potentialFriend.addPotentialFriend(user);
