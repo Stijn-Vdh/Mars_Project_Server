@@ -7,9 +7,9 @@ import java.util.Set;
 public interface FriendsRepository {
     boolean friendExists(String name, UserAccount acc);
 
-    Set<UserAccount> getFriends(UserAccount user);
+    Set<UserAccount> getFriends(UserAccount user, boolean potentialFriends);
 
-    void beFriend(String name, String friendName);
+    void beFriend(String name, String friendName, boolean potentialFriends);
 
-    void removeFriend(String name, String friendName);
+    void removeFriend(String name, String friendName, boolean potentialFriends);
 }
