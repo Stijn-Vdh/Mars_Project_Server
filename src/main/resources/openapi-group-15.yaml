@@ -42,6 +42,122 @@ components:
       example:
         section: "Other"
         description: "My pod doesnt arrive"
+    travel:
+      type: object
+      properties:
+        tripId:
+          type: integer
+        from:
+          $ref: "#/components/schemas/shortEndpoint"
+        destination:
+          $ref: "#/components/schemas/shortEndpoint"
+        date:
+          type: string
+        podType:
+          type: string
+    BusinessSubscriptionInfo:
+      type: object
+      properties:
+        subscriptionId:
+          type: integer
+        name:
+          type: string
+        smallPodsUsed:
+          type: integer
+        largePodsUsed:
+          type: integer
+    UserSubscription:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        unlimitedTravels:
+          type: boolean
+        unlimitedPackages:
+          type: boolean
+        price:
+          type: integer
+      required:
+        - id
+        - name
+        - unlunlimitedPackages
+        - unlimitedTravels
+        - price
+    BusinessSubscription:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        smallPodsDaily:
+          type: integer
+        largePodsDaily:
+          type: integer
+        dedicatedPods:
+          type: integer
+        priorityLevel:
+          type: integer
+        price:
+          type: integer
+      required:
+        - id
+        - name
+        - smallPodsDaily
+        - largePodsDaily
+        - dedicatedPods
+        - priorityLevel
+        - price
+
+    AccountInformation:
+      description: returns all the information available for an account
+      type: object
+      properties:
+        name:
+          type: string
+        homeAddress:
+          type: string
+        homeEndpoint:
+          type: integer
+        favouriteEndpoints:
+          type: array
+          items:
+            $ref: "#/components/schemas/shortEndpoint"
+    UserAccountInformation:
+      description: returns all the information available for an UserAccount
+      allOf:
+        - $ref: "components/schemas/AccountInformation"
+        - type: object
+      properties:
+        displayName:
+          type: string
+        shareLocation:
+          type: boolean
+        subscription:
+          $ref: "components/schemas/UserSubscription"
+        friends:
+          type: array
+          items:
+            type: string
+        potentialFriends:
+          type: array
+          items:
+            type: string
+        travelHistory:
+          $ref: "#/components/schemas/travel"
+    BusinessAccountInformation:
+      description: returns all the information available for an UserAccount
+      allOf:
+       - $ref: "components/schemas/AccountInformation"
+       - type: object
+      properties:
+       subscription:
+         $ref: "components/schemas/BusinessSubscription"
+       usage:
+         $ref: "components/schemas/BusinessSubscriptionInfo"
+
 paths:
   /api/message:
     get:
@@ -150,7 +266,7 @@ paths:
           description: username already is taken
         '500':
           description: Internal error.
-  /api/accountInformation: #get your account information todo: response is outdated
+  /api/accountInformation:
     summary: get your account information
     get:
       summary: get user information.
@@ -163,52 +279,9 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  name:
-                    type: string
-                  homeAdress:
-                    type: string
-                  homeEndpointID:
-                    type: integer
-                  subscription:
-                    type: string
-                  friends:
-                    type: object
-                    properties:
-                      name:
-                        type: string
-                      sharesLocation:
-                        type: boolean
-                      homeAddress:
-                        type: string
-                      homeEndpointId:
-                        type: integer
-                  favouriteTrips:
-                    type: object
-                    properties:
-                      endpointId:
-                        type: integer
-                      endpointName:
-                        type: string
-                example: {
-                  name: "Debby",
-                  homeAdress: "Colony 1, residence 15",
-                  homeEndpoint: 5,
-                  subscription: "Unlimited",
-                  friends: [
-                    {
-                      name: "Frank",
-                      sharesLocation: true,
-                      homeAddress: "residence 107",
-                      homeEndpointID: 1903
-                    } ],
-                  favourite_trips: [
-                    {
-                      endpointID: 5,
-                      endpointName: "Work"
-                    } ]
-                }
+                oneOf:
+                  - $ref: "#/components/schemas/UserAccountInformation"
+                  - $ref: "#/components/schemas/BusinessAccountInformation"
         '401':
           description: Authorization information is missing or invalid.
         '403':
@@ -344,7 +417,6 @@ paths:
       tags:
         - friend
         - user
-
       responses:
         '200':
           description: Succesfuly added a friend.
@@ -373,7 +445,7 @@ paths:
       security:
         - Token: [ User ]
 
-  /api/subscription: # todo needs rework to portray current state: it returns either user_subscription or business_subscription (any of), price is currently not worked into our system also post could be better as in path parameters instead of just one body request
+  /api/subscription:
     description: subscription.
     get:
       operationId: viewSubscriptions
@@ -386,21 +458,11 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  subscriptionId:
-                    type: integer
-                  subscriptionName:
-                    type: string
-                  subscriptionPrice:
-                    type: integer
-                example: [ {
-                  subscriptionId: 1,
-                  subscriptionName: 'Start-up'
-                },{
-                  subscriptionId: 2,
-                  subscriptionName: 'Professional'
-                } ]
+                type: array
+                items:
+                  oneOf:
+                    - $ref: "components/schemas/BusinessSubscription"
+                    - $ref: "components/schemas/UserSubscription"
         '500':
           description: Internal error.
     post:
@@ -460,16 +522,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  subscriptionId:
-                    type: integer
-                  name:
-                    type: string
-                  smallPodsUsed:
-                    type: integer
-                  largePodsUsed:
-                    type: integer
+                $ref: "components/schemas/BusinessSubscriptionInfo"
         '401':
           description: Authorization information is missing or invalid.
         '403':
@@ -655,10 +708,10 @@ paths:
                     type: string
                     enum: [ small, large ]
                   from:
-                    type: integer
+                    $ref: "#/components/schemas/shortEndpoint"
                   destination:
-                    type: integer
-                  date:
+                    $ref: "#/components/schemas/shortEndpoint"
+                  dateTime:
                     type: string
         '403':
           description: Forbidden!
@@ -763,18 +816,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  routID:
-                    type: integer
-                  from:
-                    type: string
-                  destination:
-                    type: string
-                  estmTime:
-                    type: integer
-                  currentLocation:
-                    type: string
+                $ref: "#/components/schemas/travel"
         '401':
           description: Authorization information is missing or invalid.
         '403':
@@ -796,18 +838,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  tripId:
-                    type: integer
-                  from:
-                    type: integer
-                  destination:
-                    type: integer
-                  date:
-                    type: string
-                  podType:
-                    type: string
+                $ref: "#/components/schemas/travel"
         '401':
           description: Authorization information is missing or invalid.
         '403':

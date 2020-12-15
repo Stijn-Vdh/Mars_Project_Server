@@ -8,7 +8,6 @@ import be.howest.ti.mars.logic.controller.enums.DeliveryType;
 import be.howest.ti.mars.logic.controller.exceptions.AuthenticationException;
 import be.howest.ti.mars.logic.data.Repositories;
 import be.howest.ti.mars.logic.data.repositories.AccountsRepository;
-import be.howest.ti.mars.logic.data.repositories.DeliveriesRepository;
 import be.howest.ti.mars.logic.data.util.MarsConnection;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -66,7 +65,7 @@ public class DeliveriesRepoTest {
 
         Delivery delivery2 = (Delivery) controller.getDelivery(testDebby, 3);
         assertEquals(Repositories.getEndpointsRepo().getShortEndpoint(2), delivery2.getDestination());
-        assertEquals(Repositories.getEndpointsRepo().getShortEndpoint(1), delivery2.getSource());
+        assertEquals(Repositories.getEndpointsRepo().getShortEndpoint(1), delivery2.getFrom());
         assertEquals("Debby", delivery2.getSender());
     }
 

@@ -9,9 +9,9 @@ import be.howest.ti.mars.logic.controller.subscription.UserSubscription;
 import java.util.List;
 
 public interface SubscriptionRepository {
-    List<UserSubscription> getUserSubscriptions(); // TODO: 21-11-2020 add to spec and webserver
+    List<UserSubscription> getUserSubscriptions();
 
-    List<BusinessSubscription> getBusinessSubscriptions(); // TODO: 21-11-2020 add to spec and webserver
+    List<BusinessSubscription> getBusinessSubscriptions();
 
     UserSubscription getUserSubscription(UserAccount user);
 
