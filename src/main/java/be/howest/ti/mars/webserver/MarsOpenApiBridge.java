@@ -309,4 +309,8 @@ class MarsOpenApiBridge {
         timer.scheduleAtFixedRate(wrap(this::resetBusinessUsedPods), 0, RESET_PERIOD);
     }
 
+    public void addTestAccount(){
+        controller.createAccount("test",SecureHash.getHashEncoded("test"),"test",7,false);
+    }
+
 }
