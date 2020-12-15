@@ -51,13 +51,18 @@ public class MTTSController extends AuthController {
         return "You just added a friend called:" + friendName;
     }
 
-    private UserAccount findUserByName(String friendName) {
+    public UserAccount findUserByName(String friendName) {
         List<UserAccount> resultUserList  =  Repositories.getAccountsRepo().getUserAccounts().stream().filter(user -> user.getUsername().equals(friendName)).collect(Collectors.toList());
         if (resultUserList.size() != 1) {
             throw new MarsIllegalArgumentException("Something went wrong trying to find user by name.");
         }
         return resultUserList.get(0);
     }
+
+    public UserAccount findUserByNameController(String friendName) {
+        return userAccounts.stream().filter(user -> user.equals(new UserAccount(friendName))).findAny().orElseThrow(()->new MarsIllegalArgumentException("User not found."));
+    }
+
 
     private boolean friendValidation(UserAccount acc, String friendName, boolean notFriended) { // cant friend yourself or companies or someone that you already (un)friended
         UserAccount friend = findUserByName(friendName);
