@@ -219,10 +219,10 @@ class MarsOpenApiBridge {
         timer.schedule(wrap(() -> user.sendNotification(vertx, "TRAVEL_POD_ARRIVAL", new JsonObject().put("id", id))), getETA());
 
         if (!friendName.isEmpty()){
-            System.out.println("IM HERE NOW");
             UserAccount friendAcc = controller.findUserByNameController(friendName);
-            System.out.println(friendAcc);
-            friendAcc.sendNotification(vertx,"TRAVEL_TO_FRIEND", new JsonObject().put("userTravelingToYou", user.getDisplayName()));
+            if (friendAcc.isSharesLocation() && Repositories.getFriendsRepo().friendExists(friendName, user)){
+                friendAcc.sendNotification(vertx,"TRAVEL_TO_FRIEND", new JsonObject().put("userTravelingToYou", user.getDisplayName()));
+            }
         }
 
         JsonObject travel = new JsonObject();
