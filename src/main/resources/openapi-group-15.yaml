@@ -55,6 +55,17 @@ components:
           type: string
         podType:
           type: string
+    BusinessSubscriptionInfo:
+      type: object
+      properties:
+        subscriptionId:
+          type: integer
+        name:
+          type: string
+        smallPodsUsed:
+          type: integer
+        largePodsUsed:
+          type: integer
     UserSubscription:
       type: object
       properties:
@@ -66,11 +77,40 @@ components:
           type: boolean
         unlimitedPackages:
           type: boolean
+        price:
+          type: integer
       required:
         - id
         - name
         - unlunlimitedPackages
         - unlimitedTravels
+        - price
+    BusinessSubscription:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        smallPodsDaily:
+          type: integer
+        largePodsDaily:
+          type: integer
+        dedicatedPods:
+          type: integer
+        priorityLevel:
+          type: integer
+        price:
+          type: integer
+      required:
+        - id
+        - name
+        - smallPodsDaily
+        - largePodsDaily
+        - dedicatedPods
+        - priorityLevel
+        - price
+
     AccountInformation:
       description: returns all the information available for an account
       type: object
@@ -107,7 +147,16 @@ components:
             type: string
         travelHistory:
           $ref: "#/components/schemas/travel"
-
+    BusinessAccountInformation:
+      description: returns all the information available for an UserAccount
+      allOf:
+       - $ref: "components/schemas/AccountInformation"
+       - type: object
+      properties:
+       subscription:
+         $ref: "components/schemas/BusinessSubscription"
+       usage:
+         $ref: "components/schemas/BusinessSubscriptionInfo"
 
 paths:
   /api/message:
@@ -217,7 +266,7 @@ paths:
           description: username already is taken
         '500':
           description: Internal error.
-  /api/accountInformation: #get your account information todo: response is outdated
+  /api/accountInformation:
     summary: get your account information
     get:
       summary: get user information.
@@ -232,7 +281,7 @@ paths:
               schema:
                 oneOf:
                   - $ref: "#/components/schemas/UserAccountInformation"
-
+                  - $ref: "#/components/schemas/BusinessAccountInformation"
         '401':
           description: Authorization information is missing or invalid.
         '403':
@@ -484,16 +533,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  subscriptionId:
-                    type: integer
-                  name:
-                    type: string
-                  smallPodsUsed:
-                    type: integer
-                  largePodsUsed:
-                    type: integer
+                $ref: "components/schemas/BusinessSubscriptionInfo"
         '401':
           description: Authorization information is missing or invalid.
         '403':

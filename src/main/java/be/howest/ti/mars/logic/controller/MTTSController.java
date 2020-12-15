@@ -115,7 +115,7 @@ public class MTTSController extends AuthController {
     public Object getBusinessAccountInformation(BusinessAccount business) {
         JsonObject accInformation = getAccountInformation(business);
         accInformation.put("subscription", Repositories.getSubscriptionRepo().getBusinessSubscription(business));
-        accInformation.put("Current usage subscription", Repositories.getSubscriptionRepo().getBusinessSubscriptionInfo(business));
+        accInformation.put("usage", Repositories.getSubscriptionRepo().getBusinessSubscriptionInfo(business));
         return accInformation;
     }
 
