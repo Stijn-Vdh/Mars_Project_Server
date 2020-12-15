@@ -1,7 +1,7 @@
 package be.howest.ti.mars.logic.data.h2repositories;
 
+import be.howest.ti.mars.logic.controller.Coordinate;
 import be.howest.ti.mars.logic.controller.Endpoint;
-import be.howest.ti.mars.logic.controller.accounts.BaseAccount;
 import be.howest.ti.mars.logic.controller.accounts.UserAccount;
 import be.howest.ti.mars.logic.controller.converters.ShortEndpoint;
 import be.howest.ti.mars.logic.controller.exceptions.DatabaseException;
@@ -78,7 +78,7 @@ public class EndpointsH2Repository implements EndpointsRepository {
             stmt.setInt(1, id);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    return new Endpoint(id, rs.getString("name"), true, "todo", false);
+                    return new Endpoint(id, rs.getString("name"), true, new Coordinate(rs.getDouble("longitude"), rs.getDouble("latitude")), false);
                 } else {
                     throw new EndpointException("Endpoint with ID (" + id + ") doesn't exist!");
                 }
