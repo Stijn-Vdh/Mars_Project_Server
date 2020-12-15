@@ -186,7 +186,8 @@ public class SubscriptionH2Repository implements SubscriptionRepository {
         String name = rs.getString("name");
         boolean unlimitedTravels = rs.getBoolean("unlimitedTravels");
         boolean unlimitedPackages = rs.getBoolean("unlimitedPackages");
-        return new UserSubscription(id, name, unlimitedTravels, unlimitedPackages);
+        float price = rs.getFloat("price");
+        return new UserSubscription(id, name, unlimitedTravels, unlimitedPackages,price);
     }
 
     private BusinessSubscription getBusinessSubscription(ResultSet rs) throws SQLException {
@@ -196,7 +197,8 @@ public class SubscriptionH2Repository implements SubscriptionRepository {
         int largePodsDaily = rs.getInt("largePodsDaily");
         int dedicatedPods = rs.getInt("dedicatedPods");
         int priorityLevel = rs.getInt("priorityLevel");
-        return new BusinessSubscription(id, name, smallPodsDaily, largePodsDaily, dedicatedPods, priorityLevel);
+        int price = rs.getInt("price");
+        return new BusinessSubscription(id, name, smallPodsDaily, largePodsDaily, dedicatedPods, priorityLevel, price);
     }
 
     private boolean businessSubscriptionExists(int id) {
