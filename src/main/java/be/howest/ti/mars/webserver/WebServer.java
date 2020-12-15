@@ -89,6 +89,7 @@ public class WebServer extends AbstractVerticle {
                     dbProps.getString("password"),
                     dbProps.getInteger("webconsole.port", DB_WEB_CONSOLE_FALLBACK));
             LOGGER.info("Database webconsole started on port: " + dbProps.getInteger("webconsole.port", DB_WEB_CONSOLE_FALLBACK));
+            bridge.addTestAccount();
         } catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, "DB web console is unavailable", ex);
         }
