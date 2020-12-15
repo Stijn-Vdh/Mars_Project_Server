@@ -13,13 +13,14 @@ CREATE TABLE user_subscriptions
 	id                int AUTO_INCREMENT (0) PRIMARY KEY,
 	name              varchar(50),
 	unlimitedTravels  boolean DEFAULT FALSE,
-	unlimitedPackages boolean DEFAULT FALSE
+	unlimitedPackages boolean DEFAULT FALSE,
+	price             DECIMAL(2,1)
 );
 
-INSERT INTO user_subscriptions VALUES (default, 'No subscription', FALSE, FALSE);
-INSERT INTO user_subscriptions VALUES (default, 'Martian Transport', TRUE, FALSE);
-INSERT INTO user_subscriptions VALUES (default, 'Package Transport', FALSE, TRUE);
-INSERT INTO user_subscriptions VALUES (default, 'Combined Transport', TRUE, TRUE);
+INSERT INTO user_subscriptions VALUES (default, 'No subscription', FALSE, FALSE, 0);
+INSERT INTO user_subscriptions VALUES (default, 'Martian Transport', TRUE, FALSE, 1.3);
+INSERT INTO user_subscriptions VALUES (default, 'Package Transport', FALSE, TRUE, 0.5);
+INSERT INTO user_subscriptions VALUES (default, 'Combined Transport', TRUE, TRUE, 1.6);
 
 
 CREATE TABLE business_subscriptions
@@ -29,14 +30,15 @@ CREATE TABLE business_subscriptions
 	smallPodsDaily int,
 	largePodsDaily int,
 	dedicatedPods  int DEFAULT 0,
-	priorityLevel  int DEFAULT 0
+	priorityLevel  int DEFAULT 0,
+	price int
 );
 
-INSERT INTO business_subscriptions VALUES (DEFAULT, 'No business subscription', 0, 0, 0, 0);
-INSERT INTO business_subscriptions VALUES (DEFAULT, 'Start-up Business', 300, 3, 0, 0);
-INSERT INTO business_subscriptions VALUES (DEFAULT, 'Professional Business', 500, 10, 2, 1);
-INSERT INTO business_subscriptions VALUES (DEFAULT, 'Enterprise Business', 2500, 50, 5, 2);
-INSERT INTO business_subscriptions VALUES (DEFAULT, 'Custom business', -1, -1, -1, -1);
+INSERT INTO business_subscriptions VALUES (DEFAULT, 'No business subscription', 0, 0, 0, 0, 0);
+INSERT INTO business_subscriptions VALUES (DEFAULT, 'Start-up Business', 300, 3, 0, 0, 194);
+INSERT INTO business_subscriptions VALUES (DEFAULT, 'Professional Business', 500, 10, 2, 1, 290);
+INSERT INTO business_subscriptions VALUES (DEFAULT, 'Enterprise Business', 2500, 50, 5, 2, 1449);
+INSERT INTO business_subscriptions VALUES (DEFAULT, 'Custom business', -1, -1, -1, -1, -1);
 
 
 CREATE TABLE accounts
