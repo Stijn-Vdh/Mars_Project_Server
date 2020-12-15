@@ -134,7 +134,7 @@ public class BridgeTest {
 
     // key List userAccountInformation
     private static final List<String> KEY_LIST_USER = Arrays.asList(NAME, HOME_ADDRESS, "homeEndpoint", "displayName", "shareLocation", "subscription", "friends", "travelHistory", "favouriteEndpoints");
-    private static final List<String> KEY_LIST_BUSS = Arrays.asList(NAME, HOME_ADDRESS, "homeEndpoint", "subscription", "Current usage subscription", "favouriteEndpoints");
+    private static final List<String> KEY_LIST_BUSS = Arrays.asList(NAME, HOME_ADDRESS, "homeEndpoint", "subscription", "usage", "favouriteEndpoints");
 
 
     // Response body validators

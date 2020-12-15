@@ -417,7 +417,6 @@ paths:
       tags:
         - friend
         - user
-
       responses:
         '200':
           description: Succesfuly added a friend.
@@ -446,7 +445,7 @@ paths:
       security:
         - Token: [ User ]
 
-  /api/subscription: # todo needs rework to portray current state: it returns either user_subscription or business_subscription (any of), price is currently not worked into our system also post could be better as in path parameters instead of just one body request
+  /api/subscription:
     description: subscription.
     get:
       operationId: viewSubscriptions
@@ -459,21 +458,11 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  subscriptionId:
-                    type: integer
-                  subscriptionName:
-                    type: string
-                  subscriptionPrice:
-                    type: integer
-                example: [ {
-                  subscriptionId: 1,
-                  subscriptionName: 'Start-up'
-                },{
-                  subscriptionId: 2,
-                  subscriptionName: 'Professional'
-                } ]
+                type: array
+                items:
+                  oneOf:
+                    - $ref: "components/schemas/BusinessSubscription"
+                    - $ref: "components/schemas/UserSubscription"
         '500':
           description: Internal error.
     post:
@@ -719,10 +708,10 @@ paths:
                     type: string
                     enum: [ small, large ]
                   from:
-                    type: integer
+                    $ref: "#/components/schemas/shortEndpoint"
                   destination:
-                    type: integer
-                  date:
+                    $ref: "#/components/schemas/shortEndpoint"
+                  dateTime:
                     type: string
         '403':
           description: Forbidden!
@@ -827,18 +816,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  routID:
-                    type: integer
-                  from:
-                    type: string
-                  destination:
-                    type: string
-                  estmTime:
-                    type: integer
-                  currentLocation:
-                    type: string
+                $ref: "#/components/schemas/travel"
         '401':
           description: Authorization information is missing or invalid.
         '403':
@@ -861,7 +839,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/travel"
-
         '401':
           description: Authorization information is missing or invalid.
         '403':

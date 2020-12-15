@@ -67,7 +67,7 @@ public class DeliveriesH2Repository implements DeliveriesRepository {
              PreparedStatement stmt = con.prepareStatement(SQL_ADD_DELIVERY, Statement.RETURN_GENERATED_KEYS)) {
 
             stmt.setString(1, delivery.getDeliveryType().toString());
-            stmt.setInt(2, delivery.getSource().getId());
+            stmt.setInt(2, delivery.getFrom().getId());
             stmt.setInt(3, delivery.getDestination().getId());
             stmt.setString(4, delivery.getSender());
             stmt.executeUpdate();
