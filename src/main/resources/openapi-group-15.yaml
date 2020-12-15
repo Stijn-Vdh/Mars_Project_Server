@@ -42,6 +42,73 @@ components:
       example:
         section: "Other"
         description: "My pod doesnt arrive"
+    travel:
+      type: object
+      properties:
+        tripId:
+          type: integer
+        from:
+          $ref: "#/components/schemas/shortEndpoint"
+        destination:
+          $ref: "#/components/schemas/shortEndpoint"
+        date:
+          type: string
+        podType:
+          type: string
+    UserSubscription:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        unlimitedTravels:
+          type: boolean
+        unlimitedPackages:
+          type: boolean
+      required:
+        - id
+        - name
+        - unlunlimitedPackages
+        - unlimitedTravels
+    AccountInformation:
+      description: returns all the information available for an account
+      type: object
+      properties:
+        name:
+          type: string
+        homeAddress:
+          type: string
+        homeEndpoint:
+          type: integer
+        favouriteEndpoints:
+          type: array
+          items:
+            $ref: "#/components/schemas/shortEndpoint"
+    UserAccountInformation:
+      description: returns all the information available for an UserAccount
+      allOf:
+        - $ref: "components/schemas/AccountInformation"
+        - type: object
+      properties:
+        displayName:
+          type: string
+        shareLocation:
+          type: boolean
+        subscription:
+          $ref: "components/schemas/UserSubscription"
+        friends:
+          type: array
+          items:
+            type: string
+        potentialFriends:
+          type: array
+          items:
+            type: string
+        travelHistory:
+          $ref: "#/components/schemas/travel"
+
+
 paths:
   /api/message:
     get:
@@ -163,52 +230,9 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  name:
-                    type: string
-                  homeAdress:
-                    type: string
-                  homeEndpointID:
-                    type: integer
-                  subscription:
-                    type: string
-                  friends:
-                    type: object
-                    properties:
-                      name:
-                        type: string
-                      sharesLocation:
-                        type: boolean
-                      homeAddress:
-                        type: string
-                      homeEndpointId:
-                        type: integer
-                  favouriteTrips:
-                    type: object
-                    properties:
-                      endpointId:
-                        type: integer
-                      endpointName:
-                        type: string
-                example: {
-                  name: "Debby",
-                  homeAdress: "Colony 1, residence 15",
-                  homeEndpoint: 5,
-                  subscription: "Unlimited",
-                  friends: [
-                    {
-                      name: "Frank",
-                      sharesLocation: true,
-                      homeAddress: "residence 107",
-                      homeEndpointID: 1903
-                    } ],
-                  favourite_trips: [
-                    {
-                      endpointID: 5,
-                      endpointName: "Work"
-                    } ]
-                }
+                oneOf:
+                  - $ref: "#/components/schemas/UserAccountInformation"
+
         '401':
           description: Authorization information is missing or invalid.
         '403':
@@ -796,18 +820,8 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  tripId:
-                    type: integer
-                  from:
-                    type: integer
-                  destination:
-                    type: integer
-                  date:
-                    type: string
-                  podType:
-                    type: string
+                $ref: "#/components/schemas/travel"
+
         '401':
           description: Authorization information is missing or invalid.
         '403':
