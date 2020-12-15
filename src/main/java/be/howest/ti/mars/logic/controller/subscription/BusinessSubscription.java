@@ -10,19 +10,22 @@ public class BusinessSubscription {
     private final int largePodsDaily;
     private final int dedicatedPods;
     private final int priorityLevel;
+    private final int price;
 
     @JsonCreator
     public BusinessSubscription(@JsonProperty("id") int id, @JsonProperty("name") String name,
                                 @JsonProperty("smallPodsDaily") int smallPodsDaily,
                                 @JsonProperty("largePodsDaily") int largePodsDaily,
                                 @JsonProperty("dedicatedPods") int dedicatedPods,
-                                @JsonProperty("priorityLevel") int priorityLevel) {
+                                @JsonProperty("priorityLevel") int priorityLevel,
+                                @JsonProperty("price") int price) {
         this.id = id;
         this.name = name;
         this.smallPodsDaily = smallPodsDaily;
         this.largePodsDaily = largePodsDaily;
         this.dedicatedPods = dedicatedPods;
         this.priorityLevel = priorityLevel;
+        this.price = price;
     }
 
     public int getId() {
@@ -48,6 +51,8 @@ public class BusinessSubscription {
     public int getPriorityLevel() {
         return priorityLevel;
     }
+
+    public int getPrice(){return price;}
 
     @Override
     public boolean equals(Object o) {

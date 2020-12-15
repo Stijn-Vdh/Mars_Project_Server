@@ -8,13 +8,15 @@ public class UserSubscription {
     private final String name;
     private final boolean unlimitedTravels;
     private final boolean unlimitedPackages;
+    private final float price;
 
     @JsonCreator
-    public UserSubscription(@JsonProperty("id") int id, @JsonProperty("name") String name, @JsonProperty("unlimitedTravels") boolean unlimitedTravels, @JsonProperty("unlimitedPackages") boolean unlimitedPackages) {
+    public UserSubscription(@JsonProperty("id") int id, @JsonProperty("name") String name, @JsonProperty("unlimitedTravels") boolean unlimitedTravels, @JsonProperty("unlimitedPackages") boolean unlimitedPackages, @JsonProperty("price") float price) {
         this.id = id;
         this.name = name;
         this.unlimitedTravels = unlimitedTravels;
         this.unlimitedPackages = unlimitedPackages;
+        this.price = price;
     }
 
     public int getId() {
@@ -32,6 +34,8 @@ public class UserSubscription {
     public boolean isUnlimitedPackages() {
         return unlimitedPackages;
     }
+
+    public float getPrice(){return price;}
 
     @Override
     public boolean equals(Object o) {

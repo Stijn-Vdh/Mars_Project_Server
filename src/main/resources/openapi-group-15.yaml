@@ -836,6 +836,14 @@ paths:
                 podType:
                   type: string
                   enum: [ standard, luxury ]
+                toFriend:
+                  type: string
+              example: {
+                  from: 1,
+                  destination: 2,
+                  podType: "luxury",
+                  toFriend: "Tom"
+              }
               required:
                 - from
                 - destination

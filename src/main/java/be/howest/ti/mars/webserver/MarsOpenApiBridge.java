@@ -213,14 +213,24 @@ class MarsOpenApiBridge {
         int from = ctx.getBodyAsJson().getInteger("from");
         int destination = ctx.getBodyAsJson().getInteger(DESTINATION);
         String podType = ctx.getBodyAsJson().getString("podType");
+        String friendName = ctx.getBodyAsJson().getString("toFriend", "");
         UserAccount user = getUserAccount(ctx);
         int id = controller.travel(user, from, destination, podType);
         timer.schedule(wrap(() -> user.sendNotification(vertx, "TRAVEL_POD_ARRIVAL", new JsonObject().put("id", id))), getETA());
+
+        if (!friendName.isEmpty()){
+            UserAccount friendAcc = controller.findUserByNameController(friendName);
+            if (friendAcc.isSharesLocation() && Repositories.getFriendsRepo().friendExists(friendName, user)){
+                friendAcc.sendNotification(vertx,"TRAVEL_TO_FRIEND", new JsonObject().put("userTravelingToYou", user.getDisplayName()));
+            }
+        }
 
         JsonObject travel = new JsonObject();
         travel.put("travelId", id);
         return travel;
     }
+
+
 
     public Object getTravelHistory(RoutingContext ctx) {
         return controller.getTravelHistory(getUserAccount(ctx));
