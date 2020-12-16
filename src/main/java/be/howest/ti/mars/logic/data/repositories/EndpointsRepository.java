@@ -20,7 +20,7 @@ public interface EndpointsRepository {
 
     void turnEndpointPrivate(int id);
 
-    Set<CoordinateEndpoint> getTravelEndpoints(UserAccount user);
+    Set<Endpoint> getTravelEndpoints(UserAccount user);
 
     Set<ShortEndpoint> getPackageEndpoints();
 

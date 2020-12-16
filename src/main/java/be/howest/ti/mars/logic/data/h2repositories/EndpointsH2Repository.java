@@ -3,7 +3,6 @@ package be.howest.ti.mars.logic.data.h2repositories;
 import be.howest.ti.mars.logic.controller.Coordinate;
 import be.howest.ti.mars.logic.controller.Endpoint;
 import be.howest.ti.mars.logic.controller.accounts.UserAccount;
-import be.howest.ti.mars.logic.controller.converters.CoordinateEndpoint;
 import be.howest.ti.mars.logic.controller.converters.ShortEndpoint;
 import be.howest.ti.mars.logic.controller.exceptions.DatabaseException;
 import be.howest.ti.mars.logic.controller.exceptions.EndpointException;
@@ -79,7 +78,7 @@ public class EndpointsH2Repository implements EndpointsRepository {
             stmt.setInt(1, id);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    return new Endpoint(id, rs.getString("name"), true, new Coordinate(rs.getDouble("longitude"), rs.getDouble("latitude")), false);
+                    return getEndpoint(rs);
                 } else {
                     throw new EndpointException("Endpoint with ID (" + id + ") doesn't exist!");
                 }
@@ -88,6 +87,10 @@ public class EndpointsH2Repository implements EndpointsRepository {
             LOGGER.log(Level.WARNING, ex.getMessage(), ex);
             throw new DatabaseException("Cannot retrieve endpoint with id: " + id + "!");
         }
+    }
+
+    private Endpoint getEndpoint(ResultSet rs) throws SQLException {
+        return new Endpoint(rs.getInt("id"), rs.getString("name"), true, new Coordinate(rs.getDouble("longitude"), rs.getDouble("latitude")), false);
     }
 
 
@@ -104,8 +107,8 @@ public class EndpointsH2Repository implements EndpointsRepository {
     }
 
     @Override
-    public Set<CoordinateEndpoint> getTravelEndpoints(UserAccount user) {
-        Set<CoordinateEndpoint> endpoints = new HashSet<>();
+    public Set<Endpoint> getTravelEndpoints(UserAccount user) {
+        Set<Endpoint> endpoints = new HashSet<>();
 
         try (Connection con = MarsConnection.getConnection();
              PreparedStatement stmt = con.prepareStatement(SQL_GET_TRAVEL_ENDPOINTS)) {
@@ -113,7 +116,7 @@ public class EndpointsH2Repository implements EndpointsRepository {
             stmt.setInt(2, user.getHomeAddressEndpoint());
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-                    endpoints.add(new CoordinateEndpoint(rs.getInt("id"), rs.getString("name"), new Coordinate(rs.getDouble("longitude"), rs.getDouble("latitude"))));
+                    endpoints.add(getEndpoint(rs));
                 }
             }
         } catch (SQLException ex) {
