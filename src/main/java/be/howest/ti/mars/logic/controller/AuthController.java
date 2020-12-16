@@ -27,6 +27,8 @@ public abstract class AuthController {
     }
 
     public void createAccount(String name, String password, String address, int endpoint, boolean isBusiness) {
+
+        Repositories.getEndpointsRepo().getEndpoint(endpoint);
         if (isBusiness) {
             BusinessAccount account = new BusinessAccount(name, password, endpoint, address);
             if (userAccounts.contains(new UserAccount(name)) || !businessAccounts.add(account)) { // username exists already
