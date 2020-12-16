@@ -66,7 +66,7 @@ class MarsOpenApiBridge {
     }
 
     private Long getETA() { // randomized delay
-        return 1000L + rand.nextInt(5) * 1000L;
+        return 4000L + rand.nextInt(6) * 1000L;
     }
 
     public Object sendPackage(RoutingContext ctx) {
@@ -90,7 +90,7 @@ class MarsOpenApiBridge {
             timer.schedule(wrap(() -> getUserAccount(ctx).sendNotification(vertx, "PACKAGE_POD_ARRIVAL", new JsonObject().put("id", id))), getETA());
         }
 
-        long travelDuration = getETA() * 3;
+        long travelDuration = getETA() * 2;
         timer.schedule(wrap(() -> controller.getUsersWhoLiveAt(dest).forEach(acc -> acc.sendNotification(vertx, "PACKAGE_POD_RECEIVED", new JsonObject()
                 .put("duration", travelDuration)
                 .put("sender", isUser ? getUserAccount(ctx).getDisplayName() : getBusinessAccount(ctx).getUsername())
