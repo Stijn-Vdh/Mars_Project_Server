@@ -126,7 +126,7 @@ public class MTTSController extends AuthController {
 
     public int travel(UserAccount acc, int from, int destination, String type) { // getShortEndpoint also validates if endpoint exists
         if (from == destination) throw new EndpointException("Destination and from are the same endpoint");
-        return Repositories.getTravelsRepo().travel(acc, new Travel(0, Repositories.getEndpointsRepo().getShortEndpoint(from), Repositories.getEndpointsRepo().getShortEndpoint(destination), PodType.enumOf(type), ""));
+        return Repositories.getTravelsRepo().travel(acc, new Travel(0, Repositories.getEndpointsRepo().getShortEndpoint(from), Repositories.getEndpointsRepo().getShortEndpoint(destination), PodType.enumOf(type), "", -1));
     }
 
     public Object getTravelHistory(UserAccount acc) {

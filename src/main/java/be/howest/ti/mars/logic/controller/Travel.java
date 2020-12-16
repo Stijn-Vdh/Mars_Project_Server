@@ -11,15 +11,17 @@ public class Travel {
     private final ShortEndpoint destination;
     private final PodType podType;
     private final String dateTime;
+    private final int arrivalTime;
 
     @JsonCreator
     public Travel(@JsonProperty("id") int id, @JsonProperty("from") ShortEndpoint from, @JsonProperty("destination") ShortEndpoint destination,
-                  @JsonProperty("podType") PodType podType, @JsonProperty("dateTime") String dateTime) {
+                  @JsonProperty("podType") PodType podType, @JsonProperty("dateTime") String dateTime, @JsonProperty("arrivalTime") int arrivalTime) {
         this.id = id;
         this.from = from;
         this.destination = destination;
         this.podType = podType;
         this.dateTime = dateTime;
+        this.arrivalTime = arrivalTime;
     }
 
     public int getId() {
@@ -41,6 +43,8 @@ public class Travel {
     public String getDateTime() {
         return dateTime;
     }
+
+    public int getArrivalTime(){return arrivalTime;}
 
     @Override
     public String toString() {
