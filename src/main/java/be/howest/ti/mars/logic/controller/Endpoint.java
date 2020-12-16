@@ -9,15 +9,16 @@ public class Endpoint {
     private final int id;
     private final String name;
     private final boolean available;
-    private final String location; //prob replaced with class eventually
+    private final Coordinate coordinate;
     private final boolean privateEndpoint;
 
 
-    public Endpoint(@JsonProperty("id") int id, @JsonProperty("name") String name, @JsonProperty("available") boolean available, @JsonProperty("location") String location, @JsonProperty("privateEndpoint") boolean privateEndpoint) {
+    public Endpoint(@JsonProperty("id") int id, @JsonProperty("name") String name, @JsonProperty("available")
+            boolean available, @JsonProperty("coordinate") Coordinate coordinate, @JsonProperty("privateEndpoint") boolean privateEndpoint) {
         this.id = id;
         this.name = name;
         this.available = available;
-        this.location = location;
+        this.coordinate = coordinate;
         this.privateEndpoint = privateEndpoint;
     }
 
@@ -46,11 +47,12 @@ public class Endpoint {
         return available;
     }
 
-    public String getLocation() {
-        return location;
-    }
 
     public boolean isPrivateEndpoint() {
         return privateEndpoint;
+    }
+
+    public Coordinate getCoordinate() {
+        return coordinate;
     }
 }

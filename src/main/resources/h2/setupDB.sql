@@ -5,7 +5,9 @@ CREATE TABLE endpoints
 	id        int AUTO_INCREMENT PRIMARY KEY,
 	name      varchar(50),
 	available boolean DEFAULT TRUE,
-	private   boolean DEFAULT FALSE
+	private   boolean DEFAULT FALSE,
+	latitude  double,
+	longitude double
 );
 
 CREATE TABLE user_subscriptions
@@ -14,7 +16,7 @@ CREATE TABLE user_subscriptions
 	name              varchar(50),
 	unlimitedTravels  boolean DEFAULT FALSE,
 	unlimitedPackages boolean DEFAULT FALSE,
-	price             DECIMAL(2,1)
+	price             DECIMAL(2, 1)
 );
 
 INSERT INTO user_subscriptions VALUES (default, 'No subscription', FALSE, FALSE, 0);
@@ -31,7 +33,7 @@ CREATE TABLE business_subscriptions
 	largePodsDaily int,
 	dedicatedPods  int DEFAULT 0,
 	priorityLevel  int DEFAULT 0,
-	price int
+	price          int
 );
 
 INSERT INTO business_subscriptions VALUES (DEFAULT, 'No business subscription', 0, 0, 0, 0, 0);
@@ -103,12 +105,12 @@ CREATE TABLE friends
 );
 CREATE TABLE potential_friends
 (
-    userName   varchar(50),
-    friendName varchar(50),
-    PRIMARY KEY (userName, friendName),
-    FOREIGN KEY (userName) REFERENCES users (name), --notice users here and not accounts
-    FOREIGN KEY (friendName) REFERENCES users (name),
-    CHECK (userName <> friendName)                  -- prevent befriending yourself
+	userName   varchar(50),
+	friendName varchar(50),
+	PRIMARY KEY (userName, friendName),
+	FOREIGN KEY (userName) REFERENCES users (name), --notice users here and not accounts
+	FOREIGN KEY (friendName) REFERENCES users (name),
+	CHECK (userName <> friendName)                  -- prevent befriending yourself
 );
 
 CREATE TABLE favorite_endpoints

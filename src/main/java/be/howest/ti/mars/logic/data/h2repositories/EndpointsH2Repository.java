@@ -1,8 +1,9 @@
 package be.howest.ti.mars.logic.data.h2repositories;
 
+import be.howest.ti.mars.logic.controller.Coordinate;
 import be.howest.ti.mars.logic.controller.Endpoint;
-import be.howest.ti.mars.logic.controller.accounts.BaseAccount;
 import be.howest.ti.mars.logic.controller.accounts.UserAccount;
+import be.howest.ti.mars.logic.controller.converters.CoordinateEndpoint;
 import be.howest.ti.mars.logic.controller.converters.ShortEndpoint;
 import be.howest.ti.mars.logic.controller.exceptions.DatabaseException;
 import be.howest.ti.mars.logic.controller.exceptions.EndpointException;
@@ -78,7 +79,7 @@ public class EndpointsH2Repository implements EndpointsRepository {
             stmt.setInt(1, id);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    return new Endpoint(id, rs.getString("name"), true, "todo", false);
+                    return new Endpoint(id, rs.getString("name"), true, new Coordinate(rs.getDouble("longitude"), rs.getDouble("latitude")), false);
                 } else {
                     throw new EndpointException("Endpoint with ID (" + id + ") doesn't exist!");
                 }
@@ -103,8 +104,8 @@ public class EndpointsH2Repository implements EndpointsRepository {
     }
 
     @Override
-    public Set<ShortEndpoint> getTravelEndpoints(UserAccount user) {
-        Set<ShortEndpoint> endpoints = new HashSet<>();
+    public Set<CoordinateEndpoint> getTravelEndpoints(UserAccount user) {
+        Set<CoordinateEndpoint> endpoints = new HashSet<>();
 
         try (Connection con = MarsConnection.getConnection();
              PreparedStatement stmt = con.prepareStatement(SQL_GET_TRAVEL_ENDPOINTS)) {
@@ -112,7 +113,7 @@ public class EndpointsH2Repository implements EndpointsRepository {
             stmt.setInt(2, user.getHomeAddressEndpoint());
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-                    endpoints.add(new ShortEndpoint(rs.getInt("id"), rs.getString("name")));
+                    endpoints.add(new CoordinateEndpoint(rs.getInt("id"), rs.getString("name"), new Coordinate(rs.getDouble("longitude"), rs.getDouble("latitude"))));
                 }
             }
         } catch (SQLException ex) {
