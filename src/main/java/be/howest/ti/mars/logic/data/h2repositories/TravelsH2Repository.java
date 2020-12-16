@@ -13,11 +13,12 @@ import be.howest.ti.mars.logic.data.util.MarsConnection;
 import java.sql.*;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class TravelsH2Repository implements TravelsRepository {
-
+    private static final Random RANDOM = new Random();
     public static final String DESTINATION = "destination";
     public static final String DATE_TIME = "dateTime";
     private static final Logger LOGGER = Logger.getLogger(SubscriptionH2Repository.class.getName());
@@ -41,7 +42,9 @@ public class TravelsH2Repository implements TravelsRepository {
                     int destination = rs.getInt(DESTINATION);
                     String podType = rs.getString("podType");
                     String date = rs.getString(DATE_TIME);
-                    travels.add(new Travel(id, repo.getShortEndpoint(from), repo.getShortEndpoint(destination), PodType.enumOf(podType), date));
+                    int arrivalTime = RANDOM.nextInt(21) + 5;
+
+                    travels.add(new Travel(id, repo.getShortEndpoint(from), repo.getShortEndpoint(destination), PodType.enumOf(podType), date,arrivalTime));
                 }
             }
         } catch (SQLException ex) {
@@ -50,6 +53,7 @@ public class TravelsH2Repository implements TravelsRepository {
         }
         return travels;
     }
+
 
     @Override
     public int travel(UserAccount user, Travel travel) {
