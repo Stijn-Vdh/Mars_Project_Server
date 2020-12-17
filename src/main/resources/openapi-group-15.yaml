@@ -157,33 +157,33 @@ components:
       allOf:
         - $ref: "components/schemas/AccountInformation"
         - type: object
-      properties:
-        displayName:
-          type: string
-        shareLocation:
-          type: boolean
-        subscription:
-          $ref: "components/schemas/UserSubscription"
-        friends:
-          type: array
-          items:
-            type: string
-        potentialFriends:
-          type: array
-          items:
-            type: string
-        travelHistory:
-          $ref: "#/components/schemas/travel"
+          properties:
+            displayName:
+              type: string
+            shareLocation:
+              type: boolean
+            subscription:
+              $ref: "#/components/schemas/UserSubscription"
+            friends:
+              type: array
+              items:
+                type: string
+            potentialFriends:
+              type: array
+              items:
+                type: string
+            travelHistory:
+              $ref: "#/components/schemas/travel"
     BusinessAccountInformation:
       description: returns all the information available for an UserAccount
       allOf:
-       - $ref: "components/schemas/AccountInformation"
+       - $ref: "#/components/schemas/AccountInformation"
        - type: object
-      properties:
-       subscription:
-         $ref: "components/schemas/BusinessSubscription"
-       usage:
-         $ref: "components/schemas/BusinessSubscriptionInfo"
+         properties:
+           subscription:
+             $ref: "#/components/schemas/BusinessSubscription"
+           usage:
+             $ref: "#/components/schemas/BusinessSubscriptionInfo"
 
 paths:
   /api/message:
@@ -489,8 +489,8 @@ paths:
                 type: array
                 items:
                   oneOf:
-                    - $ref: "components/schemas/BusinessSubscription"
-                    - $ref: "components/schemas/UserSubscription"
+                    - $ref: "#/components/schemas/BusinessSubscription"
+                    - $ref: "#/components/schemas/UserSubscription"
         '500':
           description: Internal error.
     post:
@@ -550,7 +550,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "components/schemas/BusinessSubscriptionInfo"
+                $ref: "#/components/schemas/BusinessSubscriptionInfo"
         '401':
           description: Authorization information is missing or invalid.
         '403':
