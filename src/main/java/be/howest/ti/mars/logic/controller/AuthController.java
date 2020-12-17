@@ -49,14 +49,10 @@ public abstract class AuthController {
                 userAccounts.stream(),
                 businessAccounts.stream())
                 .filter(acc -> acc.getUsername().equalsIgnoreCase(name) && acc.getPassword().equals(password))
-                .findAny().orElse(null);
+                .findAny().orElseThrow(() -> new AuthenticationException("Credentials do not match!"));
 
-        if (account == null) {   // pw and name doesnt match
-            throw new AuthenticationException("Credentials does not match!");
-        } else {
-            account.setAccountToken(new AccountToken(name)); // sets a new token, invalidates previous set token
-            return account.getAccountToken().getToken();
-        }
+        account.setAccountToken(new AccountToken(name)); // sets a new token, invalidates previous set token
+        return account.getAccountToken().getToken();
     }
 
     public void logout(BaseAccount account) {
@@ -65,7 +61,7 @@ public abstract class AuthController {
 
 
     public void changePassword(BaseAccount acc, String newPW) {
-       repo.changePassword(acc,newPW);
-       acc.setPassword(newPW);
+        repo.changePassword(acc, newPW);
+        acc.setPassword(newPW);
     }
 }
