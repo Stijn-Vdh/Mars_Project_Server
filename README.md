@@ -44,16 +44,19 @@ gradle run
 
 ## Features
 
-H2 database gets generated when the application starts so no other actions are needed.
+H2 database is generated when the server starts so no other actions are needed.  
+The following scripts will run automatically when deploying the server:
+
+[Setup DB Script](src/main/resources/h2/setupDB.sql)  
+[Initialise Endpoints Script](src/main/resources/h2/initEndpointsDB.sql)
 
 ## API
 
-We use an openAPI version(3.0.0) we use this API to establish communication between the server and our client.
+We use an openAPI version(3.0.0). We use [this openAPI](https://git.ti.howest.be/TI/2020-2021/s3/project-ii/projects/groep-15/server/-/blob/master/src/main/resources/openapi-group-15.yaml) to establish communication between the server and our client.
 
 ### Using the API
 
-You can use tools like Postman or your browser (only for GET methods). For information about our endpoints you can look them
-up [here](https://git.ti.howest.be/TI/2020-2021/s3/project-ii/projects/groep-15/server/-/blob/master/src/main/resources/openapi-group-15.yaml).
+You can use tools like Postman or your browser (only for GET methods).
 
 ## Description
 
@@ -61,23 +64,22 @@ up [here](https://git.ti.howest.be/TI/2020-2021/s3/project-ii/projects/groep-15/
 
 ### WebServer
 
-When the WebServer starts it first creates the H2 database, after that it loads a yaml file located in the resources folder. The yaml file contains an
-OpenAPI3 specification of our REST API. Based on that file it adds all the routes to the router. Next it adds the Logger, the cors handler, security
-handlers, SockJSHandler and as last the error handlers.
+When the WebServer starts it generates the H2 database, after which it loads a yaml file located in the resources folder. The yaml file contains the
+OpenAPI3 specification of our REST API. This file adds all routes to the router. Then it adds the Logger, the cors handler, security
+handlers, SockJSHandler and lastly the error handlers.
 
-The cors handler allows Cross-Origin Resource Sharing (CORS) on each incoming request. We add three security handlers: for users only, for businesses
-only and for businesses or users. Based on the bearer token giving by each request it validates the request. We also add a SockJSHandler which handles
-all requests incoming on the eventbus on the `events.` address. The SockJSHandler allows the clients to listen to specific channels on the eventbus on
-which they will receive their notifications. The error handlers adds the error handlers for all the non 2XX status code responses listed in the
-specification. It sets the right status code, message and the cause of the error.
+The cors handler allows Cross-Origin Resource Sharing (CORS) on each incoming request. We add three security handlers: for users and business only
+or combined. Based on the bearer token given by each request, validation occurs. We also add a SockJSHandler which handles
+all requests incoming on the eventbus on the `events.` address. The SockJSHandler allows the clients to listen to specific channels on the eventbus, on
+which they will receive their notifications. The error handlers add the handlers for all the non 2XX status code responses listed in the
+specification. It sets the right status code, message and cause of the error.
 
-For errors thrown by the request which aren't handled/caught by previous handlers it will return an internal server error. Which shouldn't be
-happening but indicates a failed handling of the incoming request by the server. The WebServer also links the correct bridge functions to the REST API
-paths. The WebServer also starts a daily timer which resets the amount of used pods by the businesses.
+For errors thrown by the request which aren't handled or caught by previous handlers, it returns an internal server error. This indicates a failed handling of the incoming request by the server. The WebServer also links the correct bridge functions to the REST API
+paths. The WebServer starts a daily timer as well, which resets the amount of used pods by the businesses.
 
 ### Bridge
 
-Each REST API path has method connected to it, the bridge pulls out all the relevant data from the context and validates it and then passes it on to
+Each REST API path has method connected to it, the `Bridge` takes all the relevant data from the context and validates it and passes it on to
 the controller.
 
 The Bridge also contains the methods to validate the AccountTokens.
@@ -98,45 +100,81 @@ instance of each Repository. For each repository we have an interface and an H2 
 
 #### AccountsRepository
 
-The `AccountsH2Repository` contains methods to retrieve users and businesses, to add users and businesses, change properties of both, and the SQL
+The `AccountsH2Repository` contains methods to retrieve, add or change properties of users and businesses and the necassary SQL
 queries for each method.
 
 #### FriendsRepository
 
-The `FriendsH2Repository` contains methods to retrieve the friends, add friends, remove friends, and the necessary SQL queries.
+The `FriendsH2Repository` contains methods to retrieve, add or remove friends and the necessary SQL queries.
 
 #### TravelsRepository
 
-The `TravelsH2Repository` contains methods to travel to an endpoint, cancel a travel and get the travel history of a user.
+The `TravelsH2Repository` contains methods to travel to an endpoint, cancel a trip and get the travel history of a user.
 
 #### EndpointsRepository
 
-The `EndpointsH2Repository` contains methods to retrieve endpoints and add them.
+The `EndpointsH2Repository` contains methods to retrieve and add endpoints.
 
 #### DeliveriesRepository
 
-The `DeliveriesH2Repository` contains methods to retrieve deliveries, add deliveries and get delivery information.
+The `DeliveriesH2Repository` contains methods to retrieve or add deliveries and get delivery information.
 
 #### FavoritesRepository
 
-The `FavoritesH2Repository` contains methods to retrieve favorite endpoints, add favorites and remove favorites.
+The `FavoritesH2Repository` contains methods to retrieve, add or remove favorite endpoints.
 
 #### SubscriptionsRepository
 
-The `SubscriptionsH2Repository` contains methods to retrieve business subscriptions, user subscriptions, user subscription info and business
-subscription info. It also contains methods to set user subscriptions and business subscriptions, and method to reset the used amount of pods of a
+The `SubscriptionsH2Repository` contains methods to retrieve business and user subscriptions or info. It also contains methods to set user and business subscriptions and a method to reset the used amount of pods of a
 business.
 
 #### ReportsRepository
 
-The `ReportsH2Repository` contains methods to add reports and get the report sections. A report needs section and a description of the report for that
+The `ReportsH2Repository` contains methods to add reports and get the report sections. A report needs a section and description of the report for that
 section.
 
 ### H2 Database
 
 The `MarsConnection` util class creates the H2 Database. It uses the [Singleton](https://en.wikipedia.org/wiki/Singleton_pattern) pattern so that only
-one instance of the class can exist. It has a static `configure` method which creates the actual H2 database using the parameters and stores those
+one instance of the class can exist. It has a static `Configure` method which creates the actual H2 database using the parameters and stores those
 inside the `MarsConnection` class. Further it has a static `getConnection` method which returns the current connection to the H2 Database.
-`configure` also calls a private method which reads a sql file from resources/h2 folder which initialize all the tables. The sql file contains all the
-sql to set up all the tables we use. It is in fifth normal form, and it has all the constraints to keep the database consistent (ACID). Then it
-executes the sql files which populate the tables. Those sql files are also located in resources/h2 folder.
+`Configure` also calls a private method which reads an sql file from the resources/h2 folder which initialize all the tables. The sql file contains all the
+sql to set up all the tables we use. It is in fifth normal form, and it has all the constraints to keep the database consistent (ACID). After database creation it 
+executes an sql script to populate the tables. Those sql files are also located in resources/h2 folder.
+
+#### Database tables:
+
+* ##### Accounts  
+Contains account name, encrypted password, home address and home endpoint id
+* ##### Businesses  
+Contains business name, subscription id and pod usage counter
+* ##### Business_subscriptions  
+Contains the different business subscription data
+* ##### Deliveries  
+Contains delivery information such as type, origin, destination, date and sender data
+* ##### Deliverytypes    
+Contains small or large delivery type
+* ##### Endpoints  
+Contains all endpoint data
+* ##### Favorite_endpoints  
+Contains accountnames coupled with their favorited endpoints
+* ##### Friends  
+Contains usernames and their friendnames
+* ##### Podtypes
+Contains data about the different pod types
+* ##### Potential_friends
+Contains non confirmed friends data
+* ##### Reports  
+Contains data from sent in reports including which section te report is about
+* ##### Report_sections  
+Contains data per reporting section
+* ##### Travels  
+Contains all travel data such as origin, destination, username, date, pod types and ETA
+* ##### Users  
+Contains all user data such as name, displayname, shareslocation and subscriptionid
+* ##### User_subscriptions
+Contains the different user subscription data
+
+***
+
+Server readme written by Maarten Vercruysse and Daniel Vlaeminck
