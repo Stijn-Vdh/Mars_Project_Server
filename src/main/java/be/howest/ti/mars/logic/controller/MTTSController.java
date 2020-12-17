@@ -11,6 +11,7 @@ import be.howest.ti.mars.logic.controller.exceptions.MarsIllegalArgumentExceptio
 import be.howest.ti.mars.logic.controller.exceptions.UsernameException;
 import be.howest.ti.mars.logic.data.Repositories;
 import io.vertx.core.json.JsonObject;
+
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -39,9 +40,9 @@ public class MTTSController extends AuthController {
     public Object addFriend(UserAccount user, String friendName) {
         UserAccount potentialFriend = findUserByName(friendName);
         if (friendValidation(user, friendName, false)) {
-            if (Repositories.getFriendsRepo().getFriends(user,true).contains(potentialFriend)){
+            if (Repositories.getFriendsRepo().getFriends(user, true).contains(potentialFriend)) {
                 user.removePotentialFriend(potentialFriend);
-            }else{
+            } else {
                 potentialFriend.addPotentialFriend(user);
             }
             user.addFriend(friendName);
@@ -52,15 +53,15 @@ public class MTTSController extends AuthController {
     }
 
     public UserAccount findUserByName(String friendName) {
-        List<UserAccount> resultUserList  =  Repositories.getAccountsRepo().getUserAccounts().stream().filter(user -> user.getUsername().equals(friendName)).collect(Collectors.toList());
-        if (resultUserList.size() != 1) {
-            throw new MarsIllegalArgumentException("Something went wrong trying to find user by name.");
-        }
-        return resultUserList.get(0);
+        return Repositories.getAccountsRepo().getUserAccounts().stream()
+                .filter(user -> user.equals(new UserAccount(friendName)))
+                .findAny()
+                .orElseThrow(() -> new MarsIllegalArgumentException("Friend with name(" + friendName + ") doesn't exist!"));
     }
 
+    //controller stores the token not the DB, if more time than maybe it gets refactored
     public UserAccount findUserByNameController(String friendName) {
-        return userAccounts.stream().filter(user -> user.equals(new UserAccount(friendName))).findAny().orElseThrow(()->new MarsIllegalArgumentException("User not found."));
+        return userAccounts.stream().filter(user -> user.equals(new UserAccount(friendName))).findAny().orElseThrow(() -> new MarsIllegalArgumentException("User not found."));
     }
 
 
@@ -76,9 +77,9 @@ public class MTTSController extends AuthController {
     public Object removeFriend(UserAccount user, String friendName) {
         UserAccount friend = findUserByName(friendName);
         if (friendValidation(user, friendName, true)) {
-            if (Repositories.getFriendsRepo().getFriends(user,true).contains(friend)){
+            if (Repositories.getFriendsRepo().getFriends(user, true).contains(friend)) {
                 user.removePotentialFriend(friend);
-            }else{
+            } else {
                 user.removeFriend(friendName);
             }
             friend.removeFriend(user.getUsername());
