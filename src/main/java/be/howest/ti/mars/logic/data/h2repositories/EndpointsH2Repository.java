@@ -90,7 +90,8 @@ public class EndpointsH2Repository implements EndpointsRepository {
     }
 
     private Endpoint getEndpoint(ResultSet rs) throws SQLException {
-        return new Endpoint(rs.getInt("id"), rs.getString("name"), true, new Coordinate(rs.getDouble("longitude"), rs.getDouble("latitude")), false);
+        return new Endpoint(rs.getInt("id"), rs.getString("name"), rs.getBoolean("available"),
+                new Coordinate(rs.getDouble("longitude"), rs.getDouble("latitude")), rs.getBoolean("private"));
     }
 
 
