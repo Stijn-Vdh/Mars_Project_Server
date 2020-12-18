@@ -150,7 +150,7 @@ public class BridgeTest {
 
     private static final Predicate<String> FRIENDS_BODY_EMPTY = body -> {
         try {
-            List<String> friendList = objectMapper.readValue(body, new TypeReference<>() {
+            List<Object> friendList = objectMapper.readValue(body, new TypeReference<>() {
             });
             return friendList.isEmpty();
         } catch (JsonProcessingException ex) {
