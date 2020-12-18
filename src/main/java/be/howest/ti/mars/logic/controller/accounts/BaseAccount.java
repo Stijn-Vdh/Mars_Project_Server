@@ -10,19 +10,23 @@ import java.util.Objects;
 public abstract class BaseAccount {
     protected static final AccountsRepository repo = Repositories.getAccountsRepo();
     private final String username; // needs to be unique
+    @JsonIgnore
     protected AccountToken accountToken;
+    @JsonIgnore
     protected int subscriptionId;
-    private Integer homeAddressEndpoint; //replace with endpoint class
+    private Integer homeEndpoint; //replace with endpoint class
+    @JsonIgnore
     private String password; // needs to be replaced with Password class which will contain hashed version
+    @JsonIgnore
     private String address; // just random info
 
-    public BaseAccount(String username, String password, String address, int homeAddressEndpoint) {
-        this(null, homeAddressEndpoint, password, username, address);
+    public BaseAccount(String username, String password, String address, int homeEndpoint) {
+        this(null, homeEndpoint, password, username, address);
     }
 
-    public BaseAccount(AccountToken accountToken, Integer homeAddressEndpoint, String password, String username, String address) {
+    public BaseAccount(AccountToken accountToken, Integer homeEndpoint, String password, String username, String address) {
         this.accountToken = accountToken;
-        this.homeAddressEndpoint = homeAddressEndpoint;
+        this.homeEndpoint = homeEndpoint;
         this.password = password;
         this.username = username;
         this.address = address;
@@ -32,12 +36,12 @@ public abstract class BaseAccount {
         this(null, null, "", name, "");
     }
 
-    public int getHomeAddressEndpoint() {
-        return homeAddressEndpoint;
+    public int getHomeEndpoint() {
+        return homeEndpoint;
     }
 
-    public void setHomeAddressEndpoint(Integer homeAddressEndpoint) {
-        this.homeAddressEndpoint = homeAddressEndpoint;
+    public void setHomeEndpoint(Integer homeEndpoint) {
+        this.homeEndpoint = homeEndpoint;
     }
 
     @JsonIgnore

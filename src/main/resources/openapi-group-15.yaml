@@ -167,7 +167,7 @@ components:
             friends:
               type: array
               items:
-                type: string
+                $ref: "#/components/schemas/friend"
             potentialFriends:
               type: array
               items:
@@ -184,6 +184,16 @@ components:
              $ref: "#/components/schemas/BusinessSubscription"
            usage:
              $ref: "#/components/schemas/BusinessSubscriptionInfo"
+    friend:
+      description: information about the friend, homeEndpoint is -1 if the friend doesnt share his location
+      type: object
+      properties:
+        name:
+          type: string
+        displayName:
+          type: string
+        homeEndpoint:
+          type: integer
 
 paths:
   /api/message:
@@ -423,7 +433,7 @@ paths:
               schema:
                 type: array
                 items:
-                  type: string
+                  $ref: "#/components/schemas/friend"
         '401':
           description: Authorization information is missing or invalid.
         '403':

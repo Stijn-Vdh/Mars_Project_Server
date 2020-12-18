@@ -114,7 +114,7 @@ public class EndpointsH2Repository implements EndpointsRepository {
         try (Connection con = MarsConnection.getConnection();
              PreparedStatement stmt = con.prepareStatement(SQL_GET_TRAVEL_ENDPOINTS)) {
             stmt.setString(1, user.getUsername());
-            stmt.setInt(2, user.getHomeAddressEndpoint());
+            stmt.setInt(2, user.getHomeEndpoint());
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     endpoints.add(getEndpoint(rs));

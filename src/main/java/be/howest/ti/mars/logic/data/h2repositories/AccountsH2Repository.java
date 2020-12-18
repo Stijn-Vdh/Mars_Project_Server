@@ -40,9 +40,9 @@ public class AccountsH2Repository implements AccountsRepository {
             stmt.setString(1, account.getUsername());
             stmt.setString(2, account.getPassword());
             stmt.setString(3, account.getAddress());
-            stmt.setInt(4, account.getHomeAddressEndpoint());
+            stmt.setInt(4, account.getHomeEndpoint());
             stmt.executeUpdate();
-            Repositories.getEndpointsRepo().turnEndpointPrivate(account.getHomeAddressEndpoint());
+            Repositories.getEndpointsRepo().turnEndpointPrivate(account.getHomeEndpoint());
         } catch (SQLException ex) {
             LOGGER.log(Level.WARNING, ex.getMessage(), ex);
             throw new DatabaseException("Cannot add account!");

@@ -2,11 +2,14 @@ package be.howest.ti.mars.logic.controller.accounts;
 
 import be.howest.ti.mars.logic.controller.MTTSController;
 import be.howest.ti.mars.logic.data.Repositories;
+import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 
 public class UserAccount extends BaseAccount {
     private static final String CHNL_TO_CLIENT_NOTIFICATION = "events.client.";
+    @JsonIgnore
     private boolean sharesLocation;
     private String displayName;
 
@@ -28,13 +31,14 @@ public class UserAccount extends BaseAccount {
         super(name);
     }
 
-   public void addPotentialFriend(UserAccount friend){
+    public void addPotentialFriend(UserAccount friend) {
         Repositories.getFriendsRepo().beFriend(getUsername(), friend.getUsername(), true);
-   }
-   public void removePotentialFriend(UserAccount friend){
-       Repositories.getFriendsRepo().removeFriend(getUsername(), friend.getUsername(), true);
+    }
 
-   }
+    public void removePotentialFriend(UserAccount friend) {
+        Repositories.getFriendsRepo().removeFriend(getUsername(), friend.getUsername(), true);
+
+    }
 
     public String getDisplayName() {
         return displayName;
@@ -78,6 +82,11 @@ public class UserAccount extends BaseAccount {
         }
     }
 
+    @JsonGetter("homeEndpoint")
+    public int getJacksonHomeEndpoint() {
+        return sharesLocation ? getHomeEndpoint() : -1;
+    }
+
     @Override
     public boolean equals(Object o) {  // sonar +__+
         return super.equals(o);
@@ -88,6 +97,7 @@ public class UserAccount extends BaseAccount {
         return super.hashCode();
     }
 
+    @JsonIgnore
     @Override
     public Object getAccountInformation() {
         return new MTTSController().getUserAccountInformation(this);
