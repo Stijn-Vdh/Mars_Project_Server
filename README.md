@@ -144,35 +144,35 @@ executes an sql script to populate the tables. Those sql files are also located 
 
 #### Database tables:
 
-* ##### Accounts  
+* **Accounts**  
 Contains account name, encrypted password, home address and home endpoint id
-* ##### Businesses  
+* **Businesses**  
 Contains business name, subscription id and pod usage counter
-* ##### Business_subscriptions  
+* **Business_subscriptions**  
 Contains the different business subscription data
-* ##### Deliveries  
+* **Deliveries**  
 Contains delivery information such as type, origin, destination, date and sender data
-* ##### Deliverytypes    
+* **Deliverytypes**    
 Contains small or large delivery type
-* ##### Endpoints  
+* **Endpoints**  
 Contains all endpoint data
-* ##### Favorite_endpoints  
+* **Favorite_endpoints**  
 Contains accountnames coupled with their favorited endpoints
-* ##### Friends  
+* **Friends**  
 Contains usernames and their friendnames
-* ##### Podtypes
+* **Podtypes**  
 Contains data about the different pod types
-* ##### Potential_friends
+* **Potential_friends**  
 Contains non confirmed friends data
-* ##### Reports  
+* **Reports**  
 Contains data from sent in reports including which section te report is about
-* ##### Report_sections  
+* **Report_sections**  
 Contains data per reporting section
-* ##### Travels  
+* **Travels**  
 Contains all travel data such as origin, destination, username, date, pod types and ETA
-* ##### Users  
+* **Users**  
 Contains all user data such as name, displayname, shareslocation and subscriptionid
-* ##### User_subscriptions
+* **User_subscriptions**  
 Contains the different user subscription data
 
 ***
