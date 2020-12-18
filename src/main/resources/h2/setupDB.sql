@@ -78,6 +78,7 @@ CREATE TABLE `report_sections`
 	`Name` VARCHAR(90) PRIMARY KEY
 );
 
+INSERT INTO report_sections VALUES ('Pod ordering / arrival');
 INSERT INTO report_sections VALUES ('Menu usage');
 INSERT INTO report_sections VALUES ('Account information');
 INSERT INTO report_sections VALUES ('Billing');

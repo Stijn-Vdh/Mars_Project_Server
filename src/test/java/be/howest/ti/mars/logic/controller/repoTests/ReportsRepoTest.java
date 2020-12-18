@@ -43,8 +43,7 @@ class ReportsRepoTest {
 
     @Test
     void getReportSections() {
-        assertEquals(4, Repositories.getReportsRepo().getReportSections().size());
-        System.out.println(Repositories.getReportsRepo().getReportSections());
+        assertEquals(5, Repositories.getReportsRepo().getReportSections().size());
     }
 
     @Test
