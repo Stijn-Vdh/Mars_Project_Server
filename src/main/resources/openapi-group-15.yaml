@@ -184,16 +184,16 @@ components:
              $ref: "#/components/schemas/BusinessSubscription"
            usage:
              $ref: "#/components/schemas/BusinessSubscriptionInfo"
-   friend:
-     description: information about the friend, homeEndpoint is -1 if the friend doesnt share his location
-     type: object
-     properties:
-       name:
-         type: string
-       displayName:
-         type: string
-       homeEndpoint:
-         type: integer
+    friend:
+      description: information about the friend, homeEndpoint is -1 if the friend doesnt share his location
+      type: object
+      properties:
+        name:
+          type: string
+        displayName:
+          type: string
+        homeEndpoint:
+          type: integer
 
 paths:
   /api/message:
