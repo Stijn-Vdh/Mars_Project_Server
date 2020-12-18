@@ -131,9 +131,7 @@ class MarsOpenApiBridge {
     public Object addFriend(RoutingContext ctx) {
         UserAccount user = getUserAccount(ctx);
         String friendName = ctx.request().getParam("fName");
-
-
-        return controller.addFriend(user, friendName);
+        return controller.addFriend(user, friendName, vertx);
     }
 
     public Object removeFriend(RoutingContext ctx) {
@@ -218,10 +216,10 @@ class MarsOpenApiBridge {
         int id = controller.travel(user, from, destination, podType);
         timer.schedule(wrap(() -> user.sendNotification(vertx, "TRAVEL_POD_ARRIVAL", new JsonObject().put("id", id))), getETA());
 
-        if (!friendName.isEmpty()){
+        if (!friendName.isEmpty()) {
             UserAccount friendAcc = controller.findUserByNameController(friendName);
-            if (friendAcc.isSharesLocation() && Repositories.getFriendsRepo().friendExists(friendName, user)){
-                friendAcc.sendNotification(vertx,"TRAVEL_TO_FRIEND", new JsonObject().put("userTravelingToYou", user.getDisplayName()));
+            if (friendAcc.isSharesLocation() && Repositories.getFriendsRepo().friendExists(friendName, user)) {
+                friendAcc.sendNotification(vertx, "TRAVEL_TO_FRIEND", new JsonObject().put("userTravelingToYou", user.getDisplayName()));
             }
         }
 
@@ -229,7 +227,6 @@ class MarsOpenApiBridge {
         travel.put("travelId", id);
         return travel;
     }
-
 
 
     public Object getTravelHistory(RoutingContext ctx) {
@@ -319,8 +316,8 @@ class MarsOpenApiBridge {
         timer.scheduleAtFixedRate(wrap(this::resetBusinessUsedPods), 0, RESET_PERIOD);
     }
 
-    public void addTestAccount(){
-        controller.createAccount("test",SecureHash.getHashEncoded("test"),"test",7,false);
+    public void addTestAccount() {
+        controller.createAccount("test", SecureHash.getHashEncoded("test"), "test", 7, false);
     }
 
 }

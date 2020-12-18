@@ -3,8 +3,6 @@ package be.howest.ti.mars.logic.controller.repoTests;
 import be.howest.ti.mars.logic.controller.MTTSController;
 import be.howest.ti.mars.logic.controller.accounts.BusinessAccount;
 import be.howest.ti.mars.logic.controller.accounts.UserAccount;
-import be.howest.ti.mars.logic.controller.exceptions.DatabaseException;
-import be.howest.ti.mars.logic.controller.exceptions.EntityNotFoundException;
 import be.howest.ti.mars.logic.controller.exceptions.UsernameException;
 import be.howest.ti.mars.logic.data.Repositories;
 import be.howest.ti.mars.logic.data.repositories.AccountsRepository;
@@ -14,7 +12,9 @@ import org.junit.jupiter.api.*;
 
 import java.sql.SQLException;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class FriendsRepoTest {
     private static final AccountsRepository accountRepo = Repositories.getAccountsRepo();
@@ -33,9 +33,9 @@ class FriendsRepoTest {
             e.printStackTrace();
         }
 
-        accountRepo.addUser(testDanny);
-        accountRepo.addUser(testDebby);
-        accountRepo.addBusiness(testPol);
+        controller.createAccount(testDanny.getUsername(), testDanny.getPassword(), testDanny.getAddress(), testDanny.getHomeAddressEndpoint(), false);
+        controller.createAccount(testDebby.getUsername(), testDebby.getPassword(), testDebby.getAddress(), testDebby.getHomeAddressEndpoint(), false);
+        controller.createAccount(testPol.getUsername(), testPol.getPassword(), testPol.getAddress(), testPol.getHomeAddressEndpoint(), false);
     }
 
     @AfterAll
@@ -48,7 +48,7 @@ class FriendsRepoTest {
     @Order(1)
     void beFriend() {
         assertEquals(0, friendRepo.getFriends(testDebby, false).size());
-        controller.addFriend(testDebby,"Danny");
+        controller.addFriend(testDebby, "Danny");
         assertEquals(1, friendRepo.getFriends(testDanny, true).size());
         assertEquals(1, friendRepo.getFriends(testDebby, false).size());
 
@@ -65,7 +65,7 @@ class FriendsRepoTest {
     void removeFriend() {
         assertEquals(1, friendRepo.getFriends(testDebby, false).size());
         assertEquals(1, friendRepo.getFriends(testDanny, false).size());
-        controller.removeFriend(testDebby,"Danny");
+        controller.removeFriend(testDebby, "Danny");
         assertEquals(0, friendRepo.getFriends(testDebby, false).size());
         assertEquals(0, friendRepo.getFriends(testDanny, false).size());
 
@@ -74,7 +74,7 @@ class FriendsRepoTest {
         assertEquals(1, friendRepo.getFriends(testDebby, true).size());
         controller.removeFriend(testDebby, "Danny");
 
-        assertThrows(UsernameException.class, ()->controller.removeFriend(testDanny, "Debby"));
+        assertThrows(UsernameException.class, () -> controller.removeFriend(testDanny, "Debby"));
 
     }
 }

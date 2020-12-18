@@ -28,13 +28,14 @@ public class UserAccount extends BaseAccount {
         super(name);
     }
 
-   public void addPotentialFriend(UserAccount friend){
+    public void addPotentialFriend(UserAccount friend) {
         Repositories.getFriendsRepo().beFriend(getUsername(), friend.getUsername(), true);
-   }
-   public void removePotentialFriend(UserAccount friend){
-       Repositories.getFriendsRepo().removeFriend(getUsername(), friend.getUsername(), true);
+    }
 
-   }
+    public void removePotentialFriend(UserAccount friend) {
+        Repositories.getFriendsRepo().removeFriend(getUsername(), friend.getUsername(), true);
+
+    }
 
     public String getDisplayName() {
         return displayName;
