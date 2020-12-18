@@ -2,6 +2,8 @@
 
 ###### This is the server of the Martian Travel Tube System
 
+[Back to documentation repo](https://git.ti.howest.be/TI/2020-2021/s3/project-ii/projects/groep-15/documentation)
+
 ## Table of Contents
 
 - [Introduction](#introduction)
@@ -56,7 +58,7 @@ We use an openAPI version(3.0.0). We use [this openAPI](https://git.ti.howest.be
 
 ### Using the API
 
-You can use tools like Postman or your browser (only for GET methods).
+You can use tools like [Postman](https://www.postman.com/) or your browser (only for GET methods).
 
 ## Description
 
@@ -138,9 +140,19 @@ section.
 The `MarsConnection` util class creates the H2 Database. It uses the [Singleton](https://en.wikipedia.org/wiki/Singleton_pattern) pattern so that only
 one instance of the class can exist. It has a static `Configure` method which creates the actual H2 database using the parameters and stores those
 inside the `MarsConnection` class. Further it has a static `getConnection` method which returns the current connection to the H2 Database.
-`Configure` also calls a private method which reads an sql file from the resources/h2 folder which initialize all the tables. The sql file contains all the
-sql to set up all the tables we use. It is in fifth normal form, and it has all the constraints to keep the database consistent (ACID). After database creation it 
-executes an sql script to populate the tables. Those sql files are also located in resources/h2 folder.
+`Configure` also calls a private method which reads an sql file from the resources/h2 folder which initialize all the tables in fifth normal form, and it has all the constraints to keep the database consistent (ACID). 
+After database creation the script **adds the following data to the database**:
+
+* User subscriptions
+* Business subs
+* Report sections
+* Delivery types
+* Pod types
+* Test account
+
+Then a separate script is ran **adding all the endpoints**.
+
+These scripts are located in the resources/h2 folder.
 
 #### Database tables:
 
@@ -177,4 +189,4 @@ Contains the different user subscription data
 
 ***
 
-Server readme written by Maarten Vercruysse and Daniel Vlaeminck
+*Written by Maarten Vercruysse and Daniel Vlaeminck*
