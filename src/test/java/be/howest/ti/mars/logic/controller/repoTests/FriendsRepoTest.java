@@ -33,9 +33,9 @@ class FriendsRepoTest {
             e.printStackTrace();
         }
 
-        controller.createAccount(testDanny.getUsername(), testDanny.getPassword(), testDanny.getAddress(), testDanny.getHomeAddressEndpoint(), false);
-        controller.createAccount(testDebby.getUsername(), testDebby.getPassword(), testDebby.getAddress(), testDebby.getHomeAddressEndpoint(), false);
-        controller.createAccount(testPol.getUsername(), testPol.getPassword(), testPol.getAddress(), testPol.getHomeAddressEndpoint(), false);
+        controller.createAccount(testDanny.getUsername(), testDanny.getPassword(), testDanny.getAddress(), testDanny.getHomeEndpoint(), false);
+        controller.createAccount(testDebby.getUsername(), testDebby.getPassword(), testDebby.getAddress(), testDebby.getHomeEndpoint(), false);
+        controller.createAccount(testPol.getUsername(), testPol.getPassword(), testPol.getAddress(), testPol.getHomeEndpoint(), false);
     }
 
     @AfterAll
