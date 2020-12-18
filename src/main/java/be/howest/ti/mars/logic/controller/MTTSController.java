@@ -10,6 +10,7 @@ import be.howest.ti.mars.logic.controller.exceptions.EndpointException;
 import be.howest.ti.mars.logic.controller.exceptions.MarsIllegalArgumentException;
 import be.howest.ti.mars.logic.controller.exceptions.UsernameException;
 import be.howest.ti.mars.logic.data.Repositories;
+import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 
 import java.util.LinkedList;
@@ -37,12 +38,17 @@ public class MTTSController extends AuthController {
         return Repositories.getDeliveriesRepo().addDelivery(new Delivery(0, deliveryType, Repositories.getEndpointsRepo().getShortEndpoint(from), Repositories.getEndpointsRepo().getShortEndpoint(destination), "", acc.getUsername()));
     }
 
-    public Object addFriend(UserAccount user, String friendName) {
-        UserAccount potentialFriend = findUserByName(friendName);
+    public void addFriend(UserAccount user, String friendName) {
+        addFriend(user, friendName, null);
+    }
+
+    public Object addFriend(UserAccount user, String friendName, Vertx vertx) {
+        UserAccount potentialFriend = findUserByNameController(friendName);
         if (friendValidation(user, friendName, false)) {
             if (Repositories.getFriendsRepo().getFriends(user, true).contains(potentialFriend)) {
                 user.removePotentialFriend(potentialFriend);
             } else {
+                if (vertx != null) potentialFriend.sendNotification(vertx, "FRIEND_REQUESTS", new JsonObject().put("from", user.getDisplayName()));
                 potentialFriend.addPotentialFriend(user);
             }
             user.addFriend(friendName);
