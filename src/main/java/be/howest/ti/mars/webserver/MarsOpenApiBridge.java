@@ -18,7 +18,6 @@ import io.vertx.ext.web.RoutingContext;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.stream.Collectors;
 
 class MarsOpenApiBridge {
     public static final String AUTHORIZATION_TOKEN_PREFIX = "Bearer ";
@@ -122,10 +121,7 @@ class MarsOpenApiBridge {
     }
 
     public Object viewFriends(RoutingContext ctx) {
-        return Repositories.getFriendsRepo().getFriends(getUserAccount(ctx), false)
-                .stream()
-                .map(UserAccount::getUsername)
-                .collect(Collectors.toUnmodifiableList());
+        return controller.getFriends(getUserAccount(ctx), false);
     }
 
     public Object addFriend(RoutingContext ctx) {
@@ -218,10 +214,10 @@ class MarsOpenApiBridge {
         int id = controller.travel(user, from, destination, podType);
         timer.schedule(wrap(() -> user.sendNotification(vertx, "TRAVEL_POD_ARRIVAL", new JsonObject().put("id", id))), getETA());
 
-        if (!friendName.isEmpty()){
+        if (!friendName.isEmpty()) {
             UserAccount friendAcc = controller.findUserByNameController(friendName);
-            if (friendAcc.isSharesLocation() && Repositories.getFriendsRepo().friendExists(friendName, user)){
-                friendAcc.sendNotification(vertx,"TRAVEL_TO_FRIEND", new JsonObject().put("userTravelingToYou", user.getDisplayName()));
+            if (friendAcc.isSharesLocation() && Repositories.getFriendsRepo().friendExists(friendName, user)) {
+                friendAcc.sendNotification(vertx, "TRAVEL_TO_FRIEND", new JsonObject().put("userTravelingToYou", user.getDisplayName()));
             }
         }
 
@@ -229,7 +225,6 @@ class MarsOpenApiBridge {
         travel.put("travelId", id);
         return travel;
     }
-
 
 
     public Object getTravelHistory(RoutingContext ctx) {
@@ -319,8 +314,8 @@ class MarsOpenApiBridge {
         timer.scheduleAtFixedRate(wrap(this::resetBusinessUsedPods), 0, RESET_PERIOD);
     }
 
-    public void addTestAccount(){
-        controller.createAccount("test",SecureHash.getHashEncoded("test"),"test",7,false);
+    public void addTestAccount() {
+        controller.createAccount("test", SecureHash.getHashEncoded("test"), "test", 7, false);
     }
 
 }

@@ -102,7 +102,7 @@ public class MTTSController extends AuthController {
         JsonObject accInformation = new JsonObject();
         accInformation.put("name", acc.getUsername());
         accInformation.put("homeAddress", acc.getAddress());
-        accInformation.put("homeEndpoint", acc.getHomeAddressEndpoint());
+        accInformation.put("homeEndpoint", acc.getHomeEndpoint());
         accInformation.put("favouriteEndpoints", Repositories.getFavoritesRepo().getFavoriteEndpoints(acc));
         return accInformation;
     }
@@ -112,7 +112,7 @@ public class MTTSController extends AuthController {
         accInformation.put("displayName", account.getDisplayName());
         accInformation.put("shareLocation", account.isSharesLocation());
         accInformation.put("subscription", Repositories.getSubscriptionRepo().getUserSubscription(account));
-        accInformation.put("friends", Repositories.getFriendsRepo().getFriends(account, false).stream().map(UserAccount::getUsername).collect(Collectors.toList()));
+        accInformation.put("friends", getFriends(account, false));
         accInformation.put("potentialFriends", Repositories.getFriendsRepo().getFriends(account, true).stream().map(UserAccount::getUsername).collect(Collectors.toList()));
         accInformation.put("travelHistory", Repositories.getTravelsRepo().getTravelHistory(account));
         return accInformation;
@@ -156,7 +156,11 @@ public class MTTSController extends AuthController {
 
     public Set<UserAccount> getUsersWhoLiveAt(int id) {
         return userAccounts.stream()
-                .filter(acc -> acc.getHomeAddressEndpoint() == id)
+                .filter(acc -> acc.getHomeEndpoint() == id)
                 .collect(Collectors.toSet());
+    }
+
+    public Set<UserAccount> getFriends(UserAccount account, boolean potentialFriends) {
+        return Repositories.getFriendsRepo().getFriends(account, potentialFriends);
     }
 }
