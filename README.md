@@ -189,4 +189,4 @@ Contains the different user subscription data
 
 ***
 
-Server readme written by Maarten Vercruysse and Daniel Vlaeminck
+*Written by Maarten Vercruysse and Daniel Vlaeminck*
