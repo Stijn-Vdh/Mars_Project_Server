@@ -140,8 +140,8 @@ section.
 The `MarsConnection` util class creates the H2 Database. It uses the [Singleton](https://en.wikipedia.org/wiki/Singleton_pattern) pattern so that only
 one instance of the class can exist. It has a static `Configure` method which creates the actual H2 database using the parameters and stores those
 inside the `MarsConnection` class. Further it has a static `getConnection` method which returns the current connection to the H2 Database.
-`Configure` also calls a private method which reads an sql file from the resources/h2 folder which initialize all the tables in fifth normal form, and it has all the constraints to keep the database consistent (ACID). After database creation it 
-This script then **adds the following data to the database**:
+`Configure` also calls a private method which reads an sql file from the resources/h2 folder which initialize all the tables in fifth normal form, and it has all the constraints to keep the database consistent (ACID). 
+After database creation the script **adds the following data to the database**:
 
 * User subscriptions
 * Business subs
