@@ -16,7 +16,7 @@ CREATE TABLE user_subscriptions
 	name              varchar(50),
 	unlimitedTravels  boolean DEFAULT FALSE,
 	unlimitedPackages boolean DEFAULT FALSE,
-	price             DECIMAL(2, 1)
+	price             int
 );
 
 INSERT INTO user_subscriptions VALUES (default, 'No subscription', FALSE, FALSE, 0);
