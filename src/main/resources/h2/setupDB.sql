@@ -20,9 +20,9 @@ CREATE TABLE user_subscriptions
 );
 
 INSERT INTO user_subscriptions VALUES (default, 'No subscription', FALSE, FALSE, 0);
-INSERT INTO user_subscriptions VALUES (default, 'Martian Transport', TRUE, FALSE, 1.3);
-INSERT INTO user_subscriptions VALUES (default, 'Package Transport', FALSE, TRUE, 0.5);
-INSERT INTO user_subscriptions VALUES (default, 'Combined Transport', TRUE, TRUE, 1.6);
+INSERT INTO user_subscriptions VALUES (default, 'Martian Transport', TRUE, FALSE, 40);
+INSERT INTO user_subscriptions VALUES (default, 'Package Transport', FALSE, TRUE, 15);
+INSERT INTO user_subscriptions VALUES (default, 'Combined Transport', TRUE, TRUE, 50);
 
 
 CREATE TABLE business_subscriptions
@@ -37,9 +37,9 @@ CREATE TABLE business_subscriptions
 );
 
 INSERT INTO business_subscriptions VALUES (DEFAULT, 'No business subscription', 0, 0, 0, 0, 0);
-INSERT INTO business_subscriptions VALUES (DEFAULT, 'Start-up Business', 300, 3, 0, 0, 194);
-INSERT INTO business_subscriptions VALUES (DEFAULT, 'Professional Business', 500, 10, 2, 1, 290);
-INSERT INTO business_subscriptions VALUES (DEFAULT, 'Enterprise Business', 2500, 50, 5, 2, 1449);
+INSERT INTO business_subscriptions VALUES (DEFAULT, 'Start-up Business', 300, 3, 0, 0, 5160);
+INSERT INTO business_subscriptions VALUES (DEFAULT, 'Professional Business', 500, 10, 2, 1, 8700);
+INSERT INTO business_subscriptions VALUES (DEFAULT, 'Enterprise Business', 2500, 50, 5, 2, 34470);
 INSERT INTO business_subscriptions VALUES (DEFAULT, 'Custom business', -1, -1, -1, -1, -1);
 
 
