@@ -115,7 +115,7 @@ public class WebServer extends AbstractVerticle {
 
     private void listen(Promise<Void> promise, AsyncResult<HttpServer> result) {
         if (result.succeeded()) {
-            LOGGER.severe(() -> String.format("Listening at port %d", result.result().actualPort()));
+            LOGGER.info(() -> String.format("Listening at port %d", result.result().actualPort()));
             promise.complete();
         } else {
             LOGGER.log(Level.SEVERE, "Web server failed to start listening", result.cause());
