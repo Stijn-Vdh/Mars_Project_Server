@@ -145,7 +145,7 @@ CREATE TABLE deliveries -- thinking of keeping a column called travelTime (how l
 	FOREIGN KEY (destination) REFERENCES endpoints (id),
 	FOREIGN KEY (sender) REFERENCES accounts (name),
 	CHECK (`from` <> destination),                                         -- doesnt allow you to send to the location you are sending from
-	CHECK (deliveryType = 'small' OR sender IN (SELECT * FROM businesses)) -- doesnt allow users to send big packages
+	CHECK (deliveryType = 'small' OR sender IN (SELECT name FROM businesses)) -- doesnt allow users to send big packages
 );
 
 CREATE TABLE podTypes
