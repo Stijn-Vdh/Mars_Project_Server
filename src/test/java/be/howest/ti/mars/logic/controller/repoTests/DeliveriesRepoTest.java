@@ -1,6 +1,6 @@
 package be.howest.ti.mars.logic.controller.repoTests;
 
-import be.howest.ti.mars.logic.controller.Delivery;
+import be.howest.ti.mars.logic.controller.converters.Delivery;
 import be.howest.ti.mars.logic.controller.MTTSController;
 import be.howest.ti.mars.logic.controller.accounts.BusinessAccount;
 import be.howest.ti.mars.logic.controller.accounts.UserAccount;

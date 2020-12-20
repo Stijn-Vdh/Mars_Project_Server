@@ -23,7 +23,6 @@ import static io.vertx.core.json.impl.JsonUtil.BASE64_DECODER;
 class MarsOpenApiBridge {
     public static final String AUTHORIZATION_TOKEN_PREFIX = "Bearer ";
     public static final String DESTINATION = "destination";
-    private static final String TOKEN = "token";
     private static final Random rand = new Random();
     private static final Timer timer = new Timer();
     private static final long RESET_PERIOD = 1000L * 60L * 60L * 24L;

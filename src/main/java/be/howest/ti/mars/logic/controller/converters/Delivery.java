@@ -1,4 +1,4 @@
-package be.howest.ti.mars.logic.controller;
+package be.howest.ti.mars.logic.controller.converters;
 
 import be.howest.ti.mars.logic.controller.converters.ShortEndpoint;
 import be.howest.ti.mars.logic.controller.enums.DeliveryType;

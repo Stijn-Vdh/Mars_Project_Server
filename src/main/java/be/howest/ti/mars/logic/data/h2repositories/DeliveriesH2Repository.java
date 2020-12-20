@@ -1,6 +1,6 @@
 package be.howest.ti.mars.logic.data.h2repositories;
 
-import be.howest.ti.mars.logic.controller.Delivery;
+import be.howest.ti.mars.logic.controller.converters.Delivery;
 import be.howest.ti.mars.logic.controller.accounts.BaseAccount;
 import be.howest.ti.mars.logic.controller.accounts.BusinessAccount;
 import be.howest.ti.mars.logic.controller.enums.DeliveryType;
