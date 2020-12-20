@@ -44,14 +44,14 @@ public class MTTSController extends AuthController {
 
     public Object addFriend(UserAccount user, String friendName, Vertx vertx) {
         UserAccount potentialFriend = findUserByNameController(friendName);
-        if (friendValidation(user, friendName, false)) {
+        if (friendValidation(user, potentialFriend, false)) {
             if (Repositories.getFriendsRepo().getFriends(user, true).contains(potentialFriend)) {
                 user.removePotentialFriend(potentialFriend);
             } else {
                 if (vertx != null) potentialFriend.sendNotification(vertx, "FRIEND_REQUESTS", new JsonObject().put("from", user.getDisplayName()));
                 potentialFriend.addPotentialFriend(user);
             }
-            user.addFriend(friendName);
+            user.addFriend(potentialFriend.getUsername());
         } else {
             throw new UsernameException("Could not add a friend with the given username or you are already friends with this person.");
         }
@@ -71,8 +71,7 @@ public class MTTSController extends AuthController {
     }
 
 
-    private boolean friendValidation(UserAccount acc, String friendName, boolean notFriended) { // cant friend yourself or companies or someone that you already (un)friended
-        UserAccount friend = findUserByName(friendName);
+    private boolean friendValidation(UserAccount acc, UserAccount friend, boolean notFriended) { // cant friend yourself or companies or someone that you already (un)friended
         boolean exists = Repositories.getAccountsRepo().getUserAccounts().contains(friend);
         boolean notYourself = !acc.equals(friend);
         boolean isFriend = Repositories.getFriendsRepo().getFriends(acc, false).contains(friend);
@@ -81,12 +80,12 @@ public class MTTSController extends AuthController {
     }
 
     public Object removeFriend(UserAccount user, String friendName) {
-        UserAccount friend = findUserByName(friendName);
-        if (friendValidation(user, friendName, true)) {
+        UserAccount friend = findUserByName(friendName); // not a problem since, i dont need the token
+        if (friendValidation(user, friend, true)) {
             if (Repositories.getFriendsRepo().getFriends(user, true).contains(friend)) {
                 user.removePotentialFriend(friend);
             } else {
-                user.removeFriend(friendName);
+                user.removeFriend(friend.getUsername());
             }
             friend.removeFriend(user.getUsername());
 
