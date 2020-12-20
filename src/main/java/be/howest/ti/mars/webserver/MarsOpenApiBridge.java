@@ -11,13 +11,14 @@ import be.howest.ti.mars.logic.controller.security.SecureHash;
 import be.howest.ti.mars.logic.data.Repositories;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpHeaders;
-import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import static io.vertx.core.json.impl.JsonUtil.BASE64_DECODER;
 
 class MarsOpenApiBridge {
     public static final String AUTHORIZATION_TOKEN_PREFIX = "Bearer ";
@@ -279,18 +280,17 @@ class MarsOpenApiBridge {
     }
 
     private UserAccount getUserAccount(RoutingContext ctx) {
-        AccountToken accountToken = Json.decodeValue(new JsonObject().put(TOKEN, getBearerToken(ctx)).toString(), AccountToken.class);
-
+        AccountToken token = new AccountToken(BASE64_DECODER.decode(getBearerToken(ctx)));
         return controller.getUserAccounts().stream()
-                .filter(acc -> accountToken.equals(acc.getAccountToken()))
+                .filter(acc -> token.equals(acc.getAccountToken()))
                 .findAny()
                 .orElse(null);
     }
 
     private BusinessAccount getBusinessAccount(RoutingContext ctx) {
-        AccountToken accountToken = Json.decodeValue(new JsonObject().put(TOKEN, getBearerToken(ctx)).toString(), AccountToken.class);
+        AccountToken token = new AccountToken(BASE64_DECODER.decode(getBearerToken(ctx)));
         return controller.getBusinessAccounts().stream()
-                .filter(acc -> accountToken.equals(acc.getAccountToken()))
+                .filter(acc -> token.equals(acc.getAccountToken()))
                 .findAny()
                 .orElse(null);
     }
