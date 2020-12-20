@@ -27,10 +27,10 @@ public class MTTSController extends AuthController {
 
     public int sendPackage(DeliveryType deliveryType, int from, int destination, BaseAccount acc, boolean userAcc) {
         if (from == destination) {
-            throw new AuthenticationException("!You cannot use the same endpoint as destination and from!");
+            throw new AuthenticationException("You cannot use the same endpoint as destination and from!");
         }
         if (deliveryType == DeliveryType.LARGE && userAcc) {
-            throw new AuthenticationException("!Only businesses can send large package pods!");
+            throw new AuthenticationException("Only businesses can send large package pods!");
         }
         if (!userAcc) {
             Repositories.getSubscriptionRepo().updateBusinessSubscription(deliveryType.equals(DeliveryType.LARGE), (BusinessAccount) acc);
@@ -55,7 +55,7 @@ public class MTTSController extends AuthController {
         } else {
             throw new UsernameException("Could not add a friend with the given username or you are already friends with this person.");
         }
-        return "You just added a friend called:" + friendName;
+        return "You just added a friend called " + potentialFriend.getDisplayName();
     }
 
     public UserAccount findUserByName(String friendName) {
@@ -93,7 +93,7 @@ public class MTTSController extends AuthController {
         } else {
             throw new UsernameException("Could not remove a friend with the given username");
         }
-        return "You just removed a friend called:" + friendName;
+        return "You just removed a friend called " + friend.getDisplayName();
     }
 
     public void favoriteEndpoint(BaseAccount acc, int id) {
