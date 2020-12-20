@@ -75,10 +75,10 @@ class MarsOpenApiBridge {
         int dest = json.getInteger(DESTINATION);
 
         if (isUser && DeliveryType.enumOf(json.getString("deliveryType")) == DeliveryType.LARGE) {
-            throw new MarsIllegalArgumentException("!Only businesses can send large package pods!");
+            throw new MarsIllegalArgumentException("Only businesses can send large package pods!");
         }
         if (json.getInteger("from").equals(json.getInteger(DESTINATION))) {
-            throw new MarsIllegalArgumentException("!You cannot use the same endpoint as destination and from!");
+            throw new MarsIllegalArgumentException("You cannot use the same endpoint as destination and from!");
         }
         int id = controller.sendPackage(DeliveryType.enumOf(json.getString("deliveryType")),
                 json.getInteger("from"),
@@ -234,7 +234,7 @@ class MarsOpenApiBridge {
         int id = Integer.parseInt(ctx.request().getParam("id"));
         controller.cancelTrip(getUserAccount(ctx), id);
 
-        return "Successfully canceled trip: " + id;
+        return "Successfully canceled your trip.";
     }
 
     public Object setDisplayName(RoutingContext ctx) {
