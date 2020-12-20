@@ -1,6 +1,5 @@
 package be.howest.ti.mars.logic.controller.converters;
 
-import be.howest.ti.mars.logic.controller.converters.ShortEndpoint;
 import be.howest.ti.mars.logic.controller.enums.PodType;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -44,7 +43,9 @@ public class Travel {
         return dateTime;
     }
 
-    public int getArrivalTime(){return arrivalTime;}
+    public int getArrivalTime() {
+        return arrivalTime;
+    }
 
     @Override
     public String toString() {

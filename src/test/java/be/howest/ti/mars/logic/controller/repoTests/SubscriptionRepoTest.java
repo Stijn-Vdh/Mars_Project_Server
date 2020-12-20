@@ -92,8 +92,10 @@ public class SubscriptionRepoTest {
     @Test
     void resetPods(){
         assertDoesNotThrow(() -> Repositories.getSubscriptionRepo().resetPods(testPol));
-
-
+        Repositories.getSubscriptionRepo().updateBusinessSubscription(true, testPol);
+        assertEquals(1, Repositories.getSubscriptionRepo().getBusinessSubscriptionInfo(testPol).getLargePodsUsed());
+        Repositories.getSubscriptionRepo().resetPods(testPol);
+        assertEquals(0, Repositories.getSubscriptionRepo().getBusinessSubscriptionInfo(testPol).getLargePodsUsed());
     }
 
 }
