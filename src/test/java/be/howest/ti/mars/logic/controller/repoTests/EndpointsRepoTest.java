@@ -9,9 +9,10 @@ import be.howest.ti.mars.logic.data.util.MarsConnection;
 import org.junit.jupiter.api.*;
 
 import java.sql.SQLException;
+import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
+
 @TestMethodOrder(MethodOrderer.Alphanumeric.class)
 public class EndpointsRepoTest {
 
@@ -39,20 +40,34 @@ public class EndpointsRepoTest {
         MarsConnection.getInstance().cleanUp();
     }
 
-    @Test
-    void addEndpoint_1(){
-       int totalEndpoints = Repositories.getEndpointsRepo().getEndpoints().size();
-       Repositories.getEndpointsRepo().addEndpoint("Brugge");
-       assertEquals(totalEndpoints + 1,Repositories.getEndpointsRepo().getEndpoints().size());
 
-       assertThrows(MarsIllegalArgumentException.class, ()-> Repositories.getEndpointsRepo().addEndpoint("Brugge"));
+    @Test
+    void addEndpoint_1() {
+        AtomicInteger totalEndpoints = new AtomicInteger();
+        assertDoesNotThrow(() -> totalEndpoints.set(Repositories.getEndpointsRepo().getEndpoints().size()));
+        assertDoesNotThrow(() -> Repositories.getEndpointsRepo().addEndpoint("Brugge"));
+        assertEquals(totalEndpoints.get() + 1, Repositories.getEndpointsRepo().getEndpoints().size());
+
+        assertThrows(MarsIllegalArgumentException.class, () -> Repositories.getEndpointsRepo().addEndpoint("Brugge"));
     }
 
     @Test
-    void getEndpoint_2(){
-        int totalEndpoints = Repositories.getEndpointsRepo().getEndpoints().size();
-        assertThrows(EndpointException.class, ()-> Repositories.getEndpointsRepo().getEndpoint(159753));
-        assertEquals("Brugge",Repositories.getEndpointsRepo().getEndpoint(totalEndpoints).getName());
+    void getEndpoint_2() {
+        AtomicInteger totalEndpoints = new AtomicInteger();
+        assertDoesNotThrow(() -> totalEndpoints.set(Repositories.getEndpointsRepo().getEndpoints().size()));
+        assertThrows(EndpointException.class, () -> Repositories.getEndpointsRepo().getEndpoint(159753));
+        assertEquals("Brugge", Repositories.getEndpointsRepo().getEndpoint(totalEndpoints.get()).getName());
     }
+
+    @Test
+    void getTravelEndpoints_3() { //total - private endpoints that arent yours or endpoints of ppl who are you not friends with that share your location
+        assertEquals(103 - 2, Repositories.getEndpointsRepo().getTravelEndpoints(testDanny).size());
+    }
+
+    @Test
+    void getPackageEndpoints_4(){ // the amount of private endpoints, can only send packages to private endpoints
+        assertEquals(3, Repositories.getEndpointsRepo().getPackageEndpoints().size());
+    }
+
 
 }
