@@ -33,11 +33,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(VertxExtension.class)
-public class BridgeTest {
+public class FullServerWideTest { // Here I test the whole server, including all exceptions that should be thrown
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
-    private static final Logger LOGGER = Logger.getLogger(BridgeTest.class.getName());
-    // i wrote my own chain method so that i could launch requests sync using these async methods
+    private static final Logger LOGGER = Logger.getLogger(FullServerWideTest.class.getName());
+
     // keys
     private static final String NAME = "name";
     private static final String DESTINATION = "destination";
@@ -314,6 +314,7 @@ public class BridgeTest {
         testContext.completeNow();
     }
 
+    // I wrote my own chain method so that i could launch requests sync using these async methods
     private void chain(final VertxTestContext testContext, HttpMethod method, String requestURI, String authorizationHeader,
                        int expectedStatusCode, Predicate<String> isExpectedBody, Runnable runnable
     ) {
