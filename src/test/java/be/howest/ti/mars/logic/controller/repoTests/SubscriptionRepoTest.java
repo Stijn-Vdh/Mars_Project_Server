@@ -1,9 +1,7 @@
 package be.howest.ti.mars.logic.controller.repoTests;
 
-import be.howest.ti.mars.logic.controller.MTTSController;
 import be.howest.ti.mars.logic.controller.accounts.BusinessAccount;
 import be.howest.ti.mars.logic.controller.accounts.UserAccount;
-import be.howest.ti.mars.logic.controller.exceptions.DatabaseException;
 import be.howest.ti.mars.logic.controller.exceptions.EntityNotFoundException;
 import be.howest.ti.mars.logic.controller.subscription.BusinessSubscription;
 import be.howest.ti.mars.logic.controller.subscription.UserSubscription;
@@ -18,12 +16,10 @@ import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class SubscriptionRepoTest {
     private static final AccountsRepository accountRepo = Repositories.getAccountsRepo();
-    private static final MTTSController controller = new MTTSController();
     private static final UserAccount testDanny = new UserAccount("Danny", "Danny", 5, "MarsStreet 69");
     private static final UserAccount testDebby = new UserAccount("Debby", "Debby", 3, "WestStreet 420");
     private static final BusinessAccount testPol = new BusinessAccount("Pol", "Pol", 6, "Earthstreet 23");
@@ -48,49 +44,56 @@ public class SubscriptionRepoTest {
     }
 
     @Test
-    void getUserSubscriptions(){
+    void getUserSubscriptions() {
         assertEquals(4, Repositories.getSubscriptionRepo().getUserSubscriptions().size());
     }
 
     @Test
-    void getBusinessSubscriptions(){
+    void getBusinessSubscriptions() {
+        assertDoesNotThrow(() -> Repositories.getSubscriptionRepo().getUserSubscription(testDanny));
         assertEquals(5, Repositories.getSubscriptionRepo().getBusinessSubscriptions().size());
     }
 
     @Test
-    void setUserSub(){
-        Repositories.getSubscriptionRepo().setUserSubscription(testDanny, 1);
+    void setUserSub() {
+        assertDoesNotThrow(() -> Repositories.getSubscriptionRepo().setUserSubscription(testDanny, 1));
         assertEquals(1, Repositories.getSubscriptionRepo().getUserSubscription(testDanny).getId());
-
-        assertThrows(EntityNotFoundException.class, ()-> Repositories.getSubscriptionRepo().setUserSubscription(testDebby, 6));
+        assertThrows(EntityNotFoundException.class, () -> Repositories.getSubscriptionRepo().setUserSubscription(testDebby, 6));
     }
 
     @Test
-    void setBusinessSub(){
-        Repositories.getSubscriptionRepo().setBusinessSubscription(testPol, 1);
+    void setBusinessSub() {
+        assertDoesNotThrow(() -> Repositories.getSubscriptionRepo().setBusinessSubscription(testPol, 1));
         assertEquals(1, Repositories.getSubscriptionRepo().getBusinessSubscription(testPol).getId());
+        assertThrows(EntityNotFoundException.class, () -> Repositories.getSubscriptionRepo().setBusinessSubscription(testPol, -1));
 
-        assertThrows(EntityNotFoundException.class, ()-> Repositories.getSubscriptionRepo().setBusinessSubscription(testPol, -1));
     }
 
     @Test
-    void getUserSub(){
+    void getUserSub() {
         List<UserSubscription> subscriptions = new LinkedList<>(Repositories.getSubscriptionRepo().getUserSubscriptions());
         String firstSubName = subscriptions.get(1).getName();
         int firstSubId = subscriptions.get(1).getId();
-
+        assertDoesNotThrow(() -> Repositories.getSubscriptionRepo().getUserSubscriptions());
         assertEquals(firstSubName, Repositories.getSubscriptionRepo().getUserSubscription(testDanny).getName());
         assertEquals(firstSubId, Repositories.getSubscriptionRepo().getUserSubscription(testDanny).getId());
     }
 
     @Test
-    void getBusinessSub(){
+    void getBusinessSub() {
         List<BusinessSubscription> subscriptions = new LinkedList<>(Repositories.getSubscriptionRepo().getBusinessSubscriptions());
         String firstSubName = subscriptions.get(1).getName();
         int firstSubId = subscriptions.get(1).getId();
-
+        assertDoesNotThrow(() -> Repositories.getSubscriptionRepo().getBusinessSubscriptions());
         assertEquals(firstSubName, Repositories.getSubscriptionRepo().getBusinessSubscription(testPol).getName());
         assertEquals(firstSubId, Repositories.getSubscriptionRepo().getBusinessSubscription(testPol).getId());
+    }
+
+    @Test
+    void resetPods(){
+        assertDoesNotThrow(() -> Repositories.getSubscriptionRepo().resetPods(testPol));
+
+
     }
 
 }
