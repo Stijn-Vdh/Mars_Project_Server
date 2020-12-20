@@ -3,8 +3,8 @@ package be.howest.ti.mars.logic.controller.converters;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class ShortEndpoint { //package could ve better name, these classes are just used for translating from db to json
-    private final int id; //temp class
+public class ShortEndpoint {
+    private final int id;
     private final String name;
 
     @JsonCreator

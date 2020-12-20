@@ -1,6 +1,8 @@
 package be.howest.ti.mars.logic.controller;
 
+import be.howest.ti.mars.logic.controller.converters.Endpoint;
 import be.howest.ti.mars.logic.controller.converters.ShortEndpoint;
+import be.howest.ti.mars.logic.controller.converters.Travel;
 import be.howest.ti.mars.logic.controller.subscription.BusinessSubscription;
 import be.howest.ti.mars.logic.controller.subscription.BusinessSubscriptionInfo;
 import be.howest.ti.mars.logic.controller.subscription.UserSubscription;

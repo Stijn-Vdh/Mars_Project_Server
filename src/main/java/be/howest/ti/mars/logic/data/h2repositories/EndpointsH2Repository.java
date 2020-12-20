@@ -1,7 +1,7 @@
 package be.howest.ti.mars.logic.data.h2repositories;
 
-import be.howest.ti.mars.logic.controller.Coordinate;
-import be.howest.ti.mars.logic.controller.Endpoint;
+import be.howest.ti.mars.logic.controller.converters.Coordinate;
+import be.howest.ti.mars.logic.controller.converters.Endpoint;
 import be.howest.ti.mars.logic.controller.accounts.UserAccount;
 import be.howest.ti.mars.logic.controller.converters.ShortEndpoint;
 import be.howest.ti.mars.logic.controller.exceptions.DatabaseException;

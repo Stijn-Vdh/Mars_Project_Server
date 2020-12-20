@@ -1,6 +1,6 @@
 package be.howest.ti.mars.logic.data.h2repositories;
 
-import be.howest.ti.mars.logic.controller.Travel;
+import be.howest.ti.mars.logic.controller.converters.Travel;
 import be.howest.ti.mars.logic.controller.accounts.UserAccount;
 import be.howest.ti.mars.logic.controller.enums.PodType;
 import be.howest.ti.mars.logic.controller.exceptions.DatabaseException;

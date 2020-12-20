@@ -1,8 +1,7 @@
 package be.howest.ti.mars.logic.data.repositories;
 
-import be.howest.ti.mars.logic.controller.Endpoint;
+import be.howest.ti.mars.logic.controller.converters.Endpoint;
 import be.howest.ti.mars.logic.controller.accounts.UserAccount;
-import be.howest.ti.mars.logic.controller.converters.CoordinateEndpoint;
 import be.howest.ti.mars.logic.controller.converters.ShortEndpoint;
 
 import java.util.Set;

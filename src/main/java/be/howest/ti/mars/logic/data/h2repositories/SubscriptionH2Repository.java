@@ -30,7 +30,7 @@ public class SubscriptionH2Repository implements SubscriptionRepository {
     private static final String SQL_SELECT_BUSINESS_SUBSCRIPTION_INFO = "SELECT bs.ID, bs.NAME, b.LARGEPODSUSED, b.SMALLPODSUSED FROM businesses b JOIN business_subscriptions bs ON bs.id = b.subscriptionid WHERE b.name = ?";
     private static final String SQL_UPDATE_USER_SUBSCRIPTION = "UPDATE users SET subscriptionid = ? WHERE name = ?";
     private static final String SQL_UPDATE_BUSINESS_SUBSCRIPTION = "UPDATE businesses SET subscriptionid = ? WHERE name = ?";
-    private static final String SQL_UPDATE_BUSINESS_SUBSCRIPTION_INFO = "UPDATE businesses SET LARGEPODSUSED = ? AND SMALLPODSUSED = ? WHERE name = ?";
+    private static final String SQL_UPDATE_BUSINESS_SUBSCRIPTION_INFO = "UPDATE businesses SET LARGEPODSUSED = ?, SMALLPODSUSED = ? WHERE name = ?";
     private static final String SQL_UPDATE_BUSINESS_SUBSCRIPTION_INFO_SMALL = "UPDATE businesses SET SMALLPODSUSED = ? WHERE name = ?";
     private static final String SQL_UPDATE_BUSINESS_SUBSCRIPTION_INFO_LARGE = "UPDATE businesses SET LARGEPODSUSED = ? WHERE name = ?";
 
@@ -187,7 +187,7 @@ public class SubscriptionH2Repository implements SubscriptionRepository {
         boolean unlimitedTravels = rs.getBoolean("unlimitedTravels");
         boolean unlimitedPackages = rs.getBoolean("unlimitedPackages");
         float price = rs.getFloat("price");
-        return new UserSubscription(id, name, unlimitedTravels, unlimitedPackages,price);
+        return new UserSubscription(id, name, unlimitedTravels, unlimitedPackages, price);
     }
 
     private BusinessSubscription getBusinessSubscription(ResultSet rs) throws SQLException {
@@ -212,9 +212,9 @@ public class SubscriptionH2Repository implements SubscriptionRepository {
     public void resetPods(BusinessAccount acc) {
         try (Connection con = MarsConnection.getConnection();
              PreparedStatement stmt = con.prepareStatement(SQL_UPDATE_BUSINESS_SUBSCRIPTION_INFO)) {
-            stmt.setString(1, acc.getUsername());
+            stmt.setInt(1, 0);
             stmt.setInt(2, 0);
-            stmt.setInt(3, 0);
+            stmt.setString(3, acc.getUsername());
             stmt.executeUpdate();
         } catch (SQLException ex) {
             LOGGER.log(Level.WARNING, ex.getMessage(), ex);
